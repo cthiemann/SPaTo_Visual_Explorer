@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
+<plist version="0.9">
+  <dict>
+    
+    <key>CFBundleIdentifier</key>
+    <string>net.spato.SPaTo-Visual-Explorer</string>
+    <key>CFBundleName</key>
+    <string>SPaTo Visual Explorer</string>
+    <key>CFBundleVersion</key>
+    <string>1.0.5_12</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.2.3_04</string>
+    <key>CFBundleExecutable</key>
+    <string>ApplicationUpdateWrapper</string>
+    <key>CFBundleIconFile</key>
+    <string>spato.icns</string>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>English</string>
+    <key>CFBundleAllowMixedLocalizations</key>
+    <string>true</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleSignature</key>
+    <string>????</string>
+
+    <key>LSArchitecturePriority</key>
+    <array>
+      <string>x86_64</string>
+      <string>i386</string>
+    </array>
+    
+    <key>Java</key>
+    <dict>
+      <key>MainClass</key>
+      <string>SPaTo_Visual_Explorer</string>
+      <key>JVMVersion</key>
+      <string>1.5+</string>
+      <key>ClassPath</key>
+      <string>$JAVAROOT/SPaTo_Visual_Explorer.jar:$JAVAROOT/core.jar:$JAVAROOT/itext.jar:$JAVAROOT/jna.jar:$JAVAROOT/jnmatlib.jar:$JAVAROOT/pdf.jar:$JAVAROOT/tGUI.jar:$JAVAROOT/xhtmlrenderer.jar</string>
+      <key>Properties</key>
+      <dict>
+        <key>spato.app-dir</key>
+        <string>$APP_PACKAGE</string>
+        <key>apple.awt.graphics.UseQuartz</key>
+        <string>true</string>
+        <key>apple.awt.use-file-dialog-packages</key>
+        <string>true</string>
+      </dict>
+      <key>VMOptions</key>
+      <string>-Xmx1024m</string>
+    </dict>
+    
+    <key>CFBundleDocumentTypes</key>
+    <array>
+      <dict>
+        <key>CFBundleTypeName</key>
+        <string>SPaTo Document</string>
+        <key>CFBundleTypeIconFile</key>
+        <string>spato-document.icns</string>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>LSItemContentTypes</key>
+        <array>
+          <string>net.spato.document</string>
+        </array>
+      </dict>
+      <dict>
+        <key>CFBundleTypeName</key>
+        <string>SPaTo Document (uncompressed)</string>
+        <key>CFBundleTypeIconFile</key>
+        <string>spato-document-uncompressed.icns</string>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>LSItemContentTypes</key>
+        <array>
+          <string>net.spato.document.uncompressed</string>
+        </array>
+      </dict>
+      <dict>
+        <key>CFBundleTypeName</key>
+        <string>SPaTo Workspace</string>
+        <key>CFBundleTypeIconFile</key>
+        <string>spato-workspace.icns</string>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>LSItemContentTypes</key>
+        <array>
+          <string>net.spato.workspace</string>
+        </array>
+      </dict>
+    </array>
+
+    <key>UTExportedTypeDeclarations</key>
+    <array>
+      <dict>
+        <key>UTTypeIdentifier</key>
+        <string>net.spato.document</string>
+        <key>UTTypeReferenceURL</key>
+        <string>http://www.spato.net/wiki/SPaTo_Document_Format</string>
+        <key>UTTypeDescription</key>
+        <string>SPaTo Document</string>
+        <key>UTTypeIconFile</key>
+        <string>sketch.incs</string>
+        <key>UTTypeConformsTo</key>
+        <array>
+          <string>public.content</string>
+          <string>com.pkware.zip-archive</string>
+        </array>
+        <key>UTTypeTagSpecification</key>
+        <dict>
+          <key>public.filename-extension</key>
+          <string>spato</string>
+        </dict>
+      </dict>
+      <dict>
+        <key>UTTypeIdentifier</key>
+        <string>net.spato.document.uncompressed</string>
+        <key>UTTypeReferenceURL</key>
+        <string>http://www.spato.net/wiki/SPaTo_Document_Format</string>
+        <key>UTTypeDescription</key>
+        <string>SPaTo Document (uncompressed)</string>
+        <key>UTTypeIconFile</key>
+        <string>sketch.incs</string>
+        <key>UTTypeConformsTo</key>
+        <array>
+          <string>public.content</string>
+          <string>com.apple.package</string>
+        </array>
+        <key>UTTypeTagSpecification</key>
+        <dict>
+          <key>public.filename-extension</key>
+          <string>spato</string>
+        </dict>
+      </dict>
+      <dict>
+        <key>UTTypeIdentifier</key>
+        <string>net.spato.workspace</string>
+        <key>UTTypeReferenceURL</key>
+        <string>http://www.spato.net/wiki/SPaTo_Workspace_Format</string>
+        <key>UTTypeDescription</key>
+        <string>SPaTo Workspace</string>
+        <key>UTTypeIconFile</key>
+        <string>sketch.incs</string>
+        <key>UTTypeConformsTo</key>
+        <array>
+          <string>public.xml</string>
+        </array>
+        <key>UTTypeTagSpecification</key>
+        <dict>
+          <key>public.filename-extension</key>
+          <string>sve</string>
+        </dict>
+      </dict>
+    </array>
+    
+  </dict>
+</plist>

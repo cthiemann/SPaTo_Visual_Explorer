@@ -1,0 +1,28 @@
+
+SPaTo uses WinRun4J as the Java launcher in Windows:
+http://winrun4j.sourceforge.net/
+
+It supports 64-bit, is actively maintained, and powerful.
+However, there is no way to construct the executable on
+a Mac (as opposed to e.g. launch4j).  But that's ok.
+
+The WinRun4J.exe is the original executable shipped with
+the launcher.  To create "SPaTo Visual Explorer.exe", you
+have to copy WinRun4J.exe, RCEDIT.exe and spato.ico to
+some Windows machine and run this:
+  RCEDIT.exe /C WinRun4J.exe
+  RCEDIT.exe /I WinRun4J.exe spato.ico
+Now, the exe-file has the correct icon embedded.
+
+WinRun4J.jar implements some goodies to access Windows
+stuff from Java (e.g. registry access).  It's slightly
+modified from the original source (file associations
+are saved to HKEY_CURRENT_USER instead of HKEY_CLASSES_ROOT
+so that we don't need to run SPaTo with admin privileges).
+
+WinRun4J reads ini-files to know what to do.  The default
+init file matches the exe's filename, i.e. "SPaTo Visual Explorer.ini".
+This ini-file include lib/SPaTo_Prelude.ini, which launches
+SPaTo_Prelude, which in turn will then ask WinRun4J to
+execute according to lib/SPaTo_Visual_Explorer.ini, which
+then launches the actual application.

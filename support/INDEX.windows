@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<update base="http://update.spato.net/latest" index="INDEX.macosx">
+  <file>
+    <remote path="common/SPaTo_Visual_Explorer.jar"/>
+    <local path="lib\SPaTo_Visual_Explorer.jar"/>
+  </file>
+  <file>
+    <remote path="common/SPaTo_Prelude.class"/>
+    <local path="lib\SPaTo_Prelude.class"/>
+  </file>
+  <file>
+    <remote path="common/SPaTo_Prelude.jar"/>
+    <local path="lib\SPaTo_Prelude.jar"/>
+  </file>
+  <file>
+    <remote path="common/core.jar"/>
+    <local path="lib\core.jar"/>
+  </file>
+  <file>
+    <remote path="common/itext.jar"/>
+    <local path="lib\itext.jar"/>
+  </file>
+  <file>
+    <remote path="common/jna.jar"/>
+    <local path="lib\jna.jar"/>
+  </file>
+  <file>
+    <remote path="common/jnmatlib.jar"/>
+    <local path="lib\jnmatlib.jar"/>
+  </file>
+  <file>
+    <remote path="common/pdf.jar"/>
+    <local path="lib\pdf.jar"/>
+  </file>
+  <file>
+    <remote path="common/tGUI.jar"/>
+    <local path="lib\tGUI.jar"/>
+  </file>
+  <file>
+    <remote path="common/xhtmlrenderer.jar"/>
+    <local path="lib\xhtmlrenderer.jar"/>
+  </file>
+  <file>
+    <remote path="windows/_SPaTo_Visual_Explorer.exe"/>
+    <local path="SPaTo Visual Explorer.exe"/>
+  </file>
+  <file>
+    <remote path="windows/_SPaTo_Visual_Explorer.ini"/>
+    <local path="SPaTo Visual Explorer.ini"/>
+  </file>
+  <file>
+    <remote path="windows/SPaTo_Visual_Explorer.ini.orig"/>
+    <local path="lib\SPaTo_Visual_Explorer.ini.orig"/>
+  </file>
+  <file>
+    <remote path="windows/SPaTo_Prelude.ini"/>
+    <local path="lib\SPaTo_Prelude.ini"/>
+  </file>
+  <file>
+    <remote path="windows/WinRun4J.jar"/>
+    <local path="lib\WinRun4J.jar"/>
+  </file>
+  <file>
+    <remote path="windows/spato-16x16.png"/>
+    <local path="lib\spato-16x16.png"/>
+  </file>
+  <file>
+    <remote path="windows/splash.gif"/>
+    <local path="lib\splash.gif"/>
+  </file>
+</update>

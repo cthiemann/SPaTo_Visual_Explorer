@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<update base="http://update.spato.net/latest" index="INDEX.macosx">
+  <file>
+    <remote path="common/SPaTo_Visual_Explorer.jar"/>
+    <local path="Contents/Resources/Java/SPaTo_Visual_Explorer.jar"/>
+  </file>
+  <file>
+    <remote path="common/SPaTo_Prelude.class"/>
+    <local path="Contents/Resources/Java/SPaTo_Prelude.class"/>
+  </file>
+  <file>
+    <remote path="common/SPaTo_Prelude.jar"/>
+    <local path="Contents/Resources/Java/SPaTo_Prelude.jar"/>
+  </file>
+  <file>
+    <remote path="common/core.jar"/>
+    <local path="Contents/Resources/Java/core.jar"/>
+  </file>
+  <file>
+    <remote path="common/itext.jar"/>
+    <local path="Contents/Resources/Java/itext.jar"/>
+  </file>
+  <file>
+    <remote path="common/jna.jar"/>
+    <local path="Contents/Resources/Java/jna.jar"/>
+  </file>
+  <file>
+    <remote path="common/jnmatlib.jar"/>
+    <local path="Contents/Resources/Java/jnmatlib.jar"/>
+  </file>
+  <file>
+    <remote path="common/pdf.jar"/>
+    <local path="Contents/Resources/Java/pdf.jar"/>
+  </file>
+  <file>
+    <remote path="common/tGUI.jar"/>
+    <local path="Contents/Resources/Java/tGUI.jar"/>
+  </file>
+  <file>
+    <remote path="common/xhtmlrenderer.jar"/>
+    <local path="Contents/Resources/Java/xhtmlrenderer.jar"/>
+  </file>
+  <file>
+    <remote path="macosx/Info.plist.orig"/>
+    <local path="Contents/Info.plist.orig"/>
+  </file>
+  <file executable="true">
+    <remote path="macosx/ApplicationUpdateWrapper"/>
+    <local path="Contents/MacOS/ApplicationUpdateWrapper"/>
+  </file>
+  <file>
+    <remote path="macosx/spato.icns"/>
+    <local path="Contents/Resources/spato.icns"/>
+  </file>
+  <file>
+    <remote path="macosx/spato-document.icns"/>
+    <local path="Contents/Resources/spato-document.icns"/>
+  </file>
+  <file>
+    <remote path="macosx/spato-document-uncompressed.icns"/>
+    <local path="Contents/Resources/spato-document-uncompressed.icns"/>
+  </file>
+  <file>
+    <remote path="macosx/spato-workspace.icns"/>
+    <local path="Contents/Resources/spato-workspace.icns"/>
+  </file>
+</update>

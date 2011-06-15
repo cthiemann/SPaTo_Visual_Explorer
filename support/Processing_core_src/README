@@ -1,0 +1,10 @@
+SPaTo currently uses a custom Processing core.jar, which is
+based on revision r7148.  The modified source code is made
+available in this directory.
+
+The Procesing core library is released under the GNU Lesser
+General Public License, and is part of the Processing project:
+http://www.processing.org/
+  Copyright (c) 2004-10 Ben Fry and Casey Reas
+  Copyright (c) 2001-04 Massachusetts Institute of Technology
+

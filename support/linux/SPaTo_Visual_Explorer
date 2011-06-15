@@ -1,0 +1,44 @@
+#!/bin/bash
+
+APPDIR=$(dirname "$0")
+. "$APPDIR/lib/config.sh"
+
+#
+# This is an "embedded" helper script to request a restart of this app:
+# It's called by the SPaTo process, so $PPID is the pid of the Java VM.
+#
+if [ "$1" == "--restart" ]; then
+  sleep 2  # SPaTo should have called System.exit by now, but give the VM some time to shut down
+  kill -9 $PPID  # ok, enough...
+  sleep 1  # wait for it...
+  # ... and go on to launch
+fi
+
+#
+# Install XDG / FreeDesktop stuff (ignore any errors)
+#
+mkdir -p ~/.spato 2>&1 > /dev/null
+date 2>&1 > ~/.spato/xdg.log
+cd lib 2>&1 > ~/.spato/xdg.log
+xdg-mime install spato-mime.xml 2>&1 >> ~/.spato/xdg.log
+xdg-icon-resource install --context mimetypes --size 128 application-x-spato.png 2>&1 >> ~/.spato/xdg.log
+xdg-icon-resource install --context mimetypes --size 128 application-x-spato-uncompressed.png 2>&1 >> ~/.spato/xdg.log
+xdg-icon-resource install --context mimetypes --size 128 application-x-spato-workspace.png 2>&1 >> ~/.spato/xdg.log
+xdg-icon-resource install --context apps --size 128 --novendor SPaTo_Visual_Explorer.png 2>&1 >> ~/.spato/xdg.log
+xdg-desktop-menu install --novendor SPaTo_Visual_Explorer.desktop 2>&1 >> ~/.spato/xdg.log
+xdg-mime default SPaTo_Visual_Explorer.desktop application/x-spato 2>&1 >> ~/.spato/xdg.log
+xdg-mime default SPaTo_Visual_Explorer.desktop application/x-spato-uncompressed 2>&1 >> ~/.spato/xdg.log
+xdg-mime default SPaTo_Visual_Explorer.desktop application/x-spato-workspace 2>&1 >> ~/.spato/xdg.log
+cd .. 2>&1 > ~/.spato/xdg.log
+
+#
+# Run the prelude
+#
+java -cp "$JAVAROOT" -Dspato.app-dir="$APPDIR" SPaTo_Prelude
+
+#
+# Finally, launch SPaTo
+#
+java $OPTIONS -cp "$CLASSPATH" -Dspato.app-dir="$APPDIR" SPaTo_Visual_Explorer
+
+

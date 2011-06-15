@@ -1,0 +1,28 @@
+#!/bin/sh
+
+APP_PACKAGE="${0%/Contents/MacOS/*}"
+APPLICATION_CMD="$APP_PACKAGE/Contents/MacOS/JavaApplicationStub"
+JAVAROOT="$APP_PACKAGE/Contents/Resources/Java"
+
+#
+# This is an "embedded" helper script to request a restart of this app:
+# It's called by the SPaTo process, so $PPID is the pid of the Java VM.
+#
+if [ "$1" == "--restart" ]; then
+  sleep 2  # SPaTo should have called System.exit by now, but give the VM some time to shut down
+  kill -9 $PPID  # ok, enough...
+  sleep 1  # wait for it...
+  open "$APP_PACKAGE"  # merry-go-round... whee! \o/
+  exit
+fi
+
+#
+# Run the prelude
+#
+java -d32 -cp "$JAVAROOT" -Xdock:name="SPaTo Visual Explorer" -Xdock:icon="$APP_PACKAGE/Contents/Resources/spato.icns" -Dspato.app-dir="$APP_PACKAGE" SPaTo_Prelude
+
+#
+# Finally, launch SPaTo
+#
+exec "$APPLICATION_CMD" "$@"
+

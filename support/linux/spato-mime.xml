@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-spato">
+    <comment>SPaTo Document</comment>
+    <glob pattern="*.spato"/>
+  </mime-type>
+  <mime-type type="application/x-spato-uncompressed">
+    <comment>SPaTo Document (uncompressed)</comment>
+    <glob pattern="*.spato/document.xml"/>
+  </mime-type>
+  <mime-type type="application/x-spato-workspace">
+    <comment>SPaTo Workspace</comment>
+    <glob pattern="*.sve"/>
+  </mime-type>
+</mime-info>

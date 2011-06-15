@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<update base="http://update.spato.net/latest" index="INDEX.linux">
+  <file>
+    <remote path="common/SPaTo_Visual_Explorer.jar"/>
+    <local path="lib/SPaTo_Visual_Explorer.jar"/>
+  </file>
+  <file>
+    <remote path="common/SPaTo_Prelude.class"/>
+    <local path="lib/SPaTo_Prelude.class"/>
+  </file>
+  <file>
+    <remote path="common/SPaTo_Prelude.jar"/>
+    <local path="lib/SPaTo_Prelude.jar"/>
+  </file>
+  <file>
+    <remote path="common/core.jar"/>
+    <local path="lib/core.jar"/>
+  </file>
+  <file>
+    <remote path="common/itext.jar"/>
+    <local path="lib/itext.jar"/>
+  </file>
+  <file>
+    <remote path="common/jna.jar"/>
+    <local path="lib/jna.jar"/>
+  </file>
+  <file>
+    <remote path="common/jnmatlib.jar"/>
+    <local path="lib/jnmatlib.jar"/>
+  </file>
+  <file>
+    <remote path="common/pdf.jar"/>
+    <local path="lib/pdf.jar"/>
+  </file>
+  <file>
+    <remote path="common/tGUI.jar"/>
+    <local path="lib/tGUI.jar"/>
+  </file>
+  <file>
+    <remote path="common/xhtmlrenderer.jar"/>
+    <local path="lib/xhtmlrenderer.jar"/>
+  </file>
+  <file executable="true">
+    <remote path="linux/SPaTo_Visual_Explorer"/>
+    <local path="SPaTo_Visual_Explorer"/>
+  </file>
+  <file>
+    <remote path="linux/SPaTo_Visual_Explorer.desktop"/>
+    <local path="lib/SPaTo_Visual_Explorer.desktop"/>
+  </file>
+  <file>
+    <remote path="linux/SPaTo_Visual_Explorer.png"/>
+    <local path="lib/SPaTo_Visual_Explorer.png"/>
+  </file>
+  <file>
+    <remote path="linux/application-x-spato.png"/>
+    <local path="lib/application-x-spato.png"/>
+  </file>
+  <file>
+    <remote path="linux/application-x-spato-uncompressed.png"/>
+    <local path="lib/application-x-spato-uncompressed.png"/>
+  </file>
+  <file>
+    <remote path="linux/application-x-spato-workspace.png"/>
+    <local path="lib/application-x-spato-workspace.png"/>
+  </file>
+  <file>
+    <remote path="linux/spato-mime.xml"/>
+    <local path="lib/spato-mime.xml"/>
+  </file>
+  <file executable="true">
+    <remote path="linux/config.sh.orig"/>
+    <local path="lib/config.sh.orig"/>
+  </file>
+</update>

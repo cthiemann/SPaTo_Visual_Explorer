@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<release-notes>
+  <release version="1.2.2" debug="beta" date="20110604T220000">
+    <note>Assuming that no immediate bug-fixes are necessary, this will become the public release version.</note>
+    <item type="new">Now available for the Linux platform</item>
+    <item type="new">Added option to show the full network or the immediate next neighbors of a node
+      <div style="margin: 0.5em 0; font-size: 80%;">The buttons to toggle these options are currently
+        invisible since the full network option may make the application irresponsibly unresponsive.
+        <ul>
+          <li><b>F</b> toggles display of the full network</li>
+          <li><b>E</b> toggles display of the immediate neighbors of the current root node</li>
+          <li><b>L</b> toggles superimposed display of the shortest-path tree</li>
+          <li>Holding down <b>Alt</b> while displaying immediate neighbors will show the neighbors
+            of node at the mouse cursor instead of those of the root node</li>
+        </ul>
+      </div>
+    </item>
+    <item type="enh">Improvements to the auto-update mechanism
+      <div style="margin: 0.5em 0; font-size: 80%;">The updater is a little more communicative in the
+        unlikely event of a water landing or other mishaps.  Also, automatic checks for updates can
+        be disabled.  Manual checks for updates can be triggered using the context menu of the
+        network/document drop-down.</div>
+    </item>
+    <item type="new">New colormap &#8220;jet&#8221; (as in MATLAB),
+      removed &#8220;focustop&#8221; and &#8220;focusbottom&#8221;</item>
+    <item type="fix">Added work-around for binary sparse matrices with 1-based indices written by save_spato.m
+      <div style="margin: 0.5em 0; font-size: 80%;">All indices in XML data are 1-based, but indices in binary
+        data (&#8220;blobs&#8221;) are 0-based.  If the weight matrix has no links to <nobr>node 0</nobr>
+        but links to <nobr>node N</nobr>, all indices are adjusted by <nobr>&#8211;1</nobr>.</div>
+    </item>
+    <item type="fix">Maximum memory size now hardcoded to <nobr>1024 MB</nobr>
+      <div style="margin: 0.5em 0; font-size: 80%;">This should fix the fatal start-up problems in
+        Windows.</div>
+    </item>
+    <item type="fix">Various other minor bug-fixes</item>
+    <item type="new">Documents can be opened by dragging the .spato file into the application window
+      <div style="margin: 0.5em 0; font-size: 80%;">Of course, this item should read &#8220;data
+        import still not available&#8221;, but we want to think positive...</div>
+    </item>
+    <item type="enh">Backbone is now called skeleton</item>
+  </release>
+  <release version="1.2.1_01" debug="alpha" date="20110227T130000">
+    <item type="fix">Fixed invisibility of context menu items</item>
+    <item type="enh">Previously opened documents are not automatically reloaded at startup
+      <div style="margin: 0.5em 0; font-size: 80%;">If any documents can be recovered, a button
+        will be shown below the document list dropdown.</div></item>
+    <item type="enh">Automatic estimation of Albers projection parameters</item>
+  </release>
+  <release version="1.2.1" debug="alpha" date="20110131T223000">
+    <item type="new">Added option to show the network backbone<br />
+      <div style="margin: 0.5em 0; font-size: 80%;">Click the Backbone button in the upper left or press B
+        to toggle display of the backbone.  All links of all trees are shown, color-coded by the number of
+        trees they participate in (black indicating participation in all trees and lighter grays indicating
+        participation in few trees).</div></item>
+    <item type="enh">Screenshots now always render nodes using circles</item>
+    <item type="enh">More secure self-update: now checking file authenticity with crypto-magic</item>
+    <item type="enh">PDF fonts are loaded on application launch, reducing the time needed for producing the
+      first screenshot</item>
+    <item type="enh">Added splash screen on Windows to indicate that the application is launching</item>
+    <item type="fix">Fixed crash on pressing snapshot album/series hot-keys when no snapshots are available
+      in the displayed data</item>
+    <item type="fix">Minor cosmetic changes to the user interface</item>
+  </release>
+  <release version="1.2.0_03" debug="alpha" date="20110102T193000">
+    <item type="fix">Fixed wrong maximum-memory detection on 32-bit Windows</item>
+    <item type="fix">Minor cleanups in the prelude</item>
+  </release>
+  <release version="1.2.0_02" debug="alpha" date="20110101T140000">
+    <item type="fix">Changed colormap and radial scaling settings for each quantity are now remembered when
+    revisiting that quantity.</item>
+    <item type="enh">When displaying two-dimensional node-coloring data and holding down the Alt key, the
+    displayed colors are determined by the node at the mouse cursor instead of the root node.</item>
+  </release>
+  <release version="1.2.0_01" debug="alpha" date="20110101T120001">
+    <item type="enh">No more automatic fireworks at application launch<br />
+      <div style="margin: 0.5em 0; font-size: 80%;">Press Ctrl-Alt-F to start the show at any time, ESC to
+      cancel.</div></item>
+    <item type="new">New colormap:<br />
+      <div style="margin: 0.5em 0;"><img src="1.2.0_01__grayredblue.png" /></div></item>
+  </release>
+  <release version="1.2.0" debug="alpha" date="20110101T120000">
+    <note>This is the first release using the new version numbering scheme</note>
+    <item type="new">Automatic self-update mechanism (on Mac and Windows)</item>
+    <item type="new">Full native platform integration on Mac OS X</item>
+    <item type="new">Partial native platform integration on Windows</item>
+    <item type="enh">Improved handling of uncompressed SPaTo documents<br />
+      <div style="margin: 0.5em 0; font-size: 80%;">On Macs, the .spato folders are automatically registered
+      as bundles and presented as single files to the user. On Windows and Linux, the "Open document" dialog
+      now allows to select either the .spato folder or the document.xml inside the .spato folder.</div>
+    </item>
+    <item type="fix">Fixed not being able to change directory in the file chooser dialogs on Windows.</item>
+  </release>
+</release-notes>
