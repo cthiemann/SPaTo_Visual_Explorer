@@ -1,5 +1,5 @@
 
-COMPILE_CLASSPATH = .:../Processing.app/Contents/Resources/Java/core.jar:../../code/jna.jar:../windows/WinRun4J.jar
+COMPILE_CLASSPATH = .:../../application.macosx/SPaTo_Visual_Explorer.app/Contents/Resources/Java/core.jar:../../code/jna.jar:../windows/WinRun4J.jar
 
 prelude: SPaTo_Prelude.class SPaTo_Prelude.jar
 
