@@ -35,6 +35,7 @@ boolean canHandleOpenFileEvents = false;  // indicates that GUI and workspace ar
 
 float t, tt, dt;  // this frame's time, last frame's time, and delta between the two
 boolean screenshot = false;  // if true, draw() will render one frame to PDF
+boolean layoutshot = false;  // if true (and screenshot == true), draw() will output coordinates of the current node positions
 
 boolean resizeRequest = false;
 int resizeWidth, resizeHeight;
@@ -104,6 +105,7 @@ void draw() {
   if (screenshot) {
     String filename = "SVE_screenshot_" + (new SimpleDateFormat("yyyyMMdd'T'HHmmss").format(new Date())) + ".pdf";
     filename = System.getProperty("user.home") + ((platform == MACOSX) ? "/Desktop" : "") + File.separator + filename;
+    if (layoutshot) doc.view.writeLayout(filename.substring(0, filename.length() - 4) + "_layout.txt");
     beginRecord(PDF, filename);
     fastNodes = false;  // always draw circles in screenshots
     console.logNote("Recording screenshot to " + filename);
@@ -205,6 +207,7 @@ void keyPressed() {
     case '[': changeZoom(.5); return;
     case ']': changeZoom(2); return;
     case 's': screenshot = true; return;
+    case 'S': screenshot = true; layoutshot = true; return;
     case 'r': // random walk
       //if (doc.view.hasLinks && (doc.view.links.index[doc.view.r].length > 0))
       //  doc.view.setRootNode(doc.view.links.index[doc.view.r][floor(random(doc.view.links.index[doc.view.r].length))]);

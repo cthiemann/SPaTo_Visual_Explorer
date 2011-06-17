@@ -678,5 +678,15 @@ class SVE2View {
     } else
       return String.format("%.4g", val);
   }
+  
+  void writeLayout(String filename) {
+    String lines[] = new String[NN];
+    Projection p = ((viewMode == VIEW_MAP) || !hasTomLayout) ? projMap : layouts[0].proj;
+    if (p == null)
+      lines = new String[] { "Error! No valid node layout available..." };
+    else for (int i = 0; i < NN; i++)
+      lines[i] = new String(p.x[i] + "\t" + p.y[i] + "\t" + nodes[i].label);
+    saveStrings(filename, lines);
+  }
 }
 
