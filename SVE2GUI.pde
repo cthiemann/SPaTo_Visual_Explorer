@@ -107,7 +107,7 @@ void guiSetup() {
   choiceNetwork = new TChoiceWithRollover(gui, "network##"); choiceNetwork.setFont(fnLargeBold);
   choiceNetwork.setEmptyString("right-click here");
   choiceNetwork.setContextMenu(gui.createPopupMenu(new String[][] {
-    { "New document\u2026", "document##new" },
+//    { "New document\u2026", "document##new" },
     { "Open document\u2026", "document##open" },
     { "Save document", "document##save" },
     { "Save document as\u2026", "document##saveAs" },
