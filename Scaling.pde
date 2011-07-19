@@ -27,7 +27,7 @@ static abstract class Scaling {
 
 static class ScalingFactory {
   static String[] productNames = { "id", "sqrt", "log" };
-  
+
   static boolean canProduce(String name) {
     for (int i = 0; i < productNames.length; i++)
       if (name.equals(productNames[i]))
@@ -35,7 +35,7 @@ static class ScalingFactory {
     return false;
   }
   static String getDefaultProduct() { return productNames[0]; }
-  
+
   static Scaling produce(String name, int N) {
     if (name.equals("id")) return new IdScaling(N);
     if (name.equals("sqrt")) return new SqrtScaling(N);

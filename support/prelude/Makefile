@@ -4,7 +4,7 @@ COMPILE_CLASSPATH = .:../../application.macosx/SPaTo_Visual_Explorer.app/Content
 prelude: SPaTo_Prelude.class SPaTo_Prelude.jar
 
 SPaTo_Prelude.jar: MaxMemDetector.class MemTest.class UpdateInstaller.class WindowsPrelude.class
-	jar cvf $@ $^ 
+	jar cvf $@ $^
 
 %.class: SPaTo_Prelude.java MaxMemDetector.java MemTest.java UpdateInstaller.java WindowsPrelude.java
 	javac -cp "$(COMPILE_CLASSPATH)" -source 1.5 -target 1.5 $^

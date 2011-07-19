@@ -25,13 +25,13 @@ import java.security.PrivateKey;
 import processing.xml.*;
 
 public class SPaTo_Update_Builder {
-  
+
   public static final String SITE = "/Users/ct/Sites/spato.net/update/";
   public static String VERSION = null;
   public PrivateKey privKey = null;
   public XMLElement xmlReleaseNotes = null;
   private static char password[] = null;
-  
+
   SPaTo_Update_Builder() throws Exception {
     xmlReleaseNotes = loadXML("release-notes/RELEASE_NOTES.xml");
     if (password == null) {
@@ -42,7 +42,7 @@ public class SPaTo_Update_Builder {
     }
     privKey = loadPrivateKey("keystore", "spato.update", password);
   }
-  
+
   public XMLElement loadXML(String filename) throws Exception {
     Reader reader = new FileReader(filename);
     XMLElement xml = XMLElement.parse(reader);
@@ -50,13 +50,13 @@ public class SPaTo_Update_Builder {
     if (xml == null) throw new Exception("XMLElement.parse returned null");
     return xml;
   }
-  
+
   public void saveXML(XMLElement xml, String filename) throws Exception {
     PrintWriter writer = new PrintWriter(filename);
     if (!xml.write(writer)) throw new Exception("XMLElement.write returned false");
     writer.close();
   }
-  
+
   public PrivateKey loadPrivateKey(String keystore, String alias, char password[]) throws Exception {
     InputStream is = new FileInputStream(keystore);
     KeyStore store = KeyStore.getInstance("JKS");
@@ -64,7 +64,7 @@ public class SPaTo_Update_Builder {
     is.close();
     return (PrivateKey)store.getKey(alias, password);
   }
-  
+
   public static void copyFile(String srcFilename, String dstFilename) throws Exception {
     if (new File(dstFilename).isDirectory()) dstFilename += "/" + new File(srcFilename).getName();
     System.out.println("Copying " + srcFilename + " to " + dstFilename);
@@ -76,7 +76,7 @@ public class SPaTo_Update_Builder {
     is.close(); os.close();
     new File(dstFilename).setLastModified(new File(srcFilename).lastModified());
   }
-  
+
   public static String commonJars[] = new String[] {
     "SPaTo_Visual_Explorer.jar", "SPaTo_Prelude.class", "SPaTo_Prelude.jar",
     "core.jar", "itext.jar", "jna.jar", "jnmatlib.jar", "pdf.jar", "tGUI.jar", "xhtmlrenderer.jar" };
@@ -122,7 +122,7 @@ public class SPaTo_Update_Builder {
       //
     }
   }
-  
+
   public void createIndex(String platform) throws Exception {
     System.out.println("Creating INDEX." + platform);
     XMLElement xmlIndex = loadXML(SITE + VERSION + "/INDEX." + platform);
@@ -156,7 +156,7 @@ public class SPaTo_Update_Builder {
     // save index
     saveXML(xmlIndex, SITE + VERSION + "/INDEX." + platform);
   }
-  
+
   public static void main(String args[]) {
     try {
       if (args.length > 0) password = args[0].toCharArray();
@@ -176,5 +176,5 @@ public class SPaTo_Update_Builder {
       e.printStackTrace();
     }
   }
-  
+
 }

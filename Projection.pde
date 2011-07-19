@@ -26,7 +26,7 @@ static abstract class Projection {
 
   Projection() {}
   Projection(int N) { this.N = N; x = new float[N]; y = new float[N]; }
-  
+
   void setScalingToFitWithin(float width, float height) {
     // fit within dimensions with preserving aspect ratio of the data
     sx = sy = min((w == 0) ? 1e-5 : width/w, (h == 0) ? 1e-5 : height/h);
@@ -49,7 +49,7 @@ static abstract class Projection {
       maxy = max(maxy, y);
     }
   }
-  
+
   void endData() {
     cx = (minx + maxx)/2;
     cy = (miny + maxy)/2;
@@ -67,7 +67,7 @@ static abstract class Projection {
 
 static class MapProjectionFactory {
   static String[] productNames = { "LonLat", "LonLat Roll", "Albers" };
-  
+
   static boolean canProduce(String name) {
     if (name == null) return false;
     for (int i = 0; i < productNames.length; i++)
@@ -76,7 +76,7 @@ static class MapProjectionFactory {
     return false;
   }
   static String getDefaultProduct() { return productNames[0]; }
-  
+
   static Projection produce(String name, int N) {
     if (name == null) return null;
     if (name.equals("LonLat")) return new LonLatProjection(N);
@@ -88,7 +88,7 @@ static class MapProjectionFactory {
 
 static class TomProjectionFactory {
   static String[] productNames = { "linear", "radial" };
-  
+
   static boolean canProduce(String name) {
     if (name == null) return false;
     for (int i = 0; i < productNames.length; i++)
@@ -97,7 +97,7 @@ static class TomProjectionFactory {
     return false;
   }
   static String getDefaultProduct() { return productNames[0]; }
-  
+
   static Projection produce(String name, int N) {
     if (name == null) return null;
     if (name.equals("linear")) return new LinearProjection(N);
@@ -145,7 +145,7 @@ static class AlbersProjection extends Projection {
   float lat[] = null, lon[] = null;  // temp arrays (need all lat/lon data to determine Albers parameters)
 
   AlbersProjection(int NN) { super(NN); }
-  
+
   void beginData() { super.beginData(); lat = new float[N]; lon = new float[N]; }
 
   // collect points in temporary arrays

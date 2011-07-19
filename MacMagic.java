@@ -33,14 +33,14 @@ import com.apple.eawt.ApplicationEvent;
  * http://developer.apple.com/library/mac/documentation/Java/Reference/1.5.0/appledoc/api/index.html
  */
 public class MacMagic extends ApplicationAdapter {
-  
+
   protected SPaTo_Visual_Explorer app = null;
-  
+
   public MacMagic(SPaTo_Visual_Explorer app) {
     this.app = app;
     Application.getApplication().addApplicationListener(this);
   }
-  
+
   public void handleOpenFile(ApplicationEvent event) {
     // wait for application setup to be done (causes otherwise NullPointerExceptions otherwise)
     while (!app.canHandleOpenFileEvents) try { Thread.sleep(25); } catch (Exception e) {}
@@ -56,13 +56,13 @@ public class MacMagic extends ApplicationAdapter {
       javax.swing.JOptionPane.showMessageDialog(null, "Unknown file type: " + event.getFilename(),
         "Open Workspace", javax.swing.JOptionPane.ERROR_MESSAGE);
   }
-  
+
   public void handleOpenApplication(ApplicationEvent event) {
     event.setHandled(true);
   }
-  
+
   public void handleQuit(ApplicationEvent event) {
     event.setHandled(true);  // FIXME: check for unsaved files
   }
-  
+
 }

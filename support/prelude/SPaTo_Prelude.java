@@ -53,8 +53,8 @@ public class SPaTo_Prelude implements Runnable {
     : new String[] { "UpdateInstaller" };
     // ? new String[] { "UpdateInstaller", "MaxMemDetector", "WindowsPrelude" }
     // : new String[] { "UpdateInstaller", "MaxMemDetector" };
-  
-  
+
+
   protected void setup() {
     // divert stdout and stderr into log file, if requested
     if (logFilename != null) try {
@@ -66,7 +66,7 @@ public class SPaTo_Prelude implements Runnable {
       System.err.println("failed to redirect output to " + logFilename);
     }
   }
-  
+
   protected void processCommandLine(String args[]) {
     for (int i = 0; i < args.length - 1; i++) {
       if (args[i].equals("sleep")) {  // sleep for some time
@@ -78,7 +78,7 @@ public class SPaTo_Prelude implements Runnable {
       }
     }
   }
-  
+
   protected boolean doTheMunchhausenTrick() {
     File update = new File(cacheJarFolder, preludeClass + ".class");
     if (update.exists()) {
@@ -92,7 +92,7 @@ public class SPaTo_Prelude implements Runnable {
     } else
       return false;  // we are up-to-date and can run the tasks ourselves
   }
-  
+
   protected void copyFile(File src, File dst) throws Exception {
     FileInputStream fis = new FileInputStream(src);
     FileOutputStream fos = new FileOutputStream(dst);
@@ -103,7 +103,7 @@ public class SPaTo_Prelude implements Runnable {
     fos.close();
     fis.close();
   }
-  
+
   public void run() {
     try {
       ClassLoader cl = null;
@@ -140,7 +140,7 @@ public class SPaTo_Prelude implements Runnable {
     System.out.println("========== End of Prelude (" + (t1 - t0) + " ms) ==========");
     try { out.close(); } catch (Exception e) {}
   }
-  
+
   public static void main(String args[]) {
     SPaTo_Prelude prelude = new SPaTo_Prelude();
     prelude.setup();
@@ -149,5 +149,5 @@ public class SPaTo_Prelude implements Runnable {
       prelude.run();
     prelude.waveGoodbye();
   }
-  
+
 }

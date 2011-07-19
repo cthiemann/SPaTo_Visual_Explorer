@@ -25,7 +25,7 @@ import javax.swing.JOptionPane;
 import com.sun.jna.Platform;
 
 public class MaxMemDetector implements Runnable {
-  
+
   // minimum memory requirement in MB
   protected final int MIN_MEMORY = 512;
   // reasonable upper bound for -Xmx in MB (the 64-bit JVM would allow you to allocate several TBs)
@@ -48,7 +48,7 @@ public class MaxMemDetector implements Runnable {
   protected int lineNo = -1, start, end;
   // should we use the WinRun4J launcher to run the tests?
   protected boolean useWinRun4J = Platform.isWindows();
-  
+
   protected void findJava() {
     // find java executable
     String java = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
@@ -63,7 +63,7 @@ public class MaxMemDetector implements Runnable {
       ? new String[] { java, "-Xmx????m", "-d" + bits, "-cp", classpath, "MemTest" }
       : new String[] { java, "-Xmx????m", "-cp", classpath, "MemTest" };
   }
-  
+
   protected void findConfigFile() {
     if (Platform.isLinux()) cfgFileOut = new File(appRootFolder, "lib/config.sh");
     if (Platform.isMac()) cfgFileOut = new File(appRootFolder, "Contents/Info.plist");
@@ -73,7 +73,7 @@ public class MaxMemDetector implements Runnable {
     if (!cfgFileIn.exists()) throw new RuntimeException(cfgFileIn + " does not exist");
     System.out.println("--- original config file is at " + cfgFileIn);
   }
-  
+
   protected void loadConfiguration() {
     // read original configuration file and cache its contents
     loadConfiguration(cfgFileIn, true);
@@ -106,7 +106,7 @@ public class MaxMemDetector implements Runnable {
     }
     if (!foundXmx) throw new RuntimeException("-Xmx([0-9]+)m not found in " + cfgFile);
   }
-  
+
   protected String[] prepareWinRun4JMemTest(long mem) {
     PrintWriter ini = null;
     try {
@@ -151,7 +151,7 @@ public class MaxMemDetector implements Runnable {
       throw new RuntimeException("could not start JVM process or read its output", e);
     }
   }
-  
+
   protected void detectMaximumHeapSize() {
     System.err.println("using " + bits + "-bit JVM");
     System.err.println("current max memory = " + oldValue);
@@ -162,7 +162,7 @@ public class MaxMemDetector implements Runnable {
     System.out.println("minmin = " + minmin);
     System.out.println("maxmax = " + maxmax);
     // run the tests
-    if (!runTest(max) && runTest(min))  // this is the most common case (we cannot improve significantly 
+    if (!runTest(max) && runTest(min))  // this is the most common case (we cannot improve significantly
       newValue = min;        // because the optimal value has already been determined in an earlier run)
     else if (!runTest(minmin))  // this is very bad
       throw new RuntimeException("minmin-fail");
@@ -180,7 +180,7 @@ public class MaxMemDetector implements Runnable {
     }
     System.err.println("recommended max memory = " + newValue);
   }
-  
+
   protected void saveConfiguration() {
     PrintWriter writer = null;
     try {
@@ -223,5 +223,5 @@ public class MaxMemDetector implements Runnable {
           JOptionPane.ERROR_MESSAGE);
     }
   }
-  
+
 }

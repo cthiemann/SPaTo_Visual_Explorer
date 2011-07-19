@@ -23,13 +23,13 @@ import processing.xml.*;
 import com.sun.jna.Platform;
 
 public class UpdateInstaller implements Runnable {
-  
+
   // the application's root folder
   protected String appRootFolder = System.getProperty("spato.app-dir");
   // the update cache folder and index
   protected File cacheFolder = null;
   protected XMLElement index = null;
-  
+
   protected void checkForIndex() {
     cacheFolder = Platform.isMac() ? new File(appRootFolder, "Contents/Resources/update")
                 : Platform.isWindows() ? new File(appRootFolder, "update")
@@ -50,7 +50,7 @@ public class UpdateInstaller implements Runnable {
       try { reader.close(); } catch (Exception e) {}
     }
   }
-  
+
   protected void moveUpdatesIntoPlace() {
     for (XMLElement file : index.getChildren("file")) {
       XMLElement remote = file.getChild("remote"), local = file.getChild("local");
@@ -73,7 +73,7 @@ public class UpdateInstaller implements Runnable {
       }
     }
   }
-  
+
   protected void deleteRecursively(File f) {
     if (f.isDirectory())
       for (File ff : f.listFiles())
@@ -94,5 +94,5 @@ public class UpdateInstaller implements Runnable {
       }
     } catch (Exception e) { e.printStackTrace(); }
   }
-  
+
 }

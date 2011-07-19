@@ -60,7 +60,7 @@ static class Base64 {
     for (int i = 0; i < 64; i++) if (map[i] == c) return i;
     throw new IllegalArgumentException("value " + c + " is not in the map");
   }
-  
+
   static String encode(byte data[]) { return encode(data, 76); }
   static String encode(byte data[], int wrapColumn) {
     StringBuffer result = new StringBuffer();
@@ -87,7 +87,7 @@ static class Base64 {
     }
     return result.toString();
   }
-  
+
   static byte[] decode(String data) {
     String lines[] = data.split("\n");
     data = ""; for (String line : lines) data += line.trim();

@@ -24,16 +24,16 @@ import java.nio.IntBuffer;
 import java.nio.FloatBuffer;
 
 static class BinaryThing {
-  
+
   static final Class supportedTypes[] = { Integer.TYPE, Float.TYPE, SparseMatrix.class };
-  
+
   Class type = null;
   int size[] = null;
   Object blob = null;
-  
+
   BinaryThing() {}
   BinaryThing(Object blob) { setBlob(blob); }
-  
+
   Class getType() { return type; }
   int[] getSize() { return size; }
   int getSize(int i) { return ((size != null) && (i >= 0) && (i < size.length)) ? size[i] : 0; }
@@ -42,12 +42,12 @@ static class BinaryThing {
   boolean isFloat1(int NN) { return is(Float.TYPE, new int[] { 1, NN }); }
   boolean isFloat2(int NN) { return is(Float.TYPE, new int[] { NN, NN }); }
   boolean isSparse(int NN) { return (type == SparseMatrix.class) && (getSparseMatrix().N == NN); }
-  
+
   Object getBlob() { return blob; }
   int[][] getIntArray() { return (blob != null) && (type == Integer.TYPE) && (size.length == 2) ? (int[][])blob : null; }
   float[][] getFloatArray() { return (blob != null) && (type == Float.TYPE) && (size.length == 2) ? (float[][])blob : null; }
   SparseMatrix getSparseMatrix() { return (blob instanceof SparseMatrix) ? (SparseMatrix)blob : null; }
-  
+
   void setBlob(Object blob) {
     this.type = null;
     this.size = null;
@@ -62,7 +62,7 @@ static class BinaryThing {
       // FIXME: bad things would happen if the sub-arrays are not all of the same length, but I am too lazy to check here...
     }
   }
-  
+
   static BinaryThing parseFromXML(XMLElement xml) throws Exception { return parseFromXML(xml, null); }
   static BinaryThing parseFromXML(XMLElement xml, TConsole.Message msg) throws Exception {
     if (xml == null) return null;
@@ -154,7 +154,7 @@ static class BinaryThing {
     }
     return res;
   }
-  
+
   static BinaryThing parseFromText(String lines[], char sep) throws Exception {
     return parseFromText(lines, sep, Float.TYPE, null); }
   static BinaryThing parseFromText(String lines[], char sep, TConsole.Message msg) throws Exception {
@@ -182,7 +182,7 @@ static class BinaryThing {
     } catch (Exception e) { throw new Exception("line " + (i+1) + ": " + e.getMessage()); }
     return res;
   }
-  
+
   static private Object parseLine(String line, char sep, Class type) throws Exception {
     String pieces[] = (sep == ' ') ? splitTokens(trim(line), WHITESPACE) : split(line, sep);
     Object result = Array.newInstance(type, new int[] { pieces.length });
@@ -194,7 +194,7 @@ static class BinaryThing {
     } catch (Exception e) { throw new Exception("not a number: " + pieces[i]); }
     return result;
   }
-  
+
   static private BinaryThing parseSparseFromText(String lines[], char sep, TConsole.Message msg) throws Exception {
     if ((lines == null) || (lines.length % 2 != 0))
       throw new Exception("no data or odd number of lines");
@@ -213,7 +213,7 @@ static class BinaryThing {
     } catch (Exception e) { throw new Exception("row " + (i+1) + ": " + e.getMessage()); }
     return new BinaryThing(matrix);
   }
-  
+
   static BinaryThing loadFromStream(DataInputStream in) throws Exception { return loadFromStream(in, null); }
   static BinaryThing loadFromStream(DataInputStream in, TConsole.Message msg) throws Exception {
     BinaryThing res = new BinaryThing();
@@ -275,7 +275,7 @@ static class BinaryThing {
       Array.set(o, i, loadFromStream(in, Array.get(o, i)));
     return o;
   }
-  
+
   void saveToStream(DataOutputStream out) throws Exception { saveToStream(out, null); }
   void saveToStream(DataOutputStream out, TConsole.Message msg) throws Exception {
     if ((type == null) || (blob == null)) return;
@@ -309,7 +309,7 @@ static class BinaryThing {
     } else {
       for (int i = 0; i < size[0]; i++) {
         saveToStream(out, Array.get(blob, i));
-        if (msg != null) msg.updateProgress(i, size[0]); 
+        if (msg != null) msg.updateProgress(i, size[0]);
       }
     }
   }
@@ -331,7 +331,7 @@ static class BinaryThing {
         saveToStream(out, Array.get(o, i));
     }
   }
-  
+
   /* If size.length == 2, this will replace the blob with a new array of size { size[1] size[0] },
    * such that newblob[i][j] == oldblob[j][i].  If size.length != 2, nothing happens. FIXME: throw exception? */
   void transpose() {
@@ -351,7 +351,7 @@ static class BinaryThing {
             Array.get(Array.get(oldblob, j), i));
     }
   }
-  
+
   /* Reshapes the current data to fit the new size if prod(newsize) == prod(size).  It does so by
    * reshaping into a linear array and then into the new format.  Linearization/delinearization is
    * row-first; i.e. the last dimension will be filled up first. */
@@ -367,7 +367,7 @@ static class BinaryThing {
     blob = Array.newInstance(type, size = newsize);
     delinearize(linear, blob);
   }
-  
+
   private void linearize(Object src, Object dst) { linearize(src, dst, 0, 0, Array.getLength(dst)); }
   private void linearize(Object src, Object dst, int dim, int offset, int prodsize) {
     prodsize /= size[dim];
@@ -375,7 +375,7 @@ static class BinaryThing {
       if (dim == size.length-1) Array.set(dst, offset + i, Array.get(src, i));
       else linearize(Array.get(src, i), dst, dim+1, offset + i*prodsize, prodsize);
   }
-  
+
   private void delinearize(Object src, Object dst) { delinearize(src, dst, 0, 0, Array.getLength(src)); }
   private void delinearize(Object src, Object dst, int dim, int offset, int prodsize) {
     prodsize /= size[dim];
@@ -395,20 +395,20 @@ static class BinaryThing {
         res += "[" + size[i] + "]";
     return res;
   }
-  
+
 }
 
 static class SparseMatrix {
   int N;  // FIXME: should this be generalized to hold non-square sparse matrices as well?
   int index[][];
   float value[][];
-  
+
   SparseMatrix(int N) {
     this.N = N;
     index = new int[N][]; value = new float[N][];
     for (int i = 0; i < N; i++) { index[i] = new int[0]; value[i] = new float[0]; }
   }
-  
+
   SparseMatrix(float data[][]) {
     this(data.length);
     for (int i = 0; i < N; i++) {
@@ -419,7 +419,7 @@ static class SparseMatrix {
       }
     }
   }
-  
+
   SparseMatrix(int N, int ii[], int jj[]) { this(N, ii, jj, null); }
   SparseMatrix(int N, int ii[], int jj[], float val[]) {
     this(N);
@@ -428,7 +428,7 @@ static class SparseMatrix {
       value[ii[l]] = (float[])append(value[ii[l]], (val != null) ? val[l] : 1f);
     }
   }
-  
+
   SparseMatrix(int ii[], int jj[]) { this(ii, jj, null); }
   SparseMatrix(int ii[], int jj[], float val[]) {
     N = 0;

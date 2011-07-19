@@ -22,9 +22,9 @@ import java.io.*;
 import org.boris.winrun4j.*;
 
 public class WindowsMagic {
-  
+
   protected SPaTo_Visual_Explorer app = null;
-  
+
   protected void setupFileAssociations() throws Exception {
     FileAssociation fa = null;
     String exeFile = new File(System.getProperty("spato.app-dir"), "SPaTo Visual Explorer.exe").getCanonicalPath();
@@ -61,5 +61,5 @@ public class WindowsMagic {
       System.out.println("!!! Failed to setup file associations or frame icon");
     }
   }
-  
+
 }

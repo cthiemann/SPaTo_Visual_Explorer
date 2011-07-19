@@ -79,8 +79,8 @@ void setup() {
       prefs.putInt("window.width", cw); prefs.putInt("window.height", ch);
     }
   });
-  addMouseWheelListener(new java.awt.event.MouseWheelListener() { 
-    public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) { 
+  addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+    public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
       mouseWheel(evt.getWheelRotation()); } });
   smooth();
   randomSeed(second() + 60*minute() + 3600*hour());

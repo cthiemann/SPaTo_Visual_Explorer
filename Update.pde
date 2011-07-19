@@ -43,17 +43,17 @@ class Updater extends Thread {
     "C3K4UUzgBqXYJwfGNKZnLp17wy/45nH7/llxBKR7eioJPdYCauxQ8M" +
     "nuArSltlIV9AnBKxb8h28xoBsEx1ek04jvJEtd93Bw7ILa3eF4MDGl" +
     "ZxwPnmTaTICIVUXtiZveOHDl1dQBKvinyU8fe3Xi7+j9klnwIDAQAB";
-  
+
   public Updater(boolean force) {
     setPriority(Thread.MIN_PRIORITY);
     this.force = force;
     // if (System.getProperty("spato.app-dir") == null)
     //   System.setProperty("spato.app-dir", "/Users/ct/Documents/Processing/SPaTo/SPaTo_Visual_Explorer/application.macosx/SPaTo_Visual_Explorer.app");
   }
-  
+
   void printOut(String msg) { System.out.println("+++ SPaTo Updater: " + msg); }
   void printErr(String msg) { System.err.println("+++ SPaTo Updater: " + msg); }
-  
+
   void setupEnvironment() {
     printOut("updateURL = " + updateURL);
     // determine which INDEX file to download
@@ -81,7 +81,7 @@ class Updater extends Thread {
     if (!cacheFolder.endsWith(File.separator)) cacheFolder += File.separator;
     printOut("cacheFolder = " + cacheFolder);
   }
-  
+
   boolean checkAndFetch() {  // returns true if update is available
     int count = 0, totalSize = 0;
     BufferedReader reader = null;
@@ -177,7 +177,7 @@ class Updater extends Thread {
       return false;
     }
   }
-  
+
   String[] getRestartCmd() {
     switch (platform) {
       case LINUX:
@@ -190,9 +190,9 @@ class Updater extends Thread {
         return null;
     }
   }
-  
+
   final static int NOTHING = -1, IGNORE = 0, INSTALL = 1, RESTART = 2;
-  
+
   int showReleaseNotesDialog(boolean canRestart) {
     // construct URL request
     String url = releaseNotesURL + "?version=" + version + "&index=" + indexName;
@@ -232,7 +232,7 @@ class Updater extends Thread {
     if (result == 0 && canRestart) return RESTART;  // install now
     return NOTHING;  // this will cause to do nothing (no kidding!)
   }
-  
+
   void askAndAct() {
     while (fireworks) try { Thread.sleep(5000); } catch (Exception e) {}
     String cmd[] = getRestartCmd();
@@ -243,7 +243,7 @@ class Updater extends Thread {
     // save the INDEX into the update cache folder to indicate that the update should be installed
     if ((action == INSTALL) || (action == RESTART))
       index.write(createWriter(cacheFolder + "INDEX"));
-    // restart application if requested 
+    // restart application if requested
     if (action == RESTART) try {
       new ProcessBuilder(cmd).start();
       exit();  // FIXME: unsaved documents?
@@ -257,7 +257,7 @@ class Updater extends Thread {
         JOptionPane.ERROR_MESSAGE);
     }
   }
-  
+
   void run() {
     try {
       setupEnvironment();
@@ -285,5 +285,5 @@ class Updater extends Thread {
       prefs.putBoolean("update.check", cbAutoUpdate.isSelected());
     }
   }
-  
+
 }

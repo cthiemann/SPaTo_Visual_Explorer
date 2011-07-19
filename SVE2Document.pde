@@ -31,27 +31,27 @@ int untitledCounter = 0;  // counter for uniquely numbering untitled documents
  */
 
 class SVE2Document {
-  
+
   XMLElement xmlDocument = new XMLElement("document");
   SVE2View view = null;
-  
+
   File file = null;  // corresponding file on disk
   String name = null;  // short name (basename of file or "<untitled%d>")
   boolean compressed = false;  // is this document in a zip archive or in a directory?
   ZipFile zipfile = null;
   ZipOutputStream zipout = null;
-  
+
   boolean modified = false;
-  
+
   HashMap<XMLElement,BinaryThing> blobCache = new HashMap<XMLElement,BinaryThing>();
-  
+
   SVE2Document() { this(null); }
   SVE2Document(File file) { setFile(file); this.view = new SVE2View(this); }
-  
-  /* 
+
+  /*
    * Metadata Accessors
    */
-  
+
   File getFile() { return file; }
   void setFile(File file) {
     // assume it's a zip archive if it's not a directory; create zip files by default
@@ -63,13 +63,13 @@ class SVE2Document {
     this.compressed = compressed;
     this.name = null;  // reset name
   }
-  
+
   boolean isCompressed() { return compressed; }
   void setCompressed(boolean compressed) { this.compressed = compressed; }
   void setCompressed() { setCompressed(true); }
-  
+
   boolean isModified() { return modified; }
-  
+
   String getName() {
     if (name == null) {
       if (file != null) {
@@ -80,7 +80,7 @@ class SVE2Document {
     }
     return name;
   }
-  
+
   String getTitle() {
     XMLElement xmlTitle = xmlDocument.getChild("title");
     if (xmlTitle != null) {
@@ -90,7 +90,7 @@ class SVE2Document {
     }
     return "Untitled Network";
   }
-  
+
   String getDescription() {
     XMLElement xmlDescription = xmlDocument.getChild("description");
     if (xmlDescription != null) {
@@ -100,32 +100,32 @@ class SVE2Document {
     }
     return "";
   }
-  
+
   /*
    * Data Accessors
    */
-  
+
   XMLElement getNodes() { return xmlDocument.getChild("nodes"); }
   XMLElement getNode(int i) { return getChild("nodes/node[" + i + "]"); }
   int getNodeCount() { return getChildren("nodes/node").length; }
-  
+
   XMLElement getAlbum() { return xmlDocument == null ? null : xmlDocument.getChild("album"); }  // FIXME: concurrency problems...
   XMLElement[] getAlbums() { return xmlDocument.getChildren("album"); }
   XMLElement getAlbum(String id) { return getChild("album[@id=" + id + "]"); }
-  
+
   XMLElement getLinks() { return xmlDocument.getChild("links"); }
-  
+
   XMLElement getSlices() { return xmlDocument.getChild("slices"); }
-  
+
   XMLElement[] getDatasets() { return xmlDocument.getChildren("dataset"); }
   XMLElement getDataset(String id) { return getChild("dataset[@id=" + id + "]"); }
-  
+
   XMLElement[] getAllQuantities() { return getChildren("dataset/data"); }
   XMLElement[] getQuantities() { return getChildren("dataset[@selected]/data"); }
   XMLElement[] getQuantities(XMLElement xmlDataset) { return xmlDataset.getChildren("data"); }
   XMLElement getQuantity(XMLElement xmlDataset, String id) {
     return getChild(xmlDataset, "data[@id=" + id + "]"); }
-    
+
   XMLElement[] getDistanceQuantities() { //return getChildren("dataset/data[@blobtype=float[N][N]]"); }
     XMLElement res[] = new XMLElement[0];
     for (XMLElement xmlData : getAllQuantities())
@@ -133,12 +133,12 @@ class SVE2Document {
         res = (XMLElement[])append(res, xmlData);
     return res;
   }
-  
+
   XMLElement getSelectedDataset() { return getChild("dataset[@selected]"); }
   XMLElement getSelectedQuantity() { return getChild("dataset[@selected]/data[@selected]"); }
   XMLElement getSelectedQuantity(XMLElement xmlDataset) {
     return getChild(xmlDataset, "data[@selected]"); }
-  
+
   void setSelectedDataset(XMLElement xmlDataset) {
     XMLElement xmlOldDataset = getSelectedDataset();
     if ((xmlDataset != null) && (xmlDataset == xmlOldDataset))
@@ -152,7 +152,7 @@ class SVE2Document {
     }
     view.setNodeColoringData(getSelectedQuantity());
   }
-  
+
   void setSelectedQuantity(XMLElement xmlData) {
     XMLElement xmlOldData = getSelectedQuantity();
     if ((xmlData != null) && (xmlData == xmlOldData))
@@ -166,9 +166,9 @@ class SVE2Document {
     view.setNodeColoringData(xmlData);
     guiUpdateNodeColoring();
   }
-  
+
   XMLElement getDistanceQuantity() { return getChild("dataset/data[@distmat]"); }
-  
+
   void setDistanceQuantity(XMLElement xmlData) {
     if ((xmlData != null) && (xmlData == view.xmlDistMat))
       return;  // nothing to do
@@ -177,11 +177,11 @@ class SVE2Document {
     if (xmlData != null) xmlData.setBoolean("distmat", true);
     guiUpdateProjection();
   }
-  
+
   /*
    * Snapshot Handling
    */
-  
+
   XMLElement getSelectedSnapshot(XMLElement xml) { return getSelectedSnapshot(xml, true); }
   XMLElement getSelectedSnapshot(XMLElement xml, boolean recursive) {
     if ((xml == null) || (xml.getChild("snapshot") == null))
@@ -211,14 +211,14 @@ class SVE2Document {
     }
     return recursive ? getSelectedSnapshot(result) : result;
   }
-  
+
   /** Returns the XML element containing the appropriate anonymous snapshot series (if any) of <code>xml</code>. */
   XMLElement getSelectedSnapshotSeriesContainer(XMLElement xml) {
     while ((xml != null) && (xml.getChild("snapshot") != null) && (xml.getChild("snapshot").getString("album") != null))
       xml = getSelectedSnapshot(xml, false);
     return ((xml == null) || (xml.getChild("snapshot") == null)) ? null : xml;
   }
-  
+
   /** Returns the index of the currently selected snapshot in an album or an anonymous snapshot series. */
   int getSelectedSnapshotIndex(XMLElement xml) {
     if (xml == null) return -1;
@@ -235,7 +235,7 @@ class SVE2Document {
     }
     return -1;
   }
-  
+
   void setSelectedSnapshot(XMLElement xml, int index) { setSelectedSnapshot(xml, index, false); }
   void setSelectedSnapshot(XMLElement xml, int index, boolean relative) {
     boolean isAlbum = xml.getName().equals("album");
@@ -270,11 +270,11 @@ class SVE2Document {
       xml = xml.getParent();
     return (xml != null) ? xml.getChild("colormap") : null;
   }
-  
+
   /*
    * Binary Cache Accessors
    */
-  
+
   BinaryThing getBlob(XMLElement xml) {
     xml = getSelectedSnapshot(xml);
     if (xml == null) return null;
@@ -305,7 +305,7 @@ class SVE2Document {
       xml.setString("blobtype", getBlobType(blob));
     return blob;
   }
-  
+
   /* This is used to ensure a set of blobs is loaded. */
   void loadBlobs(XMLElement xml) { loadBlobs(new XMLElement[] { xml }); }
   void loadBlobs(XMLElement xml[]) {
@@ -318,7 +318,7 @@ class SVE2Document {
         getBlob(xml[i]);  // getBlob will load/parse the data if not already cached
     }
   }
-  
+
   void setBlob(XMLElement xml, Object blob) { setBlob(xml, blob, false); }
   void setBlob(XMLElement xml, Object blob, boolean persistent) {
     if ((xml == null) || (blob == null)) return;
@@ -334,7 +334,7 @@ class SVE2Document {
     } else
       xml.remove("blob");
   }
-  
+
   /* This functions removes all stuff from the xml element that can be reproduced from the elements blob. */
   // FIXME: this is not used at the moment; offer a choiceQuantity context menu item to call this
   void stripXMLData(XMLElement xml) {
@@ -347,7 +347,7 @@ class SVE2Document {
         xml.removeChild(child);
     // FIXME: handle links and snapshots
   }
-  
+
   /* This returns a short description of the blob type/shape. */
   String getBlobType(BinaryThing blob) {
     String s = blob.toString();
@@ -355,11 +355,11 @@ class SVE2Document {
     s = s.replaceAll("([^0-9])[23456789][0-9]*([^0-9])", "$1M$2");  // FIXME: replaces M for any number
     return s;
   }
-  
+
   /*
    * Document Modification
    */
-  
+
   void addDataset(XMLElement xmlDataset) {
     xmlDocument.removeChild(xmlDataset);  // avoid having it in there twice
     if (xmlDataset.getString("id") == null)
@@ -367,7 +367,7 @@ class SVE2Document {
     xmlDocument.addChild(xmlDataset);
     guiUpdateNodeColoring();
   }
-  
+
   void removeDataset(XMLElement xmlDataset) {
     for (XMLElement xmlData : xmlDataset.getChildren("data"))
       removeQuantity(xmlData);
@@ -376,7 +376,7 @@ class SVE2Document {
     xmlDataset.getParent().removeChild(xmlDataset);
     guiUpdateNodeColoring();
   }
-  
+
   void addQuantity(XMLElement xmlDataset, XMLElement xmlData) { addQuantity(xmlDataset, xmlData, null); }
   void addQuantity(XMLElement xmlDataset, XMLElement xmlData, Object blob) {
     xmlDataset.removeChild(xmlData);  // make sure we won't add an already existing quantity
@@ -386,7 +386,7 @@ class SVE2Document {
     guiUpdateNodeColoring();
     guiUpdateProjection();
   }
-  
+
   void removeQuantity(XMLElement xmlData) {
     if (xmlData == view.xmlDistMat)
       view.setDistanceMatrix((XMLElement)previousOrNext(getDistanceQuantities(), xmlData));
@@ -394,23 +394,23 @@ class SVE2Document {
     if (xmlData.getBoolean("selected"))
       setSelectedQuantity((XMLElement)previousOrNext(getQuantities(), xmlData));
   }
-  
-  /* 
+
+  /*
    * Loading/Saving Functions
    */
-  
+
   Runnable newLoadingTask() {
     return new Runnable() {
       public void run() { loadFromDisk(); }
     };
   }
-  
+
   Runnable newSavingTask() {
     return new Runnable() {
       public void run() { saveToDisk(); }
     };
   }
-  
+
   void loadFromDisk(File file) { setFile(file); loadFromDisk(); }
   void loadFromDisk() {
     TConsole.Message msg = console.logInfo("Loading from " + file.getAbsolutePath()).sticky();
@@ -464,7 +464,7 @@ class SVE2Document {
     else  // FIXME
       new Layout(getBlob(xml).getIntArray(), "radial_id");  // FIXME: the horror!
   }  // FIXME
-  
+
   void saveToDisk() {
     TConsole.Message msg = console.logInfo("Saving to " + file.getAbsolutePath()).sticky();
     // open zipout or make sure the directory exists
@@ -513,7 +513,7 @@ class SVE2Document {
     console.popSticky();
     msg.text += " \u2013 done";
   }
-  
+
   InputStream createDocPartInput(String name) {
     InputStream stream = null;
     if (compressed) {
@@ -526,7 +526,7 @@ class SVE2Document {
       console.logError("Could not find or read '" + name + "' in '" + file.getAbsolutePath() + "'");
     return new BufferedInputStream(stream);
   }
-  
+
   OutputStream createDocPartOutput(String name) {
     OutputStream stream = null;
     if (compressed) {
@@ -539,12 +539,12 @@ class SVE2Document {
       console.logError("Error opening '" + name + "' in '" + file.getAbsolutePath() + "' for writing");
     return compressed ? stream : new BufferedOutputStream(stream);  // zipout is already buffered
   }
-  
+
   Reader createDocPartReader(String name) {
     try { return new InputStreamReader(createDocPartInput(name)); } catch (Exception e) { return null; } }
   Writer createDocPartWriter(String name) {
     try { return new OutputStreamWriter(createDocPartOutput(name)); } catch (Exception e) { return null; } }
-  
+
   /* Copy of processing.xml.XMLElement.parseFromReader(...), modified to fit our needs (i.e., catch parsing
    * exceptions and return null instead of silently ignoring and returning a crippled document). */
   XMLElement readXML(String name) {
@@ -566,7 +566,7 @@ class SVE2Document {
     try { reader.close(); } catch (Exception e) { }
     return xml;
   }
-  
+
   void writeXML(String name, XMLElement xml) {
     Writer writer = new File(name).isAbsolute() ? createWriter(name) : createDocPartWriter(name);
     if (writer == null) return;
@@ -580,7 +580,7 @@ class SVE2Document {
       console.abortProgress("XML writing error in " + name + ": ", e);
     }
   }
-  
+
   /* This function reads the XML document found in file specified by name.  It then traverses
    * all child tags and wherever it finds a "src" attribute it will interpret its value as
    * a URI (absolute or relative to the document base) of an additional XML file.  That file is
@@ -606,8 +606,8 @@ class SVE2Document {
         for (int j = 0; j < idoc.getChildCount(); j++)
           if (equalNameAndID(child, idoc.getChild(j), false))
             merge = idoc.getChild(j);
-      if (merge == null) { 
-        console.logError(child.getName() + ": no match found in " + src); 
+      if (merge == null) {
+        console.logError(child.getName() + ": no match found in " + src);
         continue;
       }
       // merge node with 'child'
@@ -621,7 +621,7 @@ class SVE2Document {
     }
     return doc;
   }
-  
+
   /* Being the counterpart to readMultiPartXML, this function traverses the children of the document doc
    * to extract all parts which should go into a separate file.  The first child with a "src" attribute
    * that is not already recorded in the map will be replaced by a new element that has the same tag name,
@@ -680,7 +680,7 @@ class SVE2Document {
     for (int i = 0; i < elems.length; i++) if (equalNameAndID(elems[i], child, false)) return false;
     return true;
   }
-  
+
   /* This function traverses the XML document and adds auto-generated id attribute values
    * to all links, slices, dataset, and data tags, if they are missing their id attribute.
    * Note that this function will alter its argument doc (and return a reference to it). */
@@ -699,11 +699,11 @@ class SVE2Document {
     }
     return doc;
   }
-  
+
   /*
    * Small Helper Functions
    */
-  
+
   /* Returns true if the names of a and b match (or are both null) and if the "id" attributes
    * of a and b match.  If laxID is true, the test still passes if a has an id attribute but
    * b does not. */
@@ -713,7 +713,7 @@ class SVE2Document {
       (((b.getString("id") == null) && (laxID || (a.getString("id") == null))) ||
       ((b.getString("id") != null) && b.getString("id").equals(a.getString("id"))));
   }
-  
+
   /* This function will always return a most-probably unique 8-digit hex-character sequence.
    * It does so by returning the first 8 characters of the MD5 hash of the argument name,
    * or a random sequence if name is null, an empty string, or something goes wrong with MD5. */
@@ -732,7 +732,7 @@ class SVE2Document {
       id += String.format("%02x", digest[i] & 0xff);
     return id;
   }
-  
+
   /* Recursively removes the contents of the specified directory. */
   boolean clearDirectory(File f) throws Exception {
     if (!f.isDirectory()) return false;
@@ -743,7 +743,7 @@ class SVE2Document {
     }
     return true;
   }
-  
+
   /* If needle is in the array haystack, then the element before needle is returned.
    * If needle is the first element in haystack, the element after needle is returned.
    * If haystack only contains needle, null is returned. */
@@ -755,7 +755,7 @@ class SVE2Document {
         return Array.get(haystack, i - 1);  // return element before needle
     return null;  // needle was not in haystack
   }
-  
+
   /* Evaluates an XPath expression on xmlDocument. Only understands a limited subet of XPath! */
   XMLElement[] getChildren(String path) { return getChildren(xmlDocument, path); }
   XMLElement[] getChildren(XMLElement xml, String path) {
@@ -787,13 +787,13 @@ class SVE2Document {
       result = tmp;
     return result;
   }
-  
+
   XMLElement getChild(String path) { return getChild(xmlDocument, path); }
   XMLElement getChild(XMLElement xml, String path) {
     XMLElement result[] = getChildren(xml, path);
     return ((result != null) && (result.length > 0)) ? result[0] : null;
   }
-  
+
   XMLElement[] xpathFilter(XMLElement xml[], String condition) {
     if (xml == null)
       return new XMLElement[0];

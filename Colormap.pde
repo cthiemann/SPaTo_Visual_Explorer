@@ -26,9 +26,9 @@ class Colormap {
   int colormap = 0;
   boolean logscale = false;
   float minval = 0, maxval = 1;
-  
+
   String colormaps[] = { "default", "jet", "bluered", "grayredblue", "thresholded", "discrete" };
-  
+
   Colormap() { this(null); }
   Colormap(XMLElement xml) { this(xml, 0, 1); }
   Colormap(XMLElement xml, float defaultMin, float defaultMax) {
@@ -41,25 +41,25 @@ class Colormap {
   Colormap(String cm, boolean log) { this(cm, log, 0, 1); }
   Colormap(String cm, boolean log, float minval, float maxval) {
     setColormap(cm); logscale = log; setBounds(minval, maxval); }
-  
+
   String getColormapName() { return colormaps[colormap]; }
   void setColormap(String cm) {
     for (int i = 0; i < colormaps.length; i++)
       if (colormaps[i].equals(cm))
         colormap = i;
-    if (xml != null) 
+    if (xml != null)
       xml.setString("name", colormaps[colormap]);
   }
-  
+
   boolean isLogscale() { return logscale; }
   void setLogscale(boolean log) { logscale = log; if (xml != null) xml.setBoolean("log", log); }
-  
+
   float getMinVal() { return minval; }
   float getMaxVal() { return maxval; }
   void setMinVal(float minval) { this.minval = minval; if (xml != null) xml.setFloat("minval", minval); }
   void setMaxVal(float maxval) { this.maxval = maxval; if (xml != null) xml.setFloat("maxval", maxval);  }
   void setBounds(float minval, float maxval) { setMinVal(minval); setMaxVal(maxval); }
-  
+
   color getColor(float val) { return getColor(val, minval, maxval); }
   color getColor(float val, float minval, float maxval) {
     val = constrain(val, minval, maxval);
@@ -106,7 +106,7 @@ class Colormap {
       case  7: return color(127, 127, 127);
       case  8: return color(127,   0, 255);
       case  9: return color(  0,   0,   0);
-  
+
       case 12: return color(127,   0,   0);
       case 11: return color( 80,  80,   0);
       case 10: return color(  0,  80,   0);

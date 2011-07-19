@@ -127,12 +127,12 @@ class Fireworks {
     float alpha = 1;
     boolean solid = false, slowDecay = false;
     boolean sparkling = false, isSparkling = false;
-  
+
     Particle(float t0, float x0, float y0, float vx0, float vy0, color c) {
       this(t0, x0, y0, vx0, vy0, 0, 0, c); }
     Particle(float t0, float x0, float y0, float vx0, float vy0, float ax0, float ay0, color c) {
       this.t0 = t0; x = x0; y = y0; vx = vx0; vy = vy0; ax = ax0; ay = ay0; this.c = c; }
-  
+
     void draw() {
       color cc = c;
       vx += ax*dt; vy += (ay + grav)*dt;
@@ -159,19 +159,19 @@ class Fireworks {
     Shell rr[] = new Shell[0];
     boolean finished = true;
     float t0;
-  
+
     Launcher(float t0) { this.t0 = t0; }
-  
+
     void draw() {
       finished = true;
       for (Shell r : rr) {
         if (t < r.t0) continue;
         r.draw();
-        if (!r.finished) 
+        if (!r.finished)
           finished = false;
       }
     }
-  
+
   }
 
   class ShellLauncher extends Launcher {
@@ -239,7 +239,7 @@ class Fireworks {
       this.x0 = x0;
       createParticles(sparkling, c);
     }
-  
+
     void createParticles(boolean sparkling, color c) {
       pp = new Particle[floor(sparkling ? random(150, 200) : random(100, 150))];
       if (c == 0) c = colors[floor(random(0, colors.length))];
@@ -256,7 +256,7 @@ class Fireworks {
         if (sparkling) pp[i].f *= 5;
       }
     }
-  
+
     void draw() {
       // shell physics
       alpha = 1;
@@ -287,7 +287,7 @@ class Fireworks {
   class Skyrocket extends Shell {
     Particle trail[] = new Particle[50]; int trailPointer = 0; float trailLast = 0;
     float a;
-  
+
     class TrailParticle extends Particle {
       float tau = .1;
       TrailParticle(float t0, float x0, float y0, float vx0, float vy0) {
@@ -308,13 +308,13 @@ class Fireworks {
             point(x, y);
       }
     }
-  
+
     Skyrocket(float t0, float x0, float y0, float vx0, float vy0, float a) {
       super(t0, x0, y0, vx0, vy0); this.a = a;
       mortarLaunch = false;
       createParticles();
     }
-  
+
     void createParticles() {
       pp = new Particle[floor(random(50, 150))];
       color c = colors[floor(random(0, colors.length))];
@@ -329,7 +329,7 @@ class Fireworks {
         pp[i] = new Particle(0, 0, -100, nvx, nvy, c);
       }
     }
-  
+
     void generateTrail() {
       if ((a > 0) && (t > trailLast + .05)) {
         trail[trailPointer] = new TrailParticle(t, x, y, vx, vy);
@@ -337,7 +337,7 @@ class Fireworks {
         trailLast = t;
       }
     }
-  
+
     void draw() {
       // draw tail
       for (int i = 0; i < trail.length; i++) {
@@ -369,7 +369,7 @@ class Fireworks {
       trail = new Particle[500];
       trailRate = initTrailRate = 7*sqrt(sq(vx0) + sq(vy0));
     }
-  
+
     void generateTrail() {
       if (a == 0) trailRate = max(0, trailRate - .66*initTrailRate*dt);
       int N = floor(trailRate*dt);
@@ -386,7 +386,7 @@ class Fireworks {
         trailLast = t;
       }
     }
-  
+
     void draw() {
       super.draw();
       finished = (a == 0);
@@ -394,7 +394,7 @@ class Fireworks {
         if ((p != null) && (p.alpha > 1/255.))
           finished = false;
     }
-  
+
   }
 
 }

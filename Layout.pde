@@ -40,7 +40,7 @@ class Layout {
     Vector children[];
     int numTotalChildren[];
     float sortValue[];
-    
+
     Cache(int r, float val[], boolean sortRecursively) {
       children = new Vector[NN];
       for (int i = 0; i < NN; i++) children[i] = new Vector();
@@ -59,7 +59,7 @@ class Layout {
             float v1 = sortValue[((Integer)o1).intValue()], v2 = sortValue[((Integer)o2).intValue()];
             return (v1 < v2) ? -1 : (v1 > v2) ? +1 : 0; } });
     }
-    
+
     void setupRecursively(int j, float val[], boolean sortRecursively) {
       numTotalChildren[j] = children[j].size();
       if (val != null) sortValue[j] = val[j];
@@ -73,7 +73,7 @@ class Layout {
       if (sortRecursively) sortValue[j] += sortTmp/10000;
     }
   }
-  
+
   Layout(int[][] pred, String spec) {
     this.pred = pred;
     NN = pred.length;
@@ -89,7 +89,7 @@ class Layout {
     }
     phi = (float[][])layoutCache.get(hash);
   }
-  
+
   String getSpecification() { return projection + "_" + scaling + (!order.equals("unsorted") ? "__" + order : ""); }
 
   void setupProjection(String projection) {
@@ -100,7 +100,7 @@ class Layout {
     proj = TomProjectionFactory.produce(projection, NN);
     this.projection = projection;
   }
-  
+
   void setupScaling(String scaling) { setupScaling(scaling, 1); }
   void setupScaling(String scaling, float x0) {
     if (!ScalingFactory.canProduce(scaling)) {
@@ -111,9 +111,9 @@ class Layout {
     if (scaling.equals("log")) ((LogScaling)scal).x0 = x0;
     this.scaling = scaling;
   }
-  
+
   void updateProjection(int r, float D[][]) { proj.setPoints(scal.f(D[r]), phi[r]); this.r = r; }
-  
+
   void parseSpecification(String spec) {
     order = "unsorted";
     String pieces[] = split(spec, "__");
@@ -122,7 +122,7 @@ class Layout {
     projection = pieces[0];
     scaling = (pieces.length > 1) ? pieces[1] : "id";
   }
-  
+
   float[] getSortData() {
     return null;  // FIXME: re-implement this feature...
     /*if (order.equals("unsorted")) return null;
@@ -145,7 +145,7 @@ class Layout {
       return null;
     }*/
   }
-  
+
   void calculateLayout(float sortData[]) {
     console.logProgress("Calculating layout " + getSpecification());
     for (int r = 0; r < NN; r++) {
@@ -156,7 +156,7 @@ class Layout {
     }
     console.finishProgress();
   }
-  
+
   // cache, root node, current layout node, tree depth of node j, min and max angles
   void calculateLayoutRecursively(Cache cache, int r, int j, int d, float phimin, float phimax) {
     int sumNTC = cache.numTotalChildren[j], cumNTC = 0;  // sum of total children, cumulative sum

@@ -29,13 +29,13 @@ float linkLineWidth = 0.25;
 /*
  *  Visual Explorer Document Viewer / Data Structures
  */
- 
+
 class SVE2View {
-  
+
   SVE2Document doc = null;
-   
+
   SVE2View(SVE2Document doc) { this.doc = doc; }
-   
+
   class Node {
     String id, label, name;  // node ID, short label and full name
     float poslat, poslong, w;  // geographical position and strength  // FIXME: remove the node strength stuff and use proper showLabel framework
@@ -55,7 +55,7 @@ class SVE2View {
       a = 0;
     }
   }
-  
+
   class SortedLinkList {
     int NN, NL;  // number of nodes (max value in src[] and dst[]) and number of links
     int src[] = null, dst[] = null;
@@ -165,7 +165,7 @@ class SVE2View {
   XMLElement xmlDistMat = null;
   float D[][] = null;  // distance matrix
   float minD = Float.POSITIVE_INFINITY, maxD = Float.NEGATIVE_INFINITY;
-  
+
   // current view parameters
   public final static int VIEW_MAP = 0;
   public final static int VIEW_TOM = 1;
@@ -183,7 +183,7 @@ class SVE2View {
   float xoff[] = { 0, 0 };
   float yoff[] = { 0, 0 };
   float nodeSizeFactor = 0.2;
-  
+
   void setNodes(XMLElement xmlNodes) {
     hasNodes = false;
     XMLElement tmp[] = null;
@@ -199,7 +199,7 @@ class SVE2View {
       nodes[i].showLabel = nodes[i].w > .4*maxw;
     hasNodes = true;
   }
-  
+
   void setMapProjection(XMLElement xmlProjection) {
     hasMapLayout = false;
     if (!hasNodes) return;
@@ -215,7 +215,7 @@ class SVE2View {
       hasMapLayout = true;
     }
   }
-  
+
   void setMapProjection(String name) {
     if (!hasNodes) return;
     if (xmlProjection == null)
@@ -223,13 +223,13 @@ class SVE2View {
     xmlProjection.setString("name", name);
     setMapProjection(xmlProjection);
   }
-  
+
   void setRootNode(int i) {
     if (!hasNodes || (i < 0) || (i >= NN)) return;
     r = i;
     if (hasTomLayout) layouts[l].updateProjection(r, D);
   }
-  
+
   void setLinks(XMLElement xmlLinks) { setLinks(xmlLinks, console); }
   void setLinks(XMLElement xmlLinks, TConsole console) {
     hasLinks = false;
@@ -259,7 +259,7 @@ class SVE2View {
     loglinks = new SortedLinkList(links, true, true, true);
     hasLinks = true;
   }
-  
+
   void setSlices(XMLElement xmlSlices) { setSlices(xmlSlices, console); }
   void setSlices(XMLElement xmlSlices, TConsole console) {
     hasSlices = false;
@@ -351,7 +351,7 @@ class SVE2View {
     this.xmlSlices = xmlSlices;
     hasSlices = true;
   }
-  
+
   void setNodeColoringData(XMLElement xmlData) {
     hasData = false;
     data = null;
@@ -396,7 +396,7 @@ class SVE2View {
     layouts[this.l = 0].updateProjection(r, D);
     hasTomLayout = true;
   }
-  
+
   void setDistanceMatrix(XMLElement xmlData) { setDistanceMatrix(xmlData, console); }
   void setDistanceMatrix(XMLElement xmlData, TConsole console) {
     if (!hasTomLayout) return;
@@ -440,13 +440,13 @@ class SVE2View {
     layouts[l].setupScaling(scaling, minD/1.25);
     if (r > -1) layouts[l].updateProjection(r, D);
   }
-  
+
 
   float a = 0, nodeSize = 0;
   float[] tmpx = null, tmpy = null;
   float viewWidth = width;
   float aNodes = 0, aLinks = 0, aSkeleton = 0, aNeighbors = 0, aNetwork = 0, aLabels = 0;
-  
+
   void draw() {
     if (!hasNodes || (!hasMapLayout && !hasTomLayout)) return;  // nothing to draw
     if ((showNeighbors || showNetwork) && !hasLinks) {
@@ -504,7 +504,7 @@ class SVE2View {
       }
       float d = dist(nodes[i].x, nodes[i].y, mouseX, mouseY);
       if (!invis &&
-          (gui.componentAtMouse == null) && (gui.componentMouseClicked == null) && 
+          (gui.componentAtMouse == null) && (gui.componentMouseClicked == null) &&
           (d < 50) && (d < mind) &&
           (!searchMatchesValid || !tfSearch.isFocusOwner() ||
            searchMatches[i] || (searchMatchesChild[i] > 0))) {
@@ -657,7 +657,7 @@ class SVE2View {
     for (int i = 0; i < NN; i++) {
       if ((i == r) || (i == ih) || ((aLabels > 1/255.) && nodes[i].showLabel && (!searchMatchesValid || searchMatches[i]))) {
         fill(0, 255*aLabels*nodes[i].a);
-        text(nodes[i].label + (((i == ih) && (val != null)) ? " (" + format(val[i]) + ")" : ""), 
+        text(nodes[i].label + (((i == ih) && (val != null)) ? " (" + format(val[i]) + ")" : ""),
              nodes[i].x + nodeSize/4, nodes[i].y - nodeSize/4);
       }
     }
@@ -678,7 +678,7 @@ class SVE2View {
     } else
       return String.format("%.4g", val);
   }
-  
+
   void writeLayout(String filename) {
     String lines[] = new String[NN];
     Projection p = ((viewMode == VIEW_MAP) || !hasTomLayout) ? projMap : layouts[0].proj;

@@ -19,21 +19,21 @@
  */
 
 class DataImportWizard extends TFrame {
-  
+
   TConsole console;
   File file = null;
   String str = null;
   ExecutorService worker = null;
   BufferedReader reader = null;
   String lines[] = null;
-  
+
   DataImportWizard() {
     super(SPaTo_Visual_Explorer.this.gui, "Data Import Wizard");
     setActionEventHandler(this);
     guiSetup();
     worker = Executors.newSingleThreadExecutor();
   }
-  
+
   DataImportWizard(File file) {
     this(); setTitle(file.getName());
     this.file = file;
@@ -55,7 +55,7 @@ class DataImportWizard extends TFrame {
       e.printStackTrace();
     }
   }
-  
+
   void guiSetup() {
     setBounds(100, 100, 300, 200);
     console = gui.createConsole("import");
@@ -63,7 +63,7 @@ class DataImportWizard extends TFrame {
     console.setFancy(false);
     add(console, TBorderLayout.SOUTH);
   }
-  
+
   void start() {
     validate(); gui.add(this); gui.requestFocus(this);
     worker.submit(new Runnable() {
@@ -73,7 +73,7 @@ class DataImportWizard extends TFrame {
       }
     });
   }
-  
+
   void readData() {
     console.logProgress("Reading data").indeterminate();
     lines = new String[1024];
@@ -91,14 +91,14 @@ class DataImportWizard extends TFrame {
     console.finishProgress();
     console.logNote("Got " + NL + " lines of data");
   }
-  
+
   void finish() {
     worker.shutdown();
     gui.remove(this);
   }
-  
+
   void actionPerformed(String cmd) {
     //
   }
-  
+
 }

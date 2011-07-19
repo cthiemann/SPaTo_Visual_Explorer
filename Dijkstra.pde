@@ -40,17 +40,17 @@ static class Dijkstra {
         marked = false; degree = 0;
         next = this; prev = this; child = null; parent = null; }
     }
-    
+
     int N, Nt;  // number of nodes and number of trees
     Node nodes[];  // wasteful array to quickly find an element by its "element" value
     Node min;  // minimum node (the root of the tree)
-    
+
     FibonacciHeap(int maxElement) {
       N = Nt = 0;
       min = null;
       nodes = new Node[maxElement+1];
     }
-    
+
     void insert(int element, float key) {
       Node n = new Node(element, key);
       nodes[element] = n;  // link in nodes array for quick access
@@ -66,7 +66,7 @@ static class Dijkstra {
       }
       N++; Nt++;
     }
-    
+
     int deleteMin() {
       if (min == null) return -1;  // nothing to do
       // calculate max degree
@@ -139,7 +139,7 @@ static class Dijkstra {
       nodes[element] = null;
       return element;
     }
-    
+
     void decreaseKey(int element, float key) {
       Node z = nodes[element];
       // if element is not on heap or new key is not lower, then there's nothing to do
@@ -179,7 +179,7 @@ static class Dijkstra {
       if (z.key < min.key)
         min = z;
     }
-    
+
     boolean isEmpty() { return min == null; }
   }
 
@@ -216,5 +216,5 @@ static class Dijkstra {
       }
     }
   }
-  
+
 }

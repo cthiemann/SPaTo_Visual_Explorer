@@ -432,7 +432,7 @@ void guiUpdateSearchMatches() {
   } else {
     boolean caseSensitive = !searchPhrase.equals(searchPhrase.toLowerCase());  // ignore case if no upper-case letter present
     for (int i = 0; i < doc.view.NN; i++)
-      searchMatches[i] = 
+      searchMatches[i] =
         (caseSensitive
          ? doc.view.nodes[i].label.contains(searchPhrase)
          : doc.view.nodes[i].label.toLowerCase().contains(searchPhrase))
@@ -679,12 +679,12 @@ class NetworkDetailPanel extends TComponent {
 class InPlaceRenamingTextField extends TTextField {
   TChoice choice = null;
   XMLElement xml = null;
-  
+
   InPlaceRenamingTextField(TransparentGUI gui, TChoice choice) { super(gui); this.choice = choice; }
-  
+
   TComponent.Dimension getPreferredSize() {
     return new TComponent.Dimension(max(choice.getWidth(), 50), choice.getHeight()); }
-  
+
   void show() {
     xml = (XMLElement)choice.getSelectedItem();
     if (xml == null) return;
@@ -698,7 +698,7 @@ class InPlaceRenamingTextField extends TTextField {
     parent.validate();
     gui.requestFocus(this);
   }
-  
+
   void draw(PGraphics g) {
     if (isFocusOwner())
       super.draw(g);

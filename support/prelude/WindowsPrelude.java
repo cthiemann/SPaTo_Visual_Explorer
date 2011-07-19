@@ -22,10 +22,10 @@ import java.io.*;
 import javax.swing.JOptionPane;
 
 public class WindowsPrelude implements Runnable {
-  
+
   // the application's root folder
   protected String appRootFolder = System.getProperty("spato.app-dir");
-  
+
   protected void launchApplication() {
     if (!appRootFolder.endsWith(File.separator)) appRootFolder += File.separator;
     String cmdLine[] = new String[] {
@@ -49,5 +49,5 @@ public class WindowsPrelude implements Runnable {
   public void run() {
     launchApplication();
   }
-  
+
 }
