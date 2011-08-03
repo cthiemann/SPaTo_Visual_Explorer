@@ -69,7 +69,7 @@ class DataImportWizard extends TFrame {
     worker.submit(new Runnable() {
       public void run() {
         readData();  // or... read first line(s) and detect data type (e.g. GraphML etc)
-        new CSVParser(lines);
+        TabulatedData data = new TabulatedData(lines);
       }
     });
   }

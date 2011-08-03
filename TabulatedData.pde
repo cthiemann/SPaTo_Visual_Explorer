@@ -18,7 +18,7 @@
  * along with SPaTo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class CSVParser {
+public class TabulatedData {
   // FIXME: handle header/footer lines
   // FIXME: handle line breaks in enclosed fields
   // FIXME: handle proper escape guessing
@@ -46,10 +46,10 @@ public class CSVParser {
   protected int typeRow[] = null;
 
 
-  public CSVParser(String lines[]) { this(lines, GUESS); }
-  public CSVParser(String lines[], char delim) { this(lines, delim, GUESS); }
-  public CSVParser(String lines[], char delim, char enclose) { this(lines, delim, enclose, GUESS); }
-  public CSVParser(String lines[], char delim, char enclose, char escape) {
+  public TabulatedData(String lines[]) { this(lines, GUESS); }
+  public TabulatedData(String lines[], char delim) { this(lines, delim, GUESS); }
+  public TabulatedData(String lines[], char delim, char enclose) { this(lines, delim, enclose, GUESS); }
+  public TabulatedData(String lines[], char delim, char enclose, char escape) {
     this.lines = lines;
     setParameters(delim, enclose, escape);
   }
