@@ -70,39 +70,18 @@ public class TabulatedData {
   public int getNumCols() { return numCols; }
   public int getNumRows() { return lines.length - numHeaderRows - numFooterRows; }
 
-  public int guessMatrixType() {
-    if (fields == null) parse();
-    if (typeMatrix == 0) {
-      typeMatrix = INT;
-      for (int j = 0; j < numCols; j++)
-        typeMatrix = min(typeMatrix, guessColumnType(j));
-    }
-    return typeMatrix;
-  }
+  public boolean isSquareMatrix() { return getNumCols() == getNumRows(); }
+  public boolean isIntMatrix() { return checkMatrixType() == INT; }
+  public boolean isNumericMatrix() { return checkMatrixType() >= FLOAT; }
+  public String getMatrixType() { return typeString(checkMatrixType()); }
 
-  public int guessColumnType(int j) {
-    if (fields == null) parse();
-    if (typeColumn[j] == 0) {
-      typeColumn[j] = INT;
-      for (int i = 0; i < lines.length; i++) {
-        if (typeColumn[j] == INT) try { Integer.valueOf(fields[i][j]); } catch (NumberFormatException e) { typeColumn[j] = FLOAT; }
-        if (typeColumn[j] == FLOAT) try { Float.valueOf(fields[i][j]); } catch (NumberFormatException e) { typeColumn[j] = STRING; break; }
-      }
-    }
-    return typeColumn[j];
-  }
+  public boolean isIntColumn(int j) { return checkColumnType(j) == INT; }
+  public boolean isNumericColumn(int j) { return checkColumnType(j) >= FLOAT; }
+  public String getColumnType(int j) { return typeString(checkColumnType(j)); }
 
-  public int guessRowType(int i) {
-    if (fields == null) parse();
-    if (typeRow[i] == 0) {
-      typeRow[i] = INT;
-      for (int j = 0; j < numCols; j++) {
-        if (typeRow[i] == INT) try { Integer.valueOf(fields[i][j]); } catch (NumberFormatException e) { typeRow[i] = FLOAT; }
-        if (typeRow[i] == FLOAT) try { Float.valueOf(fields[i][j]); } catch (NumberFormatException e) { typeRow[i] = STRING; break; }
-      }
-    }
-    return typeRow[i];
-  }
+  public boolean isIntRow(int j) { return checkRowType(j) == INT; }
+  public boolean isNumericRow(int j) { return checkRowType(j) >= FLOAT; }
+  public String getRowType(int j) { return typeString(checkRowType(j)); }
 
   public float[][] getFloatMatrix() {
     if (fields == null) parse();
@@ -234,6 +213,46 @@ public class TabulatedData {
     // create proper type caches
     typeColumn = new int[numCols];
     typeRow = new int[lines.length];
+  }
+
+  protected int checkMatrixType() {
+    if (typeMatrix == 0) {
+      typeMatrix = INT;
+      for (int j = 0; j < numCols; j++)
+        typeMatrix = min(typeMatrix, checkColumnType(j));
+    }
+    return typeMatrix;
+  }
+
+  protected int checkColumnType(int j) {
+    if (typeColumn[j] == 0) {
+      typeColumn[j] = INT;
+      for (int i = 0; i < lines.length; i++) {
+        if (typeColumn[j] == INT) try { Integer.valueOf(fields[i][j]); } catch (NumberFormatException e) { typeColumn[j] = FLOAT; }
+        if (typeColumn[j] == FLOAT) try { Float.valueOf(fields[i][j]); } catch (NumberFormatException e) { typeColumn[j] = STRING; break; }
+      }
+    }
+    return typeColumn[j];
+  }
+
+  protected int checkRowType(int i) {
+    if (typeRow[i] == 0) {
+      typeRow[i] = INT;
+      for (int j = 0; j < numCols; j++) {
+        if (typeRow[i] == INT) try { Integer.valueOf(fields[i][j]); } catch (NumberFormatException e) { typeRow[i] = FLOAT; }
+        if (typeRow[i] == FLOAT) try { Float.valueOf(fields[i][j]); } catch (NumberFormatException e) { typeRow[i] = STRING; break; }
+      }
+    }
+    return typeRow[i];
+  }
+
+  protected String typeString(int type) {
+    switch (type) {
+      case STRING: return "string";
+      case FLOAT: return "numeric";
+      case INT: return "integer";
+      default: return "unknown";
+    }
   }
 
 }
