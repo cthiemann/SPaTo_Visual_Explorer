@@ -79,8 +79,8 @@ class DataImportWizard extends TFrame {
     lines = new String[1024];
     int NL = 0;
     try {
-      while ((lines[NL++] = reader.readLine()) != null)
-        if (NL >= lines.length)
+      while ((lines[NL] = reader.readLine()) != null)
+        if (++NL >= lines.length)
           lines = expand(lines);
     } catch (IOException e) {
       console.abortProgress("Error while reading data: ", e);
