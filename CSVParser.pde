@@ -21,6 +21,7 @@
 public class CSVParser {
   // FIXME: handle header/footer lines
   // FIXME: handle line breaks in enclosed fields
+  // FIXME: handle proper escape guessing
 
   protected String lines[] = null;
 
@@ -53,19 +54,19 @@ public class CSVParser {
     setParameters(delim, enclose, escape);
   }
 
-  public void setDelim(char delim) { this.delim = delim; this.fields = null; checkParameters(); }
+  public void setDelim(char delim) { this.delim = delim; parse(); }
   public char getDelim() { return delim; }
 
-  public void setEnclose(char enclose) { this.enclose = enclose; this.fields = null; checkParameters(); }
+  public void setEnclose(char enclose) { this.enclose = enclose; parse(); }
   public char getEnclose() { return enclose; }
 
-  public void setEscape(char escape) { this.escape = escape; this.fields = null; checkParameters(); }
+  public void setEscape(char escape) { this.escape = escape; parse(); }
   public char getEscape() { return escape; }
 
   public void setParameters(char delim, char enclose, char escape) {
-    this.delim = delim; this.enclose = enclose; this.escape = escape; this.fields = null; checkParameters(); }
+    this.delim = delim; this.enclose = enclose; this.escape = escape; parse(); }
 
-  public String[][] getFields() { if (fields == null) parse(); return fields; }
+  public String[][] getFields() { return fields; }
   public int getNumCols() { return numCols; }
   public int getNumRows() { return lines.length - numHeaderRows - numFooterRows; }
 
@@ -157,17 +158,6 @@ public class CSVParser {
     return result;
   }
 
-  protected void parse() {
-    this.fields = new String[lines.length][];
-    typeMatrix = 0;
-    typeColumn = new int[numCols];
-    typeRow = new int[lines.length];
-    for (int i = 0; i < lines.length; i++)
-      fields[i] = parseRecord(lines[i]);
-  }
-
-  protected String[] parseRecord(String record) { return parseRecord(record, delim, enclose, escape); }
-
   protected String[] parseRecord(String record, char delim, char enclose, char escape) {
     Vector<String> result = new Vector<String>();  // return value
     String currentField = "";  // current field
@@ -175,9 +165,11 @@ public class CSVParser {
     boolean escaped = false;
     for (int i = 0; i < record.length(); i++) {
       char c = record.charAt(i);
-      if (((delim == WHITESPACE) ? Character.isWhitespace(c) : (c == delim)) && !enclosed) {
-        result.add(currentField);
-        currentField = "";
+      if ((c == delim) && !enclosed) {
+        if ((delim != ' ') || (!currentField.equals(""))) {  // treat multiple spaces as one separator
+          result.add(currentField);
+          currentField = "";
+        }
       } else if ((c == escape) && (i < record.length() - 1) && (record.charAt(i+1) == enclose)) {
         escaped = true;
       } else if ((c == enclose) && !escaped) {
@@ -191,29 +183,57 @@ public class CSVParser {
     return result.toArray(new String[numCols]);
   }
 
-  protected void checkParameters() {
-    if (lines.length > 2) {
-      String testA = lines[lines.length/2];
-      String testB = lines[lines.length/2-1];
-      for (char testDelim : (delim == GUESS) ? new char[] { ',', '\t', WHITESPACE, ';', '$' } : new char[] { delim }) {
-        for (char testEnclose : (enclose == GUESS) ? new char[] { '"', '\'' } : new char[] { enclose }) {
-          for (char testEscape : (escape == GUESS) ? new char[] { '\\', testEnclose } : new char[] { escape }) {
-            int sizeA = parseRecord(testA, testDelim, testEnclose, testEscape).length;
-            int sizeB = parseRecord(testB, testDelim, testEnclose, testEscape).length;
-            if ((sizeA > 1) && (sizeA == sizeB)) {
-              delim = testDelim;
-              enclose = testEnclose;
-              escape = testEscape;
-              numCols = sizeA;
-              return;  // done
-            }
+  protected String[][] parse(String lines[], char delim, char enclose, char escape, int minNumCols) {
+    // parse one record that most probably is neither header nor footer and check number of columns
+    int numCols = parseRecord(lines[lines.length/2], delim, enclose, escape).length;
+    if (numCols < minNumCols) return null;
+    // parse all records and make sure they all have the same number of columns
+    String fields[][] = new String[lines.length][];
+    for (int i = 0; i < lines.length; i++) {
+      fields[i] = parseRecord(lines[i], delim, enclose, escape);
+      if (fields[i].length != numCols) return null;
+    }
+    return fields;
+  }
+
+  protected void parse() {
+    // reset all processed data
+    this.fields = null;
+    typeMatrix = 0;
+    typeColumn = null;
+    typeRow = null;
+    numCols = 0;
+    // check if we actually have to do anything
+    if ((lines == null) || (lines.length == 0)) return;
+    // cycle through all parameters that are to be GUESSed, saving the "best" parsing result
+    char _delim = this.delim, _enclose = this.enclose, _escape = this.escape;
+    for (char enclose : (_enclose == GUESS) ? new char[] { '"', '\'' } : new char[] { _enclose }) {
+      for (char escape : (_escape == GUESS) ? new char[] { '\\', enclose } : new char[] { _escape }) {
+        for (char delim : (_delim == GUESS) ? new char[] { '\t', ' ', ',', ';', '$' } : new char[] { _delim }) {
+          // try to parse into more columns than we already found (at least 2)
+          String fields[][] = parse(lines, delim, enclose, escape, max(2, numCols + 1));
+          if (fields != null) {
+            // these seem to be good parameters, save them into the class member variables
+            // (yes, using the same names for local and class variables is pretty awesome fun)
+            this.fields = fields;
+            this.delim = delim;
+            this.enclose = enclose;
+            this.escape = escape;
+            numCols = fields[0].length;
           }
         }
       }
     }
-    // nothing worked, reset all parameters to GUESS, yields single-column data
-    delim = enclose = escape = GUESS;
-    numCols = 1;
+    // if the guessing didn't yield anything appropriate, then treat this as 1-column data
+    if (this.fields == null) {
+      this.fields = new String[lines.length][1];
+      for (int i = 0; i < lines.length; i++)
+        this.fields[i][0] = lines[i];
+      numCols = 1;
+    }
+    // create proper type caches
+    typeColumn = new int[numCols];
+    typeRow = new int[lines.length];
   }
 
 }
