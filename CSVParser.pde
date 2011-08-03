@@ -36,6 +36,14 @@ public class CSVParser {
 
   protected String fields[][] = null;
 
+  public static final int UNKNOWN = 0;
+  public static final int STRING = 1;
+  public static final int FLOAT = 2;
+  public static final int INT = 3;
+  protected int typeMatrix = 0;
+  protected int typeColumn[] = null;
+  protected int typeRow[] = null;
+
 
   public CSVParser(String lines[]) { this(lines, GUESS); }
   public CSVParser(String lines[], char delim) { this(lines, delim, GUESS); }
@@ -58,6 +66,42 @@ public class CSVParser {
     this.delim = delim; this.enclose = enclose; this.escape = escape; this.fields = null; checkParameters(); }
 
   public String[][] getFields() { if (fields == null) parse(); return fields; }
+  public int getNumCols() { return numCols; }
+  public int getNumRows() { return lines.length - numHeaderRows - numFooterRows; }
+
+  public int guessMatrixType() {
+    if (fields == null) parse();
+    if (typeMatrix == 0) {
+      typeMatrix = INT;
+      for (int j = 0; j < numCols; j++)
+        typeMatrix = min(typeMatrix, guessColumnType(j));
+    }
+    return typeMatrix;
+  }
+
+  public int guessColumnType(int j) {
+    if (fields == null) parse();
+    if (typeColumn[j] == 0) {
+      typeColumn[j] = INT;
+      for (int i = 0; i < lines.length; i++) {
+        if (typeColumn[j] == INT) try { Integer.valueOf(fields[i][j]); } catch (NumberFormatException e) { typeColumn[j] = FLOAT; }
+        if (typeColumn[j] == FLOAT) try { Float.valueOf(fields[i][j]); } catch (NumberFormatException e) { typeColumn[j] = STRING; break; }
+      }
+    }
+    return typeColumn[j];
+  }
+
+  public int guessRowType(int i) {
+    if (fields == null) parse();
+    if (typeRow[i] == 0) {
+      typeRow[i] = INT;
+      for (int j = 0; j < numCols; j++) {
+        if (typeRow[i] == INT) try { Integer.valueOf(fields[i][j]); } catch (NumberFormatException e) { typeRow[i] = FLOAT; }
+        if (typeRow[i] == FLOAT) try { Float.valueOf(fields[i][j]); } catch (NumberFormatException e) { typeRow[i] = STRING; break; }
+      }
+    }
+    return typeRow[i];
+  }
 
   public float[][] getFloatMatrix() {
     if (fields == null) parse();
@@ -115,6 +159,9 @@ public class CSVParser {
 
   protected void parse() {
     this.fields = new String[lines.length][];
+    typeMatrix = 0;
+    typeColumn = new int[numCols];
+    typeRow = new int[lines.length];
     for (int i = 0; i < lines.length; i++)
       fields[i] = parseRecord(lines[i]);
   }
