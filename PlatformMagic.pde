@@ -38,7 +38,7 @@ public void updatePlatformMagic() {
   if (platform == MACOSX) {
     boolean showDoc = ((doc != null) && !fireworks);
     if (defaultTitle == null) defaultTitle = frame.getTitle();
-    frame.setTitle(showDoc ? doc.getFile().getAbsolutePath() : defaultTitle);
+    frame.setTitle(showDoc ? ((doc.getFile() != null) ? doc.getFile().getAbsolutePath() : doc.getName()) : defaultTitle);
     jframe.getRootPane().putClientProperty("Window.documentFile", showDoc ? doc.getFile() : null);
     jframe.getRootPane().putClientProperty("Window.documentModified", showDoc && doc.isModified());
   }
