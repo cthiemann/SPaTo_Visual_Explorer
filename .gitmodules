@@ -1,0 +1,3 @@
+[submodule "TransparentGUI"]
+	path = TransparentGUI
+	url = https://github.com/cthiemann/TransparentGUI.git
