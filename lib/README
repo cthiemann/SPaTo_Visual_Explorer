@@ -1,5 +1,15 @@
 This directory contains various libraries used by the SPaTo Visual Explorer:
 
+core.jar is the Processing Core (see src/core for sources)
+  Copyright (c) 2004-10 Ben Fry and Casey Reas
+  Copyright (c) 2001-04 Massachusetts Institute of Technology
+
+pdf.jar is the Processing PDF library
+  Copyright (c) 2005-10 Ben Fry and Casey Reas
+
+itext.jar is also taken from the Processing repository,
+  apparently Copyright (c) Bruno Lowagie
+
 jna.jar is the Java Native Access library <http://jna.java.net>
   Copyright (c) 2007 Wayne Meissner, All Rights Reserved
   Copyright (c) 2007, 2008, 2009 Timothy Wall, All Rights Reserved
