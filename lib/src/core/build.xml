@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<project name="Processing Core" default="build">
+
+  <target name="clean">
+    <delete dir="build" />
+  </target>
+  
+  <target name="compile">
+    <mkdir dir="build/classes" />
+    <javac target="1.5" encoding="UTF-8" includeantruntime="false" srcdir="src" destdir="build/classes" />
+  </target>		
+
+  <target name="build" depends="compile">
+    <jar basedir="build/classes" destfile="build/core.jar" />
+  </target>
+  
+</project>
