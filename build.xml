@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<project name="SPaTo Visual Explorer" default="compile">
+
+  <path id="app.libs">
+    <fileset dir="lib"><include name="**/*.jar" /></fileset>
+  </path>
+
+  <target name="compile">
+	  <mkdir dir="build/classes" />
+    <javac srcdir="src" destdir="build/classes" includeantruntime="false">
+      <classpath refid="app.libs" />
+      <!-- <compilerarg value="-Xlint" /> -->
+    </javac>
+  </target>
+
+  <target name="run" depends="compile">
+    <java classname="net.spato.sve.app.SPaTo_Visual_Explorer" classpath="build/classes:${toString:app.libs}" fork="true" />
+  </target>
+
+  <target name="clean">
+    <delete dir="build" />
+  </target>
+
+</project>

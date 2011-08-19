@@ -1,8 +1,3 @@
-applet/
+build/
 application.*/
-*.zip
 *.tmproj
-support/*.class
-support/prelude/*.class
-support/prelude/*.jar
-support/windows/*.class
