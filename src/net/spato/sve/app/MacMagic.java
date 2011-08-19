@@ -34,6 +34,7 @@ import com.apple.eawt.ApplicationEvent;
  * http://developer.apple.com/library/mac/#documentation/Java/Conceptual/Java14Development/07-NativePlatformIntegration/NativePlatformIntegration.html%23//apple_ref/doc/uid/TP40001909-SW1
  * http://developer.apple.com/library/mac/documentation/Java/Reference/1.5.0/appledoc/api/index.html
  */
+@SuppressWarnings("deprecation")
 public class MacMagic extends ApplicationAdapter {
 
   protected SPaTo_Visual_Explorer app = null;

@@ -9,7 +9,7 @@
 	  <mkdir dir="build/classes" />
     <javac srcdir="src" destdir="build/classes" includeantruntime="false">
       <classpath refid="app.libs" />
-      <!-- <compilerarg value="-Xlint" /> -->
+      <compilerarg value="-Xlint" />
     </javac>
   </target>
 

@@ -1,100 +1,59 @@
 package net.spato.sve.app;
 
-import processing.core.*;
-import processing.xml.*;
 
-import processing.pdf.*;
+import com.sun.jna.*;
+import com.sun.jna.ptr.*;
+import com.sun.jna.win32.*;
+import edu.northwestern.rocs.jnmatlib.*;
+import java.applet.*;
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.Dimension;
+import java.awt.dnd.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.awt.Image;
+import java.io.*;
+import java.lang.reflect.Array;
+import java.net.*;
+import java.security.DigestInputStream;
+import java.security.KeyFactory;
+import java.security.MessageDigest;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.spec.X509EncodedKeySpec;
+import java.text.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Collections;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import java.util.prefs.Preferences;
-import java.text.SimpleDateFormat;
-import java.lang.reflect.Array;
-import java.nio.Buffer;
-import java.nio.IntBuffer;
-import java.nio.FloatBuffer;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.util.Vector;
-import java.util.Collections;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-import javax.swing.JFrame;
-import javax.swing.UIManager;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.nio.FloatBuffer;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-import java.awt.event.KeyEvent;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.nio.FloatBuffer;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.security.KeyFactory;
-import java.security.spec.X509EncodedKeySpec;
-import javax.swing.JOptionPane;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.FileDialog;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.SwingUtilities;
-import java.security.MessageDigest;
-import java.security.DigestInputStream;
-
-import org.xhtmlrenderer.layout.*;
-import org.xhtmlrenderer.simple.extend.*;
-import org.xhtmlrenderer.*;
-import org.xhtmlrenderer.tool.*;
-import org.xhtmlrenderer.pdf.*;
-import org.xhtmlrenderer.render.*;
-import org.xhtmlrenderer.css.constants.*;
-import com.sun.jna.*;
-import org.xhtmlrenderer.resource.*;
-import org.xhtmlrenderer.css.sheet.*;
-import org.xhtmlrenderer.css.extend.*;
-import edu.northwestern.rocs.jnmatlib.*;
-import org.xhtmlrenderer.event.*;
-import org.xhtmlrenderer.css.parser.property.*;
-import org.xhtmlrenderer.css.newmatch.*;
-import com.sun.jna.win32.*;
-import org.xhtmlrenderer.context.*;
-import org.xhtmlrenderer.newtable.*;
-import org.xhtmlrenderer.protocols.data.*;
-import org.xhtmlrenderer.css.parser.*;
-import org.xhtmlrenderer.swing.*;
-import org.xhtmlrenderer.css.value.*;
-import org.xhtmlrenderer.css.extend.lib.*;
-import org.xhtmlrenderer.css.style.*;
-import org.xhtmlrenderer.simple.extend.form.*;
-import org.xhtmlrenderer.simple.*;
-import org.xhtmlrenderer.css.util.*;
-import org.xhtmlrenderer.css.style.derived.*;
-import tGUI.*;
-import com.sun.jna.ptr.*;
-import org.xhtmlrenderer.util.*;
-import org.xhtmlrenderer.extend.*;
-
-import java.applet.*;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.event.MouseEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.FocusEvent;
-import java.awt.Image;
-import java.io.*;
-import java.net.*;
-import java.text.*;
-import java.util.*;
-import java.util.zip.*;
 import java.util.regex.*;
+import java.util.Vector;
+import java.util.zip.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import org.xhtmlrenderer.simple.*;
+import processing.core.*;
+import processing.pdf.*;
+import processing.xml.*;
+import tGUI.*;
 
 public class SPaTo_Visual_Explorer extends PApplet {
+
+public static SPaTo_Visual_Explorer INSTANCE = null;  // FIXME: this is probably quite evil...
+private static final long serialVersionUID = 0l;
 
 /*
  * Copyright 2011 Christian Thiemann <christian@spato.net>
@@ -139,6 +98,7 @@ boolean resizeRequest = false;
 int resizeWidth, resizeHeight;
 
 public void setup() {
+  INSTANCE = this;
   setupPlatformMagic();
   checkForUpdates(false);
   // start caching PDF fonts in a new thread (otherwise the program might stall for up
@@ -151,8 +111,8 @@ public void setup() {
   // setup window
   int w = prefs.getInt("window.width", 1280);
   int h = prefs.getInt("window.height", 720);
-  if (w > screen.width) { w = screen.width; h = 9*w/16; }
-  if (h > screen.height) { h = (int)round(0.9f*screen.height); w = 16*h/9; }
+  if (w > screenWidth) { w = screenWidth; h = 9*w/16; }
+  if (h > screenHeight) { h = round(0.9f*screenHeight); w = 16*h/9; }
   size(w, h);
   frame.setTitle("SPaTo Visual Explorer " + version + ((versionDebug.length() > 0) ? " (" + versionDebug + ")" : ""));
   frame.setResizable(true);
@@ -357,606 +317,7 @@ public void checkForUpdates(boolean force) {
   if (prefs.getBoolean("update.check", true) || force)
     new Updater(force).start();
 }
-/*
- * Copyright 2011 Christian Thiemann <christian@spato.net>
- * Developed at Northwestern University <http://rocs.northwestern.edu>
- *
- * This file is part of the SPaTo Visual Explorer (SPaTo).
- *
- * SPaTo is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * SPaTo is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with SPaTo.  If not, see <http://www.gnu.org/licenses/>.
- */
 
-
-
-
-
-
-static class BinaryThing {
-
-  static final Class supportedTypes[] = { Integer.TYPE, Float.TYPE, SparseMatrix.class };
-
-  Class type = null;
-  int size[] = null;
-  Object blob = null;
-
-  BinaryThing() {}
-  BinaryThing(Object blob) { setBlob(blob); }
-
-  public Class getType() { return type; }
-  public int[] getSize() { return size; }
-  public int getSize(int i) { return ((size != null) && (i >= 0) && (i < size.length)) ? size[i] : 0; }
-  public boolean is(Class t, int s[]) { return (blob != null) && (type == t) && Arrays.equals(size, s); }
-  public boolean isInt2(int NN) { return is(Integer.TYPE, new int[] { NN, NN }); }
-  public boolean isFloat1(int NN) { return is(Float.TYPE, new int[] { 1, NN }); }
-  public boolean isFloat2(int NN) { return is(Float.TYPE, new int[] { NN, NN }); }
-  public boolean isSparse(int NN) { return (type == SparseMatrix.class) && (getSparseMatrix().N == NN); }
-
-  public Object getBlob() { return blob; }
-  public int[][] getIntArray() { return (blob != null) && (type == Integer.TYPE) && (size.length == 2) ? (int[][])blob : null; }
-  public float[][] getFloatArray() { return (blob != null) && (type == Float.TYPE) && (size.length == 2) ? (float[][])blob : null; }
-  public SparseMatrix getSparseMatrix() { return (blob instanceof SparseMatrix) ? (SparseMatrix)blob : null; }
-
-  public void setBlob(Object blob) {
-    this.type = null;
-    this.size = null;
-    this.blob = blob;
-    if (blob == null) return;
-    type = blob.getClass();
-    size = new int[0];
-    while (type.isArray()) {
-      type = type.getComponentType();
-      size = append(size, (blob == null) ? 0 : Array.getLength(blob));
-      blob = (Array.getLength(blob) > 0) ? Array.get(blob, 0) : null;  // we've saved the original blob to this.blob already
-      // FIXME: bad things would happen if the sub-arrays are not all of the same length, but I am too lazy to check here...
-    }
-  }
-
-  public static BinaryThing parseFromXML(XMLElement xml) throws Exception { return parseFromXML(xml, null); }
-  public static BinaryThing parseFromXML(XMLElement xml, TConsole.Message msg) throws Exception {
-    if (xml == null) return null;
-    BinaryThing res = new BinaryThing();
-    res.type = null; res.size = null; res.blob = null;
-    XMLElement tmp[] = null;  // will hold the slice/values/source children
-    XMLElement xmlp = xml;  // the first non-snapshot ancestor
-    while (xmlp.getName().equals("snapshot"))
-      if ((xmlp = xmlp.getParent()) == null)
-        throw new Exception("choked on orphaned snapshot");
-    // determine type
-    if (xmlp.getName().equals("slices")) {
-      res.type = Integer.TYPE;
-      tmp = xml.getChildren("slice");
-    } else if (xmlp.getName().equals("data")) {
-      res.type = Float.TYPE;
-      tmp = xml.getChildren("values");
-    } else if (xmlp.getName().equals("links")) {
-      res.type = SparseMatrix.class;
-      tmp = xml.getChildren("source");
-    } else
-      throw new Exception("unsupported XML element \u2018" + xmlp.getName() + "\u2019");
-    if (((tmp == null) || (tmp.length == 0)) && (res.type != SparseMatrix.class))
-      throw new Exception("no values found");
-    // determine size and create blob
-    int N = tmp.length, NN = 0;
-    if (res.type == SparseMatrix.class) {
-      N = xml.getInt("size");
-      for (int i = 0; i < tmp.length; i++) {
-        N = max(N, tmp[i].getInt("index"));
-        XMLElement tmp2[] = tmp[i].getChildren("target");
-        for (int j = 0; j < tmp2.length; j++)
-          N = max(N, tmp2[j].getInt("index", 0));
-        if (msg != null) msg.updateProgress(i, 2*N);
-      }
-      res.blob = new SparseMatrix(N);
-    } else {
-      if (tmp[0].getContent() == null)
-        throw new Exception("no values in first " + tmp[0].getName() + " element");
-      NN = splitTokens(trim(tmp[0].getContent())).length;
-      if (!((N == NN) || (N == 1)))
-        throw new Exception("wrong number of " + tmp[0].getName() + " elements");
-      res.size = new int[] { N, NN };
-      res.blob = Array.newInstance(res.type, res.size);
-    }
-    // parse values
-    boolean filled[] = new boolean[N];  // track which indices have been filled already
-    String indexAttr = (res.type == SparseMatrix.class) ? "index" : "root";
-    for (int i = 0; i < N; i++) {
-      String inElemStr = " in " + tmp[i].getName() + " element " + (i+1);
-      int ii = (N == 1) ? 0 : tmp[i].getInt(indexAttr, 0) - 1;
-      if ((ii < 0) || (ii >= N))
-        throw new Exception("invalid " + indexAttr + " " + tmp[i].getString(indexAttr) + inElemStr);
-      if (filled[ii])
-        throw new Exception("duplicate " + indexAttr + " value" + inElemStr);
-      if (res.type == SparseMatrix.class) {
-        SparseMatrix matrix = (SparseMatrix)res.blob;
-        XMLElement tmp2[] = tmp[i].getChildren("target");
-        matrix.index[ii] = new int[tmp2.length];
-        matrix.value[ii] = new float[tmp2.length];
-        boolean filled2[] = new boolean[N];
-        for (int j = 0; j < tmp2.length; j++) {
-          String inElemStr2 = inElemStr + ", " + tmp2[j].getName() + " " + (j+1);
-          int jj = matrix.index[ii][j] = tmp2[j].getInt("index", 0) - 1;
-          if ((jj < 0) || (jj >= N))
-            throw new Exception("invalid index " + tmp2[j].getString("index") + inElemStr2);
-          if (filled2[jj])
-            throw new Exception("duplicate index value" + inElemStr2);
-          if (Float.isNaN(matrix.value[ii][j] = tmp2[j].getFloat("weight", Float.NaN)))
-            throw new Exception("invalid weight value " + tmp[j].getString("weight") + inElemStr2);
-        }
-        if (msg != null) msg.updateProgress(i + N, 2*N);
-      } else {
-        if (tmp[i].getContent() == null)
-          throw new Exception("no values" + inElemStr);
-        Object row = parseLine(tmp[i].getContent(), ' ', res.type);
-        if (Array.getLength(row) != NN)
-          throw new Exception("wrong number of values" + inElemStr);
-        Array.set(res.blob, ii, row);
-        if (msg != null) msg.updateProgress(i, N);
-      }
-    }
-    // post-process if necessary
-    if (xml.getName().equals("slices")) {
-      int pred[][] = (int[][])res.blob;
-      for (int r = 0; r < NN; r++)
-        for (int i = 0; i < NN; i++)
-          pred[r][i]--;  // indices are 1-based in XML, but 0-based in binary
-    }
-    return res;
-  }
-
-  public static BinaryThing parseFromText(String lines[], char sep) throws Exception {
-    return parseFromText(lines, sep, Float.TYPE, null); }
-  public static BinaryThing parseFromText(String lines[], char sep, TConsole.Message msg) throws Exception {
-    return parseFromText(lines, sep, Float.TYPE, msg); }
-  public static BinaryThing parseFromText(String lines[], char sep, Class type) throws Exception {
-    return parseFromText(lines, sep, type, null); }
-  public static BinaryThing parseFromText(String lines[], char sep, Class type, TConsole.Message msg) throws Exception {
-    if (type == SparseMatrix.class)
-      return parseSparseFromText(lines, sep, msg);
-    if ((lines == null) || (lines.length == 0) ||
-        (lines[0] == null) || (Array.getLength(parseLine(lines[0], sep, type)) == 0))
-      throw new Exception("no data to parse");
-    BinaryThing res = new BinaryThing();
-    res.type = type;
-    res.size = new int[] { lines.length, Array.getLength(parseLine(lines[0], sep, type)) };
-    res.blob = Array.newInstance(res.type, res.size);
-    int i = -1;
-    try {
-      for (i = 0; i < res.size[0]; i++) {
-        Object row = parseLine(lines[i], sep, res.type);
-        if (Array.getLength(row) != res.size[1]) throw new Exception("wrong number of elements");
-        Array.set(res.blob, i, row);
-        if (msg != null) msg.updateProgress(i, res.size[0]);
-      }
-    } catch (Exception e) { throw new Exception("line " + (i+1) + ": " + e.getMessage()); }
-    return res;
-  }
-
-  static private Object parseLine(String line, char sep, Class type) throws Exception {
-    String pieces[] = (sep == ' ') ? splitTokens(trim(line), WHITESPACE) : split(line, sep);
-    Object result = Array.newInstance(type, new int[] { pieces.length });
-    int i = -1;
-    try {
-      for (i = 0; i < pieces.length; i++)
-        if (type == Integer.TYPE) Array.set(result, i, Integer.valueOf(pieces[i]).intValue());
-        else Array.set(result, i, Float.valueOf(pieces[i]).floatValue());
-    } catch (Exception e) { throw new Exception("not a number: " + pieces[i]); }
-    return result;
-  }
-
-  static private BinaryThing parseSparseFromText(String lines[], char sep, TConsole.Message msg) throws Exception {
-    if ((lines == null) || (lines.length % 2 != 0))
-      throw new Exception("no data or odd number of lines");
-    SparseMatrix matrix = new SparseMatrix(lines.length/2);
-    int i = -1;
-    try {
-      for (i = 0; i < lines.length/2; i++) {
-        matrix.index[i] = (int[])parseLine(lines[2*i+0], sep, Integer.TYPE);
-        for (int j = 0; j < matrix.index[i].length; j++)
-          if (--matrix.index[i][j] < 0)  // indices are 1-based in text files
-            throw new Exception("invalid index: " + (matrix.index[i][j]+1));
-        matrix.value[i] = (float[])parseLine(lines[2*i+1], sep, Float.TYPE);
-        if (matrix.index[i].length != matrix.value[i].length)
-          throw new Exception("index/value length mismatch");
-      }
-    } catch (Exception e) { throw new Exception("row " + (i+1) + ": " + e.getMessage()); }
-    return new BinaryThing(matrix);
-  }
-
-  public static BinaryThing loadFromStream(DataInputStream in) throws Exception { return loadFromStream(in, null); }
-  public static BinaryThing loadFromStream(DataInputStream in, TConsole.Message msg) throws Exception {
-    BinaryThing res = new BinaryThing();
-    res.blob = null; res.type = null; res.size = null;
-    // read type
-    int tmp = in.readInt();
-    if ((tmp < 0) || (tmp >= supportedTypes.length))
-      throw new Exception("unknown data type");
-    res.type = supportedTypes[tmp];
-    // read array size
-    if (res.type == SparseMatrix.class)
-      res.blob = new SparseMatrix(in.readInt());
-    else {
-      res.size = new int[0];
-      while ((tmp = in.readInt()) != -1)
-        res.size = append(res.size, tmp);
-    }
-    // read data
-    if (res.type == SparseMatrix.class) {
-      SparseMatrix matrix = res.getSparseMatrix();
-      for (int i = 0; i < matrix.N; i++) {
-        int M = in.readInt();
-        matrix.index[i] = (int[])loadFromStream(in, new int[M]);
-        matrix.value[i] = (float[])loadFromStream(in, new float[M]);
-        if (msg != null) msg.updateProgress(i, matrix.N);
-      }
-    } else {
-      res.blob = Array.newInstance(res.type, res.size);
-      for (int i = 0; i < res.size[0]; i++) {
-        Array.set(res.blob, i, loadFromStream(in, Array.get(res.blob, i)));
-        if (msg != null) msg.updateProgress(i, res.size[0]);
-      }
-    }
-    return res;
-  }
-  static private Object loadFromStream(DataInputStream in, Object o) throws Exception {
-    // read single value if o is not an array
-    if (!o.getClass().isArray()) {
-      if (o.getClass().getComponentType() == Integer.TYPE) return in.readInt();
-      if (o.getClass().getComponentType() == Float.TYPE) return in.readFloat();
-      return null;
-    }
-    // fill 1-D array with values from stream
-    Class type = o.getClass().getComponentType();
-    if (!type.isArray()) {
-      byte bytes[] = new byte[4*Array.getLength(o)];
-      ByteBuffer bbuf = ByteBuffer.wrap(bytes);
-      int off = 0, n;
-      while (off < bytes.length)
-        if ((n = in.read(bytes, off, bytes.length - off)) == -1)
-          throw new IOException("unexpected end-of-file");
-        else off += n;
-      if (type == Integer.TYPE) bbuf.asIntBuffer().get((int[])o);
-      else if (type == Float.TYPE) bbuf.asFloatBuffer().get((float[])o);
-      return o;
-    }
-    // recursively fill multi-dim array
-    for (int i = 0; i < Array.getLength(o); i++)
-      Array.set(o, i, loadFromStream(in, Array.get(o, i)));
-    return o;
-  }
-
-  public void saveToStream(DataOutputStream out) throws Exception { saveToStream(out, null); }
-  public void saveToStream(DataOutputStream out, TConsole.Message msg) throws Exception {
-    if ((type == null) || (blob == null)) return;
-    // write type
-    int typeID = -1;
-    for (int i = 0; i < supportedTypes.length; i++)
-      if (type == supportedTypes[i])
-        typeID = i;
-    if (typeID == -1)
-      throw new Exception("unsupported data type");
-    out.writeInt(typeID);
-    // write size
-    if (blob instanceof SparseMatrix)
-      out.writeInt(getSparseMatrix().N);
-    else {
-      for (int i = 0; i < size.length; i++)
-        out.writeInt(size[i]);
-      out.writeInt(-1);  // array size terminator
-    }
-    // write data
-    if (blob instanceof SparseMatrix) {
-      SparseMatrix matrix = getSparseMatrix();
-      for (int i = 0; i < matrix.N; i++) {
-        if (matrix.index[i].length != matrix.value[i].length)
-          throw new Exception("index/value length mismatch at row " + (i+1));
-        out.writeInt(matrix.index[i].length);
-        saveToStream(out, matrix.index[i]);
-        saveToStream(out, matrix.value[i]);
-        if (msg != null) msg.updateProgress(i, matrix.N);
-      }
-    } else {
-      for (int i = 0; i < size[0]; i++) {
-        saveToStream(out, Array.get(blob, i));
-        if (msg != null) msg.updateProgress(i, size[0]);
-      }
-    }
-  }
-  private void saveToStream(DataOutputStream out, Object o) throws Exception {
-    Class type = null;
-    if (!(type = o.getClass()).isArray()) {  // write single value
-      if (type == Integer.TYPE) out.writeInt(((Integer)o).intValue());
-      else if (type == Float.TYPE) out.writeFloat(((Float)o).floatValue());
-    } else if (!(type = o.getClass().getComponentType()).isArray()) {  // write 1-D array
-      byte bytes[] = new byte[4*Array.getLength(o)];
-      ByteBuffer bbuf = ByteBuffer.wrap(bytes);
-      Buffer buf = (type == Integer.TYPE) ? bbuf.asIntBuffer() :
-                   (type == Float.TYPE) ? bbuf.asFloatBuffer() : null;
-      if (type == Integer.TYPE) ((IntBuffer)buf).put((int[])o);
-      else if (type == Float.TYPE) ((FloatBuffer)buf).put((float[])o);
-      out.write(bytes, 0, bytes.length);
-    } else {  // recursively write multi-dim array
-      for (int i = 0; i < Array.getLength(o); i++)
-        saveToStream(out, Array.get(o, i));
-    }
-  }
-
-  /* If size.length == 2, this will replace the blob with a new array of size { size[1] size[0] },
-   * such that newblob[i][j] == oldblob[j][i].  If size.length != 2, nothing happens. FIXME: throw exception? */
-  public void transpose() {
-    if ((type == null) || (blob == null)) return;
-    if (blob instanceof SparseMatrix) {
-      BinaryThing bt = new BinaryThing(((SparseMatrix)blob).getFullMatrix());
-      bt.transpose();
-      blob = new SparseMatrix(bt.getFloatArray());
-    } else {
-      if ((size == null) || (size.length != 2)) return;
-      Object oldblob = blob;
-      size = new int[] { size[1], size[0] };
-      blob = Array.newInstance(type, size);
-      for (int i = 0; i < size[0]; i++)
-        for (int j = 0; j < size[1]; j++)
-          Array.set(Array.get(blob, i), j,
-            Array.get(Array.get(oldblob, j), i));
-    }
-  }
-
-  /* Reshapes the current data to fit the new size if prod(newsize) == prod(size).  It does so by
-   * reshaping into a linear array and then into the new format.  Linearization/delinearization is
-   * row-first; i.e. the last dimension will be filled up first. */
-  public void reshape(int newsize[]) {
-    if ((type == null) || (size == null) || (newsize == null) || (size.length*newsize.length == 0)) return;
-    int prodsize = 1; for (int i = 0; i < size.length; i++) prodsize *= size[i];
-    int prodnewsize = 1; for (int i = 0; i < newsize.length; i++) prodnewsize *= newsize[i];
-    if (prodsize != prodnewsize) return;
-    // reshape into linear blob
-    Object linear = Array.newInstance(type, new int[] { (int)prodsize });
-    linearize(blob, linear);
-    // create new blob and delinearize
-    blob = Array.newInstance(type, size = newsize);
-    delinearize(linear, blob);
-  }
-
-  private void linearize(Object src, Object dst) { linearize(src, dst, 0, 0, Array.getLength(dst)); }
-  private void linearize(Object src, Object dst, int dim, int offset, int prodsize) {
-    prodsize /= size[dim];
-    for (int i = 0; i < Array.getLength(src); i++)
-      if (dim == size.length-1) Array.set(dst, offset + i, Array.get(src, i));
-      else linearize(Array.get(src, i), dst, dim+1, offset + i*prodsize, prodsize);
-  }
-
-  private void delinearize(Object src, Object dst) { delinearize(src, dst, 0, 0, Array.getLength(src)); }
-  private void delinearize(Object src, Object dst, int dim, int offset, int prodsize) {
-    prodsize /= size[dim];
-    for (int i = 0; i < Array.getLength(dst); i++)
-      if (dim == size.length-1) Array.set(dst, i, Array.get(src, offset + i));
-      else delinearize(src, Array.get(dst, i), dim+1, offset + i*prodsize, prodsize);
-  }
-
-  public String toString() {
-    if ((type == null) || (blob == null))
-      return "null";
-    if (blob instanceof SparseMatrix)
-      return "SparseMatrix(" + getSparseMatrix().N + ")";
-    String res = type.getName();
-    if (size != null)
-      for (int i = 0; i < size.length; i++)
-        res += "[" + size[i] + "]";
-    return res;
-  }
-
-}
-
-static class SparseMatrix {
-  int N;  // FIXME: should this be generalized to hold non-square sparse matrices as well?
-  int index[][];
-  float value[][];
-
-  SparseMatrix(int N) {
-    this.N = N;
-    index = new int[N][]; value = new float[N][];
-    for (int i = 0; i < N; i++) { index[i] = new int[0]; value[i] = new float[0]; }
-  }
-
-  SparseMatrix(float data[][]) {
-    this(data.length);
-    for (int i = 0; i < N; i++) {
-      for (int j = 0; j < N; j++) {
-        if (data[i][j] == 0) continue;
-        index[i] = (int[])append(index[i], j);
-        value[i] = (float[])append(value[i], data[i][j]);
-      }
-    }
-  }
-
-  SparseMatrix(int N, int ii[], int jj[]) { this(N, ii, jj, null); }
-  SparseMatrix(int N, int ii[], int jj[], float val[]) {
-    this(N);
-    for (int l = 0; l < ii.length; l++) {
-      index[ii[l]] = (int[])append(index[ii[l]], jj[l]);
-      value[ii[l]] = (float[])append(value[ii[l]], (val != null) ? val[l] : 1f);
-    }
-  }
-
-  SparseMatrix(int ii[], int jj[]) { this(ii, jj, null); }
-  SparseMatrix(int ii[], int jj[], float val[]) {
-    N = 0;
-    for (int l = 0; l < ii.length; l++)
-      N = max(N, max(ii[l], jj[l]) + 1);
-    index = new int[N][]; value = new float[N][];
-    for (int i = 0; i < N; i++) {
-      index[i] = new int[0];
-      value[i] = new float[0];
-    }
-    for (int l = 0; l < ii.length; l++) {
-      index[ii[l]] = (int[])append(index[ii[l]], jj[l]);
-      value[ii[l]] = (float[])append(value[ii[l]], (val != null) ? val[l] : 1f);
-    }
-  }
-
-  public float[][] getFullMatrix() {
-    float result[][] = (float[][])Array.newInstance(Float.TYPE, new int[] { N, N });
-    for (int i = 0; i < N; i++)
-      for (int j = 0; j < index[i].length; j++)
-        result[i][index[i][j]] = value[i][j];
-    return result;
-  }
-}
-/*
- * Copyright 2011 Christian Thiemann <christian@spato.net>
- * Developed at Northwestern University <http://rocs.northwestern.edu>
- *
- * This file is part of the SPaTo Visual Explorer (SPaTo).
- *
- * SPaTo is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * SPaTo is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with SPaTo.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-// FIXME: This should be refactored such that different colormaps are different subclasses of Colormap
-
-class Colormap {
-  XMLElement xml = null;
-  int NDC = 20;  // number of colors in "discrete"
-  int colormap = 0;
-  boolean logscale = false;
-  float minval = 0, maxval = 1;
-
-  String colormaps[] = { "default", "jet", "bluered", "grayredblue", "thresholded", "discrete" };
-
-  Colormap() { this(null); }
-  Colormap(XMLElement xml) { this(xml, 0, 1); }
-  Colormap(XMLElement xml, float defaultMin, float defaultMax) {
-    this(xml == null ? "default"  : xml.getString("name", "default"),
-         xml == null ? false      : xml.getBoolean("log"),
-         xml == null ? defaultMin : xml.getFloat("minval", defaultMin),
-         xml == null ? defaultMax : xml.getFloat("maxval", defaultMax));
-    this.xml = xml;
-  }
-  Colormap(String cm, boolean log) { this(cm, log, 0, 1); }
-  Colormap(String cm, boolean log, float minval, float maxval) {
-    setColormap(cm); logscale = log; setBounds(minval, maxval); }
-
-  public String getColormapName() { return colormaps[colormap]; }
-  public void setColormap(String cm) {
-    for (int i = 0; i < colormaps.length; i++)
-      if (colormaps[i].equals(cm))
-        colormap = i;
-    if (xml != null)
-      xml.setString("name", colormaps[colormap]);
-  }
-
-  public boolean isLogscale() { return logscale; }
-  public void setLogscale(boolean log) { logscale = log; if (xml != null) xml.setBoolean("log", log); }
-
-  public float getMinVal() { return minval; }
-  public float getMaxVal() { return maxval; }
-  public void setMinVal(float minval) { this.minval = minval; if (xml != null) xml.setFloat("minval", minval); }
-  public void setMaxVal(float maxval) { this.maxval = maxval; if (xml != null) xml.setFloat("maxval", maxval);  }
-  public void setBounds(float minval, float maxval) { setMinVal(minval); setMaxVal(maxval); }
-
-  public int getColor(float val) { return getColor(val, minval, maxval); }
-  public int getColor(float val, float minval, float maxval) {
-    val = constrain(val, minval, maxval);
-    // discrete
-    if (colormap == 5) return getColorDiscrete((int)val);
-    // apply log() if requested
-    if (logscale) { val = log(val); minval = minval > 0 ? log(minval) : Float.NaN; maxval = log(maxval); }
-    // thresholded
-    if (colormap == 4) return getColorDiscrete((int)(val/(maxval/PApplet.parseFloat(NDC))));
-    // continuous colormaps
-    float v = Float.isNaN(minval) ? val/maxval : (val - minval)/(maxval - minval);
-    if (Float.isNaN(v)) return color(0);
-    // blue to red colormap
-    if (colormap == 2) return color(255*v, 0, 255*(1-v));
-    // gray to red to blue colormap
-    if (colormap == 3) {
-      if (v < 0.5f) return color(127 + 127*v/0.5f, 127 - 127*v/0.5f, 127 - 127*v/0.5f);  // gray to red
-                   return color(255 - 255*(v - 0.5f)/0.5f, 0, 255*(v - 0.5f)/0.5f);  // red to blue
-    }
-    // jet colormap
-    if (colormap == 1) {
-      if (v < .125f) return color(0, 0, 128 + 127*v/.125f);
-      if (v < .375f) return color(0, 255*(v-.125f)/.250f, 255);
-      if (v < .625f) return color(255*(v-.375f)/.250f, 255, 255*(1 - (v-.375f)/.250f));
-      if (v < .875f) return color(255, 255*(1 - (v-.625f)/.250f), 0);
-                    return color(255 - 127*(v-.875f)/.125f, 0, 0);
-    }
-    // return color from default colormap
-    if (v < .25f) return color(255, 255*4*v, 0);
-    if (v < .5f)  return color(255*(1 - 4*(v-.25f)), 255, 0);
-    if (v < .75f) return color(0, 255, 255*4*(v-.5f));
-                 return color(0, 255*(1 - 4*(v-.75f)), 255);
-  }
-
-  public int getColorDiscrete(int v) {
-    switch ((v-1) % 20) {
-      case  2: return color(255,   0,   0);
-      case  1: return color(191, 191,   0);
-      case  0: return color(  0, 191,   0);
-      case  5: return color(  0, 191, 191);
-      case  4: return color(  0,   0, 255);
-      case  3: return color(255,   0, 255);
-      case  6: return color(255, 127,   0);
-      case  7: return color(127, 127, 127);
-      case  8: return color(127,   0, 255);
-      case  9: return color(  0,   0,   0);
-
-      case 12: return color(127,   0,   0);
-      case 11: return color( 80,  80,   0);
-      case 10: return color(  0,  80,   0);
-      case 15: return color(  0,  80,  80);
-      case 14: return color(  0,   0, 127);
-      case 13: return color(127,   0, 127);
-      case 16: return color(127,  63,   0);
-      case 17: return color( 63,  63,  63);
-      case 18: return color( 63,   0, 127);
-      case 19: return color(191, 191, 191);
-    }
-    return color(0);  // should never happen...
-  }
-
-
-  class Renderer extends TChoice.StringRenderer {
-    public TComponent.Dimension getPreferredSize(TChoice c, Object o, boolean inMenu) {
-      TComponent.Dimension d = super.getPreferredSize(c, o, inMenu);
-      d.width += 305; return d;
-    }
-    public void draw(TChoice c, PGraphics g, Object o, TComponent.Rectangle bounds, boolean inMenu) {
-      bounds.x += 305; bounds.width -= 305;
-      super.draw(c, g, o, bounds, inMenu);
-      bounds.x -= 305; bounds.width += 305;
-      int cm = colormap;  // save original colormap
-      setColormap((String)o);
-      g.noFill();
-      for (int i = 0; i < 300; i++) {
-        g.stroke(getColor((colormap == 5) ? i*NDC/300.f : i, 0, 300));
-        g.line(bounds.x + i, bounds.y + .25f*bounds.height, bounds.x + i, bounds.y + .75f*bounds.height);
-      }
-      colormap = cm;  // restore original colormap
-    }
-  }
-
-}
 /*
  * Copyright 2011 Christian Thiemann <christian@spato.net>
  * Developed at Northwestern University <http://rocs.northwestern.edu>
@@ -1143,7 +504,8 @@ public void showDropStatus(String str, Transferable t) {
     try { bufreader.close(); } catch (Exception e) {}
   }
   try {
-    java.util.List ff = (java.util.List)t.getTransferData(DataFlavor.javaFileListFlavor);
+    @SuppressWarnings("unchecked")  // FIXME: can we avoid "unchecked cast" here?
+    java.util.List<File> ff = (java.util.List<File>)t.getTransferData(DataFlavor.javaFileListFlavor);
     str += "\n\nList: " + ff + "\n\n";
     for (Object f : ff)
       str += f + "\n";
@@ -1174,12 +536,13 @@ public void hideDropStatus() {
   gui.remove(winDropStatus);
 }
 
+@SuppressWarnings("unchecked")  // FIXME: can we avoid "unchecked cast" at ff = ...getTransferData(...)?
 public boolean handleTransferable(Transferable t) {
   // handle dropped files
   if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
     File ff[];
     try {
-      ff = (File[])((java.util.List)t.getTransferData(DataFlavor.javaFileListFlavor)).toArray(new File[0]);
+      ff = ((java.util.List<File>)t.getTransferData(DataFlavor.javaFileListFlavor)).toArray(new File[0]);
     } catch (Exception e) {
       console.logError("Error while getting the names of the dropped/pasted files: ", e);
       e.printStackTrace();
@@ -1886,35 +1249,35 @@ class Layout {
   int r = -1;  // currently loaded slice
 
   class Cache {
-    Vector children[];
+    Vector<Vector<Integer>> children;
     int numTotalChildren[];
     float sortValue[];
 
     Cache(int r, float val[], boolean sortRecursively) {
-      children = new Vector[NN];
-      for (int i = 0; i < NN; i++) children[i] = new Vector();
+      children = new Vector<Vector<Integer>>();
+      for (int i = 0; i < NN; i++) children.add(new Vector<Integer>());
       numTotalChildren = new int[NN];
       if (val != null) sortValue = new float[NN];
       // setup children vector
       for (int i = 0; i < NN; i++)
         if (pred[r][i] >= 0)
-          children[pred[r][i]].add(new Integer(i));  // i is a child of s.pred[i] (by definition)
+          children.get(pred[r][i]).add(new Integer(i));  // i is a child of pred[r][i] (by definition)
       // setup numTotalChildren and sortValue vectors
       setupRecursively(r, val, sortRecursively);
       // sort children vector
       if (val != null)
         for (int i = 0; i < NN; i++)
-          Collections.sort(children[i], new Comparator() { public int compare(Object o1, Object o2) {
-            float v1 = sortValue[((Integer)o1).intValue()], v2 = sortValue[((Integer)o2).intValue()];
+          Collections.sort(children.get(i), new Comparator<Integer>() { public int compare(Integer o1, Integer o2) {
+            float v1 = sortValue[o1.intValue()], v2 = sortValue[o2.intValue()];
             return (v1 < v2) ? -1 : (v1 > v2) ? +1 : 0; } });
     }
 
     public void setupRecursively(int j, float val[], boolean sortRecursively) {
-      numTotalChildren[j] = children[j].size();
+      numTotalChildren[j] = children.get(j).size();
       if (val != null) sortValue[j] = val[j];
       float sortTmp = 0;
-      for (int ii = 0; ii < children[j].size(); ii++) {
-        int i = ((Integer)children[j].get(ii)).intValue();
+      for (int ii = 0; ii < children.get(j).size(); ii++) {
+        int i = children.get(j).get(ii).intValue();
         setupRecursively(i, val, sortRecursively);
         numTotalChildren[j] += numTotalChildren[i];
         if (sortRecursively) sortTmp += sortValue[i];
@@ -2009,9 +1372,9 @@ class Layout {
   // cache, root node, current layout node, tree depth of node j, min and max angles
   public void calculateLayoutRecursively(Cache cache, int r, int j, int d, float phimin, float phimax) {
     int sumNTC = cache.numTotalChildren[j], cumNTC = 0;  // sum of total children, cumulative sum
-    Vector I = cache.children[j];
+    Vector<Integer> I = cache.children.get(j);
     for (int ii = 0; ii < I.size(); ii++) {
-      int i = ((Integer)I.get(ii)).intValue();
+      int i = I.get(ii).intValue();
       float iphimin = phimin + (phimax - phimin)*cumNTC/sumNTC;
       cumNTC += cache.numTotalChildren[i] + 1;  // sum of i's children plus i itself
       float iphimax = phimin + (phimax - phimin)*cumNTC/sumNTC;
@@ -3500,7 +2863,7 @@ public void guiUpdateNodeColoring() {
   }
   //
   btnColormapLog.setVisibleAndEnabled(doc.view.hasData && !doc.view.colormap.getColormapName().equals("discrete"));
-  if (doc.view.hasData) btnColormapLog.setSelected(doc.view.colormap.logscale);
+  if (doc.view.hasData) btnColormapLog.setSelected(doc.view.colormap.isLogscale());
   //
 //  TWindow win = (TWindow)sldQuantitySnapshot.getParent();
   TPanel win = (TPanel)sldQuantitySnapshot.getParent();
