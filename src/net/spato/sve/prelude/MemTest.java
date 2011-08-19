@@ -18,6 +18,8 @@
  * along with SPaTo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package net.spato.sve.prelude;
+
 public class MemTest {
   public static void main(String args[]) {
     System.out.println("MemTest: max memory is " + Runtime.getRuntime().maxMemory() + " bytes");

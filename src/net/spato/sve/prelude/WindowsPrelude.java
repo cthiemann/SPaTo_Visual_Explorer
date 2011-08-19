@@ -18,6 +18,8 @@
  * along with SPaTo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package net.spato.sve.prelude;
+
 import java.io.*;
 import javax.swing.JOptionPane;
 

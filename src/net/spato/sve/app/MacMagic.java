@@ -18,6 +18,8 @@
  * along with SPaTo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package net.spato.sve.app;
+
 import java.io.File;
 import com.apple.eawt.Application;
 import com.apple.eawt.ApplicationAdapter;
