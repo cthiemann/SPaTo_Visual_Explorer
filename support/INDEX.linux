@@ -21,10 +21,6 @@
     <local path="lib/itext.jar"/>
   </file>
   <file>
-    <remote path="common/jna.jar"/>
-    <local path="lib/jna.jar"/>
-  </file>
-  <file>
     <remote path="common/pdf.jar"/>
     <local path="lib/pdf.jar"/>
   </file>

@@ -10,12 +10,7 @@ pdf.jar is the Processing PDF library
 itext.jar is also taken from the Processing repository,
   apparently Copyright (c) Bruno Lowagie
 
-jna.jar is the Java Native Access library <http://jna.java.net>
-  Copyright (c) 2007 Wayne Meissner, All Rights Reserved
-  Copyright (c) 2007, 2008, 2009 Timothy Wall, All Rights Reserved
-
 xhtmlrenderer.jar is the Flying Saucer XHTML renderer <http://code.google.com/p/flying-saucer/>
 
 tGUI.jar is the TransparentGUI for Processing
-jnmatlib.jar is the native interface for libmat and libmx
   Copyright 2011 Christian Thiemann

@@ -234,9 +234,9 @@ public class SPaToGUI extends TransparentGUI {
     console.logNote("Copyright (C) 2008\u20132011 by Christian Thiemann").tE = tE;
     console.logNote("Research on Complex Systems, Northwestern University").tE = tE;
     console.logDebug("--------------------------------------------------------");
-    console.logDebug("[OS] " + System.getProperty("os.name") + " " + System.getProperty("os.version") + " (" + System.getProperty("os.arch") + ")");
+    console.logDebug("[OS] " + System.getProperty("os.name") + " " + System.getProperty("os.version") + " (" + System.getProperty("os.arch") + ") " + System.getProperty("sun.arch.data.model"));
     console.logDebug("[JRE] " + System.getProperty("java.runtime.name") + " " + System.getProperty("java.runtime.version"));
-    console.logDebug("[JVM] " + System.getProperty("java.vm.name") + " " + System.getProperty("java.vm.version") + " (" + System.getProperty("java.vm.vendor") + ") [" + (com.sun.jna.Platform.is64Bit() ? "64" : "32") + "-bit]");
+    console.logDebug("[JVM] " + System.getProperty("java.vm.name") + " " + System.getProperty("java.vm.version") + " (" + System.getProperty("java.vm.vendor") + ")");
     console.logDebug("[path] " + System.getenv(((PApplet.platform != PApplet.WINDOWS) ? ((PApplet.platform == PApplet.MACOSX) ? "DY" : "") + "LD_LIBRARY_" : "") + "PATH"));
     console.logDebug("[mem] max: " + (Runtime.getRuntime().maxMemory()/1024/1024) + " MB");
     // if (!JNMatLib.isLoaded() && (versionDebug.length() > 0)) console.logError("[JNMatLib] " + JNMatLib.getError().getMessage());
