@@ -18,12 +18,13 @@
  * along with SPaTo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.spato.sve.app;
+package net.spato.sve.app.platform;
 
 import java.io.File;
 import com.apple.eawt.Application;
 import com.apple.eawt.ApplicationAdapter;
 import com.apple.eawt.ApplicationEvent;
+import net.spato.sve.app.SPaTo_Visual_Explorer;
 
 /**
  * This class deals with all the Mac-related goodies, specifically opening documents

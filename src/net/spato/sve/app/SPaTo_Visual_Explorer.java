@@ -45,6 +45,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import net.spato.sve.app.layout.*;
 import net.spato.sve.app.util.*;
+import net.spato.sve.app.platform.*;
 import org.xhtmlrenderer.simple.*;
 import processing.core.*;
 import processing.pdf.*;
@@ -90,7 +91,7 @@ String versionDate = new SimpleDateFormat("MMMM d, yyyy", Locale.US).format(pars
 
 ExecutorService worker = Executors.newSingleThreadExecutor();
 public Preferences prefs = Preferences.userRoot().node("/net/spato/SPaTo_Visual_Explorer");  // FIXME: should not be public
-boolean canHandleOpenFileEvents = false;  // indicates that GUI and workspace are ready to open files
+public boolean canHandleOpenFileEvents = false;  // indicates that GUI and workspace are ready to open files  // FIXME: should not be public
 
 float t, tt, dt;  // this frame's time, last frame's time, and delta between the two
 boolean screenshot = false;  // if true, draw() will render one frame to PDF
@@ -99,9 +100,11 @@ boolean layoutshot = false;  // if true (and screenshot == true), draw() will ou
 boolean resizeRequest = false;
 int resizeWidth, resizeHeight;
 
+PlatformMagic platformMagic = null;
+
 public void setup() {
   INSTANCE = this;
-  setupPlatformMagic();
+  platformMagic = new PlatformMagic();
   checkForUpdates(false);
   // start caching PDF fonts in a new thread (otherwise the program might stall for up
   // to a minute or more when taking the first screenshot)
@@ -591,7 +594,7 @@ public void handleDroppedFiles(File ff[]) {
 }
 
 
-boolean fireworks = false;
+public boolean fireworks = false;  // FIXME: public?
 Fireworks fw = null;
 
 public void startFireworks() {
@@ -610,73 +613,7 @@ public void disposeFireworks() {
 }
 
 
-/*
- * Copyright 2011 Christian Thiemann <christian@spato.net>
- * Developed at Northwestern University <http://rocs.northwestern.edu>
- *
- * This file is part of the SPaTo Visual Explorer (SPaTo).
- *
- * SPaTo is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * SPaTo is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with SPaTo.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-
-
-
-JFrame jframe = null;
-String defaultTitle = null;
-Object macmagic = null;  // holds a MacMagic instance if platform is MACOSX
-Object winmagic = null;  // holds a WindowsMagic instance if platform is MACOSX
-
-// called by setup()
-public void setupPlatformMagic() {
-  if (platform == MACOSX) macmagic = loadMagicClass("Mac");
-  if (platform == WINDOWS) winmagic = loadMagicClass("Windows");
-  if (platform == WINDOWS) setSystemLookAndFeel();
-}
-
-// called by guiFastUpdate()
-public void updatePlatformMagic() {
-  if (platform == MACOSX) {
-    boolean showDoc = ((doc != null) && !fireworks);
-    if (defaultTitle == null) defaultTitle = frame.getTitle();
-    frame.setTitle(showDoc ? ((doc.getFile() != null) ? doc.getFile().getAbsolutePath() : doc.getName()) : defaultTitle);
-    jframe.getRootPane().putClientProperty("Window.documentFile", showDoc ? doc.getFile() : null);
-    jframe.getRootPane().putClientProperty("Window.documentModified", showDoc && doc.isModified());
-  }
-}
-
-public Object loadMagicClass(String platform) {
-  try {
-    return Class.forName("net.spato.sve.app." + platform + "Magic").
-      getConstructor(new Class[] { SPaTo_Visual_Explorer.class }).
-      newInstance(new Object[] { this });
-  } catch (Exception e) {
-    e.printStackTrace();
-    return null;
-  }
-}
-
-public boolean setSystemLookAndFeel() {
-  try {
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    return true;
-  } catch (Exception e) {
-    e.printStackTrace();
-    return false;
-  }
-}
-
+public JFrame jframe = null;  // FIXME: should not be public
 // overriding main() to create the applet within a JFrame (needed to do much of the Mac magic).
 public static void main(String args[]) {
   SPaTo_Visual_Explorer applet = new SPaTo_Visual_Explorer();
@@ -757,7 +694,7 @@ int untitledCounter = 0;  // counter for uniquely numbering untitled documents
  * Visual Explorer Document / Data Provider
  */
 
-class SVE2Document {
+public class SVE2Document {
 
   XMLElement xmlDocument = new XMLElement("document");
   SVE2View view = null;
@@ -1840,7 +1777,7 @@ public void guiFastUpdate() {
   btnNodes.getParent().setVisibleAndEnabled(doc != null);
   sldAlbumSnapshot.getParent().setVisibleAndEnabled((doc != null) && (doc.getAlbum() != null));
   lblStatus.setText(((doc == null) || (doc.view.ih == -1)) ? "" : doc.view.nodes[doc.view.ih].name);
-  updatePlatformMagic();
+  platformMagic.update();
   if (doc == null) return;
   choiceMapProjection.setEnabled(doc.view.hasMapLayout);
   choiceTomProjection.setEnabled(doc.view.hasTomLayout);
@@ -2969,7 +2906,7 @@ class SVE2View {
 
 File workspaceFile = null;
 boolean showWorkspaceRecoveryButton = true;
-SVE2Document doc = null;  // current document
+public SVE2Document doc = null;  // current document  // FIXME: should not be public
 Vector<SVE2Document> docs = new Vector<SVE2Document>();  // all loaded documents
 
 /*
