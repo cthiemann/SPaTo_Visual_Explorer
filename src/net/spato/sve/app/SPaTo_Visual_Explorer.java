@@ -90,7 +90,7 @@ String versionDebug = "beta";
 String versionTimestamp = "20110604T220000";
 String versionDate = new SimpleDateFormat("MMMM d, yyyy", Locale.US).format(parseISO8601(versionTimestamp));
 
-ExecutorService worker = Executors.newSingleThreadExecutor();
+public ExecutorService worker = Executors.newSingleThreadExecutor();  // FIXME: public?
 public Preferences prefs = Preferences.userRoot().node("/net/spato/SPaTo_Visual_Explorer");  // FIXME: should not be public
 public boolean canHandleOpenFileEvents = false;  // indicates that GUI and workspace are ready to open files  // FIXME: should not be public
 
@@ -103,10 +103,13 @@ int resizeWidth, resizeHeight;
 
 PlatformMagic platformMagic = null;
 public DataTransferHandler dataTransferHandler = null;  // FIXME: public?
+public Workspace workspace = null;  // FIXME: public?
+public SVE2Document doc = null;  // FIXME: get rid of this variable
 
 public void setup() {
   INSTANCE = this;
   platformMagic = new PlatformMagic();
+  workspace = new Workspace(this);
   checkForUpdates(false);
   // start caching PDF fonts in a new thread (otherwise the program might stall for up
   // to a minute or more when taking the first screenshot)
@@ -155,7 +158,7 @@ public void setup() {
   // go
   tt = millis()/1000.f;
   if (prefs.getBoolean("workspace.auto-recover", false))
-    replaceWorkspace(XMLElement.parse(prefs.get("workspace", "<workspace />")));
+    workspace.replaceWorkspace(XMLElement.parse(prefs.get("workspace", "<workspace />")));
   canHandleOpenFileEvents = true;
 }
 
@@ -245,7 +248,7 @@ public void keyPressed() {
     if (keyEvent.isAltDown()) {  // FIXME: All this could be handled by TPopupMenu
       switch (keyEvent.getKeyCode()) {
         case KeyEvent.VK_O: actionPerformed("workspace##open"); return;
-        case KeyEvent.VK_S: if (docs.size() > 0) actionPerformed("workspace##save" + (keyEvent.isShiftDown() ? "As" : "")); return;
+        case KeyEvent.VK_S: if (workspace.docs.size() > 0) actionPerformed("workspace##save" + (keyEvent.isShiftDown() ? "As" : "")); return;
         case KeyEvent.VK_F: startFireworks(); return;
       }
       return;
@@ -1259,8 +1262,8 @@ int fnsizeSmall = 10, fnsizeMedium = 12, fnsizeLarge = 14;
 PFont fnSmall, fnMedium, fnLarge, fnLargeBold;
 boolean fastNodes = false;
 
-boolean searchMatchesValid = false;
-boolean searchMatches[] = null;  // this is true for nodes which are matched by the search phrase
+public boolean searchMatchesValid = false;  // FIXME: public?
+public boolean searchMatches[] = null;  // this is true for nodes which are matched by the search phrase  // FIXME: public?
 int searchMatchesChild[] = null;  // this is 1 for nodes which have any node in their branch that matches the search phrase
 String searchMsg = null;
 int searchUniqueMatch = -1;
@@ -1473,10 +1476,10 @@ public void guiSetupHotkeys() {
 public void guiUpdate() {
   guiFastUpdate();
   choiceNetwork.removeAll();
-  if (docs.size() > 0) {
-    choiceNetwork.add(docs.toArray());
+  if (workspace.docs.size() > 0) {
+    choiceNetwork.add(workspace.docs.toArray());
     if (doc != null)
-      choiceNetwork.select(docs.indexOf(doc));
+      choiceNetwork.select(workspace.docs.indexOf(doc));
   }
   choiceNetwork.getContextMenu().setEnabled("document##save", doc != null);
   choiceNetwork.getContextMenu().setEnabled("document##saveAs", doc != null);
@@ -1484,9 +1487,9 @@ public void guiUpdate() {
   choiceNetwork.getContextMenu().getItem("document##compressed").setText(
     ((doc != null) && doc.compressed) ? "Save uncompressed" : "Save compressed");
   choiceNetwork.getContextMenu().setEnabled("document##close", doc != null);
-  choiceNetwork.getContextMenu().setEnabled("workspace##save", docs.size() > 0);
-  choiceNetwork.getContextMenu().setEnabled("workspace##saveAs", docs.size() > 0);
-  if ((btnWorkspaceRecovery != null) && !showWorkspaceRecoveryButton) {
+  choiceNetwork.getContextMenu().setEnabled("workspace##save", workspace.docs.size() > 0);
+  choiceNetwork.getContextMenu().setEnabled("workspace##saveAs", workspace.docs.size() > 0);
+  if ((btnWorkspaceRecovery != null) && !workspace.showWorkspaceRecoveryButton) {
     gui.remove(btnWorkspaceRecovery.getParent().getParent());  // remove the button from the GUI
     btnWorkspaceRecovery.setHotKey(0);  // release hotkey
     btnWorkspaceRecovery = null;  // ... and we don't need that anymore
@@ -1667,17 +1670,17 @@ public void guiUpdateSearchMatches() {
 public void actionPerformed(String cmd) {
   String argv[] = split(cmd, "##");
   if (argv[0].equals("workspace")) {
-    if (argv[1].equals("open")) openWorkspace();
-    if (argv[1].equals("save")) saveWorkspace();
-    if (argv[1].equals("saveAs")) saveWorkspace(true);
-    if (argv[1].equals("recover")) replaceWorkspace(XMLElement.parse(prefs.get("workspace", "<workspace />")));
+    if (argv[1].equals("open")) workspace.openWorkspace();
+    if (argv[1].equals("save")) workspace.saveWorkspace();
+    if (argv[1].equals("saveAs")) workspace.saveWorkspace(true);
+    if (argv[1].equals("recover")) workspace.replaceWorkspace(XMLElement.parse(prefs.get("workspace", "<workspace />")));
   } else if (argv[0].equals("document")) {
-    if (argv[1].equals("new")) newDocument();
-    if (argv[1].equals("open")) openDocument();
-    if (argv[1].equals("save")) saveDocument();
-    if (argv[1].equals("saveAs")) saveDocument(true);
-    if (argv[1].equals("compressed")) { doc.setCompressed(!doc.isCompressed()); saveDocument(); }
-    if (argv[1].equals("close")) closeDocument();
+    if (argv[1].equals("new")) workspace.newDocument();
+    if (argv[1].equals("open")) workspace.openDocument();
+    if (argv[1].equals("save")) workspace.saveDocument();
+    if (argv[1].equals("saveAs")) workspace.saveDocument(true);
+    if (argv[1].equals("compressed")) { doc.setCompressed(!doc.isCompressed()); workspace.saveDocument(); }
+    if (argv[1].equals("close")) workspace.closeDocument();
   } else if (argv[0].equals("search")) {
     searchMatchesValid = false;
     if (argv[1].equals("enterKeyPressed") && (searchUniqueMatch > -1)) {
@@ -1688,7 +1691,7 @@ public void actionPerformed(String cmd) {
     searchMatchesValid = false;
     prefs.putBoolean("search.regexp", btnRegexpSearch.isSelected());
   } else if (argv[0].equals("network"))
-    switchToNetwork(argv[1]);
+    workspace.switchToNetwork(argv[1]);
   else if (argv[0].equals("projMap"))
     doc.view.setMapProjection(argv[1]);
   else if (argv[0].equals("projTom")) {
@@ -2616,213 +2619,6 @@ class SVE2View {
   }
 }
 
-/*
- * Copyright 2011 Christian Thiemann <christian@spato.net>
- * Developed at Northwestern University <http://rocs.northwestern.edu>
- *
- * This file is part of the SPaTo Visual Explorer (SPaTo).
- *
- * SPaTo is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * SPaTo is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with SPaTo.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-File workspaceFile = null;
-boolean showWorkspaceRecoveryButton = true;
-public SVE2Document doc = null;  // current document  // FIXME: should not be public
-Vector<SVE2Document> docs = new Vector<SVE2Document>();  // all loaded documents
-
-/*
- * Document Management
- */
-
-// This FileFilter accepts:
-//   1) directories ending with ".spato" if they contain a document.xml
-//   2) files ending with ".spato" if they are zip files
-//   3) files named "document.xml" if they are in directory ending with ".spato"
-// It's probably a good idea to allow case (3), because selecting directories might
-// seem unusally awkward for some users (it's still possible, though).
-static FileFilter ffDocuments = new FileFilter() {
- public String getDescription() { return "SPaTo Documents"; }
- public boolean accept(File f) {
-   if (f.getName().endsWith(".spato")) {
-     if (f.isDirectory()) {  // accept .spato directory if it contains a document.xml
-       for (File ff : f.listFiles())
-         if (ff.getName().equals("document.xml"))
-           return true;
-       return false;
-     } else  // accept .spato files if it's a zip file
-        try { new ZipFile(f); return true; } catch (Exception e) { return false; }
-   }
-   if (f.getName().equals("document.xml"))  // accept document.xml if it's inside a .spato directory
-     return f.getParent().endsWith(".spato");
-   return false;
- }
-};
-
-public File[] selectDocumentFilesToOpen() {
-  File result[] = FileDialogUtils.selectFiles(FileDialogUtils.OPENMULTIPLE, "Open document", ffDocuments);
-  for (int i = 0; i < result.length; i++)            // normalize filename if some
-    if (result[i].getName().equals("document.xml"))  // blabla.spato/document.xml
-      result[i] = result[i].getParentFile();         // was selected
-  return result;
-}
-public File selectDocumentFileToWrite() { return selectDocumentFileToWrite(null); }
-public File selectDocumentFileToWrite(File selectedFile) {
-  return FileDialogUtils.ensureExtension("spato",
-    FileDialogUtils.selectFile(FileDialogUtils.SAVE, "Save document", ffDocuments, selectedFile));
-}
-
-public void newDocument() {
-  SVE2Document newdoc = new SVE2Document();
-  docs.add(newdoc);
-  switchToNetwork(newdoc);
-//  new LinksImportWizard(newdoc).start();
-}
-
-public void openDocument() { openDocuments(selectDocumentFilesToOpen()); }
-public void openDocument(File file) { if (file != null) openDocuments(new File[] { file }); }
-public void openDocuments(File files[]) {
-  if (files == null) return;
-  for (File f : files) {
-    SVE2Document newdoc = null;
-    for (SVE2Document d : docs)
-      if (d.getFile().equals(f))
-        newdoc = d;  // this document is already open
-    if (newdoc == null) {  // load if not already open
-      newdoc = new SVE2Document(f);
-      docs.add(newdoc);
-      worker.submit(newdoc.newLoadingTask());
-    }
-    switchToNetwork(newdoc);
-  }
-}
-
-public void closeDocument() {
-  int i = docs.indexOf(doc);
-  if (i == -1) return;
-  docs.remove(i);
-  switchToNetwork((docs.size() > 0) ? docs.get(i % docs.size()) : null);
-  //worker.remove(doc);  // cancel any jobs in the worker thread that are related to this document
-}
-
-public void saveDocument() { saveDocument(false); }
-public void saveDocument(boolean forceSelect) {
-  if (doc == null) return;
-  File file = doc.getFile();
-  for (SVE2Document d : docs)
-    if ((d != doc) && d.getFile().equals(file))
-      docs.remove(d);  // prevent duplicate entries in docs
-  if ((file == null) || forceSelect) {
-    if ((file = selectDocumentFileToWrite(file)) == null) return;
-    boolean compressed = !file.exists() || !file.isDirectory();  // save compressed by default
-    doc.setFile(file, compressed);
-    updateWorkspacePref();
-  }
-  worker.submit(doc.newSavingTask());
-}
-
-public boolean switchToNetwork(int i) { return switchToNetwork(((i < 0) || (i >= docs.size())) ? docs.get(i) : null); }
-public boolean switchToNetwork(String name) {
-  SVE2Document newdoc = null;
-  for (int i = 0; i < docs.size(); i++)
-    if (name.equals(docs.get(i).getName()))
-      newdoc = docs.get(i);
-  return switchToNetwork(newdoc);
-}
-public boolean switchToNetwork(SVE2Document newdoc) {
-  searchMatchesValid = false;
-  searchMatches = null;
-  doc = newdoc;
-  guiUpdate();
-  updateWorkspacePref();
-  return doc != null;
-}
-
-/*
- * Workspace Management
- */
-
-static FileFilter ffWorkspace = FileDialogUtils.createFileFilter("sve", "SVE Workspaces");
-
-public File selectWorkspaceFileToOpen() { return FileDialogUtils.selectFile(FileDialogUtils.OPEN, "Open workspace", ffWorkspace); }
-public File selectWorkspaceFileToWrite() { return selectWorkspaceFileToWrite(null); }
-public File selectWorkspaceFileToWrite(File selectedFile) {
-  return FileDialogUtils.ensureExtension("sve",
-    FileDialogUtils.selectFile(FileDialogUtils.SAVE, "Save workspace", ffWorkspace, selectedFile));
-}
-
-public void openWorkspace() { openWorkspace(selectWorkspaceFileToOpen()); }
-public void openWorkspace(File file) {
-  if ((file == null) || file.equals(workspaceFile)) return;
-  try {
-    replaceWorkspace(new XMLElement(this, file.getAbsolutePath()));
-  } catch (Exception e) {
-    console.logError("Error reading workspace from " + file.getAbsolutePath() + ": ", e);
-    workspaceFile = null;
-    return;
-  }
-  console.logInfo("Opened workspace " + file.getAbsolutePath());
-  workspaceFile = file;
-}
-
-public void saveWorkspace() { saveWorkspace(false); }
-public void saveWorkspace(boolean forceSelect) {
-  File file = workspaceFile;
-  if ((file == null) || forceSelect)
-    file = selectWorkspaceFileToWrite(file);
-  if (file == null) return;
-  try {
-    PrintWriter writer = createWriter(file.getAbsolutePath());
-    writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    new XMLWriter(writer).write(XMLElement.parse(prefs.get("workspace", "<workspace />")), true);
-    writer.close();
-  } catch (Exception e) {
-    console.logError("Error saving workspace to " + file.getAbsolutePath() + ": ", e);
-    return;
-  }
-  console.logInfo("Workspace saved to " + file.getAbsolutePath());
-  workspaceFile = file;
-}
-
-public void updateWorkspacePref() {
-  String workspace = "";
-  for (SVE2Document d : docs)
-    if (d.getFile() != null)
-      workspace += "<document src=\"" + d.getFile().getAbsolutePath() + "\"" +
-        ((d == doc) ? " selected=\"true\"" : "")  + " />";
-  workspace = "<workspace>" + workspace + "</workspace>";
-  prefs.put("workspace", workspace);
-  showWorkspaceRecoveryButton = false;
-}
-
-public void replaceWorkspace(XMLElement workspace) {
-  if (workspace == null) return;
-  doc = null;
-  docs.clear();
-  XMLElement xmlDocuments[] = workspace.getChildren("document");
-  for (XMLElement xmlDocument : xmlDocuments) {
-    String src = xmlDocument.getString("src");
-    if (src == null) continue;  // should not happen...
-    SVE2Document newdoc = new SVE2Document(new File(src));
-    docs.add(newdoc);
-    worker.submit(newdoc.newLoadingTask());
-    if (xmlDocument.getBoolean("selected"))
-      switchToNetwork(newdoc);
-  }
-  if ((doc == null) && (docs.size() > 0)) switchToNetwork(docs.get(0));
-  else updateWorkspacePref();
-  guiUpdate();
-}
 
 
 

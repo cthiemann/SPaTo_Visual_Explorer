@@ -154,7 +154,7 @@ public class DataTransferHandler implements DropTargetListener {
   public void handleDroppedFiles(File ff[]) {
     for (File f : ff) {
       if (f.getName().endsWith(".spato"))
-        app.openDocument(f);
+        app.workspace.openDocument(f);
       else if (f.getName().endsWith(".mat"))
         ;//FIXME//new Thread(new MatFileImport(f)).start();
       else

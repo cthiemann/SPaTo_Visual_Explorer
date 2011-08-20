@@ -50,10 +50,10 @@ public class MacMagic extends ApplicationAdapter {
     while (!app.canHandleOpenFileEvents) try { Thread.sleep(25); } catch (Exception e) {}
     // check for valid file type and load the file
     if (event.getFilename().endsWith(".spato")) {
-      app.openDocument(new File(event.getFilename()));
+      app.workspace.openDocument(new File(event.getFilename()));
       event.setHandled(true);
     } else if (event.getFilename().endsWith(".sve")) {
-      app.openWorkspace(new File(event.getFilename()));
+      app.workspace.openWorkspace(new File(event.getFilename()));
       event.setHandled(true);
     } else
       // FIXME: in-app error message?
