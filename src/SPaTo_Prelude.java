@@ -18,8 +18,6 @@
  * along with SPaTo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.spato.sve.prelude;
-
 import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -49,7 +47,7 @@ public class SPaTo_Prelude implements Runnable {
   // name of main prelude class (this class)
   protected static final String preludeClass = "SPaTo_Prelude";
   // list of jar files needed to run all tasks
-  protected static final String preludeJars[] = { "SPaTo_Prelude.jar", "core.jar", "jna.jar" };
+  protected static final String preludeJars[] = { "SPaTo_Prelude.jar", "core.jar" };
   // list of tasks to run from preludeJars (class names)
   protected static final String taskNames[] = isWindows
     ? new String[] { "UpdateInstaller", "WindowsPrelude" }
@@ -132,7 +130,7 @@ public class SPaTo_Prelude implements Runnable {
       // run tasks
       for (int i = 0; i < taskNames.length; i++) {
         System.out.println("========== " + taskNames[i] + " ==========");
-        try { ((Runnable)cl.loadClass(taskNames[i]).newInstance()).run(); }
+        try { ((Runnable)cl.loadClass("net.spato.sve.prelude." + taskNames[i]).newInstance()).run(); }
         catch (Exception e) { e.printStackTrace(); System.err.println("!!! Failed to run " + taskNames[i]); }
       }
     } catch (Exception e) { e.printStackTrace(); }
