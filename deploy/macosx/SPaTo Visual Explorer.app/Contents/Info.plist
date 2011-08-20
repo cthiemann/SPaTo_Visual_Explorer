@@ -35,7 +35,7 @@
     <key>Java</key>
     <dict>
       <key>MainClass</key>
-      <string>SPaTo_Visual_Explorer</string>
+      <string>net.spato.sve.app.SPaTo_Visual_Explorer</string>
       <key>JVMVersion</key>
       <string>1.5+</string>
       <key>ClassPath</key>

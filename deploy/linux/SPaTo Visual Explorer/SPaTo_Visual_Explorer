@@ -1,7 +1,10 @@
 #!/bin/bash
 
 APPDIR=$(dirname "$0")
-. "$APPDIR/lib/config.sh"
+JAVAROOT="$APPDIR/lib"
+CLASSPATH="$JAVAROOT/SPaTo_Visual_Explorer.jar:$JAVAROOT/core.jar:$JAVAROOT/itext.jar:$JAVAROOT/pdf.jar:$JAVAROOT/tGUI.jar:$JAVAROOT/xhtmlrenderer.jar"
+
+OPTIONS=-Xmx1024m
 
 #
 # This is an "embedded" helper script to request a restart of this app:
@@ -39,6 +42,6 @@ java -cp "$JAVAROOT" -Dspato.app-dir="$APPDIR" SPaTo_Prelude
 #
 # Finally, launch SPaTo
 #
-java $OPTIONS -cp "$CLASSPATH" -Dspato.app-dir="$APPDIR" SPaTo_Visual_Explorer
+java $OPTIONS -cp "$CLASSPATH" -Dspato.app-dir="$APPDIR" net.spato.sve.app.SPaTo_Visual_Explorer
 
 

@@ -1,27 +1,130 @@
 <?xml version="1.0" ?>
-<project name="SPaTo Visual Explorer" default="compile">
+<project name="SPaTo Visual Explorer" default="help">
 
-  <path id="app.libs">
-    <fileset dir="lib"><include name="**/*.jar" /></fileset>
-  </path>
 
-  <target name="compile">
+  <target name="help" description="Show this help text">
+    <java classname="org.apache.tools.ant.Main"><arg value="-projecthelp" /></java>
+  </target>
+
+  <target name="clean" description="Clear build directory">
+    <delete dir="build" />
+  </target>
+
+
+
+  <!-- Raw Java stuff (compile & run) -->
+
+
+  <target name="compile" description="Compile all sources (application &amp; prelude)">
 	  <mkdir dir="build/classes" />
     <javac srcdir="src" destdir="build/classes"
-           target="1.5" source="1.5"
-           encoding="UTF-8" includeantruntime="false">
-      <classpath refid="app.libs" />
+           target="1.5" source="1.5" encoding="UTF-8" includeantruntime="false">
+      <classpath><fileset dir="lib"><include name="**/*.jar" /></fileset></classpath>
       <compilerarg value="-Xlint" />
     </javac>
   </target>
 
-  <target name="run" depends="compile">
-    <java classname="net.spato.sve.app.SPaTo_Visual_Explorer"
-          classpath="build/classes:${toString:app.libs}" fork="true" />
+  <target name="run" depends="compile" description="Run the application (without prelude)">
+    <java classname="net.spato.sve.app.SPaTo_Visual_Explorer" fork="true">
+      <classpath>
+        <pathelement location="build/classes" />
+        <fileset dir="lib"><include name="**/*.jar" /></fileset>
+      </classpath>
+    </java>
   </target>
 
-  <target name="clean">
-    <delete dir="build" />
+  <target name="javadoc" depends="compile"><!-- description="Create javadoc documentation"> -->
+    <javadoc sourcepath="src" destdir="docs/javadoc">
+      <classpath>
+        <pathelement location="build/classes" />
+        <fileset dir="lib"><include name="**/*.jar" /></fileset>
+      </classpath>
+      <link href="http://download.oracle.com/javase/1.5.0/docs/api/" />
+      <link href="http://processing.googlecode.com/svn/trunk/processing/build/javadoc/core/" />
+    </javadoc>
   </target>
+
+
+
+  <!-- Application package assembly -->
+
+
+  <target name="build" depends="build-linux, build-macosx, build-windows"
+          description="Create stand-alone applications (Linux, MacOS &amp; Windows)" />
+
+  <target name="jars" depends="compile">
+    <jar destfile="build/SPaTo_Visual_Explorer.jar" basedir="build/classes" includes="net/spato/sve/app/**" />
+    <jar destfile="build/SPaTo_Prelude.jar" basedir="build/classes" includes="net/spato/sve/prelude/**" />
+  </target>
+
+  <fileset dir="." id="bin.common">
+    <include name="build/classes/SPaTo_Prelude.class" />
+    <include name="build/SPaTo_*.jar" />
+    <include name="lib/*.jar" />
+    <exclude name="lib/WinRun4J.jar" />
+  </fileset>
+
+  <target name="build-linux" depends="jars">
+    <mkdir dir="build/linux" />
+    <copy todir="build/linux">
+      <fileset dir="deploy/linux"><include name="SPaTo Visual Explorer/**" /></fileset>
+    </copy>
+    <chmod dir="build/linux/SPaTo Visual Explorer" includes="SPaTo_Visual_Explorer" perm="a+x" />
+    <copy todir="build/linux/SPaTo Visual Explorer/lib" flatten="true">
+      <fileset refid="bin.common" />
+    </copy>
+  </target>
+
+  <target name="build-macosx" depends="jars">
+    <mkdir dir="build/macosx" />
+    <copy todir="build/macosx">
+      <fileset dir="deploy/macosx"><include name="SPaTo Visual Explorer.app/**" /></fileset>
+    </copy>
+    <chmod dir="build/macosx/SPaTo Visual Explorer.app/Contents/MacOS" includes="**" perm="a+x" />
+    <copy todir="build/macosx/SPaTo Visual Explorer.app/Contents/Resources/Java" flatten="true">
+      <fileset refid="bin.common" />
+    </copy>
+  </target>
+
+  <target name="build-windows" depends="jars">
+    <mkdir dir="build/windows" />
+    <copy todir="build/windows">
+      <fileset dir="deploy/windows"><include name="SPaTo Visual Explorer/**" /></fileset>
+    </copy>
+    <copy todir="build/windows/SPaTo Visual Explorer/lib" flatten="true">
+      <fileset refid="bin.common" />
+      <fileset dir="lib" includes="WinRun4J.jar" />
+    </copy>
+  </target>
+
+
+
+  <!-- Deployment (dmg/tar.gz/zip packages) -->
+
+
+  <target name="dist" depends="dist-linux, dist-macosx, dist-windows"
+          description="Create distributable application archives (dmg, tar.gz &amp; zip)">
+  </target>
+
+  <target name="dist-linux" depends="build-linux">
+    <tar destfile="build/linux/SPaTo_Visual_Explorer.tar.gz" basedir="build/linux" compression="gzip">
+      <include name="SPaTo Visual Explorer/**" />
+    </tar>
+  </target>
+
+  <target name="dist-macosx" depends="build-macosx">
+    <dependset>
+      <srcfileset dir="build/macosx/SPaTo Visual Explorer.app" />
+      <targetfileset dir="build/macosx" includes="SPaTo_Visual_Explorer.dmg" />
+    </dependset>
+    <exec executable="deploy/macosx/create_dmg.sh" />
+  </target>
+
+  <target name="dist-windows" depends="build-windows">
+    <zip destfile="build/windows/SPaTo_Visual_Explorer.zip" basedir="build/windows" level="9">
+      <include name="SPaTo Visual Explorer/**" />
+    </zip>
+  </target>
+
 
 </project>
