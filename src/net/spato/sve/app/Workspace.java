@@ -37,8 +37,8 @@ public class Workspace {
   protected File workspaceFile = null;
   public boolean showWorkspaceRecoveryButton = true;  // FIXME: should not be public
 
-  protected Vector<SPaTo_Visual_Explorer.SVE2Document> docs = new Vector<SPaTo_Visual_Explorer.SVE2Document>();  // all loaded documents
-  public SPaTo_Visual_Explorer.SVE2Document doc = null;  // current document  // FIXME: public?
+  protected Vector<SPaToDocument> docs = new Vector<SPaToDocument>();  // all loaded documents
+  public SPaToDocument doc = null;  // current document  // FIXME: public?
 
   public Workspace(SPaTo_Visual_Explorer app) {
     this.app = app;
@@ -86,7 +86,7 @@ public class Workspace {
   }
 
   public void newDocument() {
-    SPaTo_Visual_Explorer.SVE2Document newdoc = app.new SVE2Document();
+    SPaToDocument newdoc = new SPaToDocument(app);
     docs.add(newdoc);
     switchToNetwork(newdoc);
   }
@@ -96,12 +96,12 @@ public class Workspace {
   public void openDocuments(File files[]) {
     if (files == null) return;
     for (File f : files) {
-      SPaTo_Visual_Explorer.SVE2Document newdoc = null;
-      for (SPaTo_Visual_Explorer.SVE2Document d : docs)
+      SPaToDocument newdoc = null;
+      for (SPaToDocument d : docs)
         if (d.getFile().equals(f))
           newdoc = d;  // this document is already open
       if (newdoc == null) {  // load if not already open
-        newdoc = app.new SVE2Document(f);
+        newdoc = new SPaToDocument(app, f);
         docs.add(newdoc);
         app.worker.submit(newdoc.newLoadingTask());
       }
@@ -121,7 +121,7 @@ public class Workspace {
   public void saveDocument(boolean forceSelect) {
     if (doc == null) return;
     File file = doc.getFile();
-    for (SPaTo_Visual_Explorer.SVE2Document d : docs)
+    for (SPaToDocument d : docs)
       if ((d != doc) && d.getFile().equals(file))
         docs.remove(d);  // prevent duplicate entries in docs
     if ((file == null) || forceSelect) {
@@ -135,13 +135,13 @@ public class Workspace {
 
   public boolean switchToNetwork(int i) { return switchToNetwork(((i < 0) || (i >= docs.size())) ? docs.get(i) : null); }
   public boolean switchToNetwork(String name) {
-    SPaTo_Visual_Explorer.SVE2Document newdoc = null;
+    SPaToDocument newdoc = null;
     for (int i = 0; i < docs.size(); i++)
       if (name.equals(docs.get(i).getName()))
         newdoc = docs.get(i);
     return switchToNetwork(newdoc);
   }
-  public boolean switchToNetwork(SPaTo_Visual_Explorer.SVE2Document newdoc) {
+  public boolean switchToNetwork(SPaToDocument newdoc) {
     app.searchMatchesValid = false;
     app.searchMatches = null;
     doc = newdoc;
@@ -199,7 +199,7 @@ public class Workspace {
 
   public void updateWorkspacePref() {
     String workspace = "";
-    for (SPaTo_Visual_Explorer.SVE2Document d : docs)
+    for (SPaToDocument d : docs)
       if (d.getFile() != null)
         workspace += "<document src=\"" + d.getFile().getAbsolutePath() + "\"" +
           ((d == doc) ? " selected=\"true\"" : "")  + " />";
@@ -216,7 +216,7 @@ public class Workspace {
     for (XMLElement xmlDocument : xmlDocuments) {
       String src = xmlDocument.getString("src");
       if (src == null) continue;  // should not happen...
-      SPaTo_Visual_Explorer.SVE2Document newdoc = app.new SVE2Document(new File(src));
+      SPaToDocument newdoc = new SPaToDocument(app, new File(src));
       docs.add(newdoc);
       app.worker.submit(newdoc.newLoadingTask());
       if (xmlDocument.getBoolean("selected"))

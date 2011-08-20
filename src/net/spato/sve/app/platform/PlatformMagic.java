@@ -21,6 +21,7 @@
 package net.spato.sve.app.platform;
 
 import javax.swing.UIManager;
+import net.spato.sve.app.SPaToDocument;
 import net.spato.sve.app.SPaTo_Visual_Explorer;
 import processing.core.PApplet;
 
@@ -42,7 +43,7 @@ public class PlatformMagic {
 
   public void update() {
     if (PApplet.platform == PApplet.MACOSX) {
-      SPaTo_Visual_Explorer.SVE2Document doc = SPaTo_Visual_Explorer.INSTANCE.doc;
+      SPaToDocument doc = SPaTo_Visual_Explorer.INSTANCE.doc;
       boolean showDoc = ((doc != null) && !SPaTo_Visual_Explorer.INSTANCE.fireworks);
       if (defaultTitle == null) defaultTitle = SPaTo_Visual_Explorer.INSTANCE.frame.getTitle();
       SPaTo_Visual_Explorer.INSTANCE.frame.setTitle(showDoc ? ((doc.getFile() != null) ? doc.getFile().getAbsolutePath() : doc.getName()) : defaultTitle);

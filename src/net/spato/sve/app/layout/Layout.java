@@ -136,13 +136,13 @@ public class Layout {
     /*if (order.equals("unsorted")) return null;
     try {
       String pieces[] = split(order, '_');
-      SVE2View.Dataset ds = null;
+      SPaToView.Dataset ds = null;
       for (int d = 0; d < view.ND; d++)
         if (view.data[d].xml.getString("id").equals(pieces[0]))
           ds = view.data[d];
       if (ds == null) throw new Exception("Dataset " + pieces[0] + " not found");
       if (pieces.length < 2) throw new Exception("Quantity not specified");
-      SVE2View.Data data = null;
+      SPaToView.Data data = null;
       for (int q = 0; q < ds.NQ; q++)
         if (ds.data[q].xml.getString("id").equals(pieces[1]))
           data = ds.data[q];
