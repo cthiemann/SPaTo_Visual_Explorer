@@ -21,8 +21,10 @@
 package net.spato.sve.prelude;
 
 import java.io.*;
-import processing.xml.*;
+
 import com.sun.jna.Platform;
+import processing.xml.*;
+
 
 public class UpdateInstaller implements Runnable {
 

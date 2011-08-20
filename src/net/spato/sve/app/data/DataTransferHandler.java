@@ -20,20 +20,21 @@
 
 package net.spato.sve.app.data;
 
-import net.spato.sve.app.SPaTo_Visual_Explorer;
-import java.awt.dnd.DropTargetListener;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTarget;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.Reader;
+
+import net.spato.sve.app.SPaTo_Visual_Explorer;
 import processing.core.PApplet;
 import tGUI.*;
-import java.io.BufferedReader;
-import java.io.Reader;
 
 
 public class DataTransferHandler implements DropTargetListener {

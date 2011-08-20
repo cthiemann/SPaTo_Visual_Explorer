@@ -25,10 +25,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
-import net.spato.sve.app.SPaTo_Visual_Explorer;
+import java.util.concurrent.Executors;
+
 import processing.core.PApplet;
+import net.spato.sve.app.SPaTo_Visual_Explorer;
 import tGUI.*;
 
 

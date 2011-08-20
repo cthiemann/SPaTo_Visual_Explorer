@@ -23,6 +23,7 @@ package net.spato.sve.app;
 import java.awt.event.KeyEvent;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
 import net.spato.sve.app.data.*;
 import net.spato.sve.app.layout.*;
 import processing.core.PApplet;

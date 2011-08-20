@@ -24,8 +24,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Vector;
-import net.spato.sve.app.SPaTo_Visual_Explorer;
+
 import processing.core.PApplet;
+import net.spato.sve.app.SPaTo_Visual_Explorer;
 
 
 public class Layout {

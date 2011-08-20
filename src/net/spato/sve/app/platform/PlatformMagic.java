@@ -21,8 +21,9 @@
 package net.spato.sve.app.platform;
 
 import javax.swing.UIManager;
-import net.spato.sve.app.SPaToDocument;
+
 import net.spato.sve.app.SPaTo_Visual_Explorer;
+import net.spato.sve.app.SPaToDocument;
 import processing.core.PApplet;
 
 

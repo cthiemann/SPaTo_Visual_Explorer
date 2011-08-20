@@ -22,19 +22,18 @@ package net.spato.sve.app;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.awt.Frame;
 import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ExecutorService;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.prefs.Preferences;
 import javax.swing.JFrame;
+
 import net.spato.sve.app.data.*;
 import net.spato.sve.app.layout.*;
 import net.spato.sve.app.platform.*;

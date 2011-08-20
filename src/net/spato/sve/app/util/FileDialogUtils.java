@@ -22,12 +22,13 @@ package net.spato.sve.app.util;
 
 import java.awt.FileDialog;
 import java.io.File;
-import javax.swing.filechooser.FileFilter;
 import java.io.FilenameFilter;
-import net.spato.sve.app.SPaTo_Visual_Explorer;
-import processing.core.PApplet;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
+
+import processing.core.PApplet;
+import net.spato.sve.app.SPaTo_Visual_Explorer;
 
 
 public class FileDialogUtils {

@@ -24,7 +24,9 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 import javax.swing.JOptionPane;
+
 import com.sun.jna.Platform;
+
 
 public class MaxMemDetector implements Runnable {
 
