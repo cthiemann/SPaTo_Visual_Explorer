@@ -18,8 +18,15 @@
  * along with SPaTo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.*;
-import org.boris.winrun4j.*;
+package net.spato.sve.app.platform;
+
+import java.io.File;
+
+import net.spato.sve.app.SPaTo_Visual_Explorer;
+import org.boris.winrun4j.FileAssociation;
+import org.boris.winrun4j.FileAssociations;
+import org.boris.winrun4j.FileVerb;
+
 
 public class WindowsMagic {
 

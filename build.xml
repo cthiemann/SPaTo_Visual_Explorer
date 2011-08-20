@@ -7,14 +7,17 @@
 
   <target name="compile">
 	  <mkdir dir="build/classes" />
-    <javac srcdir="src" destdir="build/classes" includeantruntime="false">
+    <javac srcdir="src" destdir="build/classes"
+           target="1.5" source="1.5"
+           encoding="UTF-8" includeantruntime="false">
       <classpath refid="app.libs" />
       <compilerarg value="-Xlint" />
     </javac>
   </target>
 
   <target name="run" depends="compile">
-    <java classname="net.spato.sve.app.SPaTo_Visual_Explorer" classpath="build/classes:${toString:app.libs}" fork="true" />
+    <java classname="net.spato.sve.app.SPaTo_Visual_Explorer"
+          classpath="build/classes:${toString:app.libs}" fork="true" />
   </target>
 
   <target name="clean">
