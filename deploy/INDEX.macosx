@@ -33,8 +33,8 @@
     <local path="Contents/Resources/Java/xhtmlrenderer.jar"/>
   </file>
   <file>
-    <remote path="macosx/Info.plist.orig"/>
-    <local path="Contents/Info.plist.orig"/>
+    <remote path="macosx/Info.plist"/>
+    <local path="Contents/Info.plist"/>
   </file>
   <file executable="true">
     <remote path="macosx/ApplicationUpdateWrapper"/>

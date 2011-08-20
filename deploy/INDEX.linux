@@ -61,7 +61,7 @@
     <local path="lib/spato-mime.xml"/>
   </file>
   <file executable="true">
-    <remote path="linux/config.sh.orig"/>
-    <local path="lib/config.sh.orig"/>
+    <remote path="linux/config.sh"/>
+    <local path="lib/config.sh"/>
   </file>
 </update>

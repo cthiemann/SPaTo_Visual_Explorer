@@ -41,8 +41,8 @@
     <local path="SPaTo Visual Explorer.ini"/>
   </file>
   <file>
-    <remote path="windows/SPaTo_Visual_Explorer.ini.orig"/>
-    <local path="lib\SPaTo_Visual_Explorer.ini.orig"/>
+    <remote path="windows/SPaTo_Visual_Explorer.ini"/>
+    <local path="lib\SPaTo_Visual_Explorer.ini"/>
   </file>
   <file>
     <remote path="windows/SPaTo_Prelude.ini"/>
