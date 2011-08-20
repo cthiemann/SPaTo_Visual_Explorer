@@ -142,11 +142,11 @@ public class Workspace {
     return switchToNetwork(newdoc);
   }
   public boolean switchToNetwork(SPaToDocument newdoc) {
-    app.searchMatchesValid = false;
-    app.searchMatches = null;
+    app.gui.searchMatchesValid = false;
+    app.gui.searchMatches = null;
     doc = newdoc;
     app.doc = newdoc;  // FIXME
-    app.guiUpdate();
+    app.gui.update();
     updateWorkspacePref();
     return doc != null;
   }
@@ -224,7 +224,7 @@ public class Workspace {
     }
     if ((doc == null) && (docs.size() > 0)) switchToNetwork(docs.get(0));
     updateWorkspacePref();
-    app.guiUpdate();
+    app.gui.update();
   }
 
 }

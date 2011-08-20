@@ -507,29 +507,29 @@ public class SPaToView {
       if (!invis &&
           (app.gui.componentAtMouse == null) && (app.gui.componentMouseClicked == null) &&
           (d < 50) && (d < mind) &&
-          (!app.searchMatchesValid || !app.tfSearch.isFocusOwner() ||
-           app.searchMatches[i] || (app.searchMatchesChild[i] > 0))) {
+          (!app.gui.searchMatchesValid || !app.gui.tfSearch.isFocusOwner() ||
+           app.gui.searchMatches[i] || (app.gui.searchMatchesChild[i] > 0))) {
         mind = d; ih = i; }
     }
     // draw links
     if (hasSlices && ((aLinks > 1/192.f) || (aSkeleton > 1/192.f) || (aNeighbors > 1/192.f) || (aNetwork > 1/192.f))) {
       g.noFill(); g.strokeWeight(linkLineWidth);
       // update search matches
-      if (app.searchMatchesValid) {
+      if (app.gui.searchMatchesValid) {
         // update branch matching flags (would need to be recursive, but we are sloppy here)
         // 1: node i matches search
         // 0: node i does not match and we don't know of any children who match
         // 2: node i does not match but we used to have matching children
         for (int i = 0; i < NN; i++)
-          app.searchMatchesChild[i] = app.searchMatches[i] ? 1 : 2*app.searchMatchesChild[i];
+          app.gui.searchMatchesChild[i] = app.gui.searchMatches[i] ? 1 : 2*app.gui.searchMatchesChild[i];
         // if we think that node i has a matching child, tell the parent of node i
         for (int i = 0; i < NN; i++)
-          if ((app.searchMatchesChild[i] > 0) && (pred[r][i] != -1))
-            app.searchMatchesChild[pred[r][i]] = 1;
+          if ((app.gui.searchMatchesChild[i] > 0) && (pred[r][i] != -1))
+            app.gui.searchMatchesChild[pred[r][i]] = 1;
         // if any of the nodes with status 2 has not been set to 1 by now, there is no matching child
         for (int i = 0; i < NN; i++)
-          if (app.searchMatchesChild[i] == 2)
-            app.searchMatchesChild[i] = 0;
+          if (app.gui.searchMatchesChild[i] == 2)
+            app.gui.searchMatchesChild[i] = 0;
       }
       // visualize salience matrix
       if (aSkeleton > 1/192.f) {
@@ -604,8 +604,8 @@ public class SPaToView {
         for (int i = 0; i < NN; i++) {
           int j = pred[r][i];
           if (j == -1) continue;  // don't draw links from disconnected (or root) nodes
-          if (app.searchMatchesValid) {
-            float alphafactor = (app.searchMatches[i] || (app.searchMatchesChild[i] > 0)) ? 1.25f : 0.25f;
+          if (app.gui.searchMatchesValid) {
+            float alphafactor = (app.gui.searchMatches[i] || (app.gui.searchMatchesChild[i] > 0)) ? 1.25f : 0.25f;
             g.stroke(64 + 128*aSNN, 64*(1 - aSNN), 64*(1 - aSNN), PApplet.min(255, (192*aLinks + 63*aSNN)*alphafactor));
             g.strokeWeight((alphafactor > 1) ? 1 : 0.25f);
           }
@@ -631,7 +631,7 @@ public class SPaToView {
     if (aNodes > 1/192.f) {
       g.noStroke();
       for (int i = 0; i < NN; i++) {
-        float alphafactor = !app.searchMatchesValid ? 1 : (app.searchMatches[i] ? 1.25f : 0.125f);
+        float alphafactor = !app.gui.searchMatchesValid ? 1 : (app.gui.searchMatches[i] ? 1.25f : 0.125f);
         g.fill((val == null) ? 127 : colormap.getColor(val[i]), 192*aNodes*nodes[i].a*alphafactor);
         if (fastNodes)
           g.rect(nodes[i].x + .5f, nodes[i].y + .5f, 3*nodeSize/4, 3*nodeSize/4);
@@ -652,11 +652,11 @@ public class SPaToView {
     }
     g.rectMode(PApplet.CORNER);
     // draw labels
-    g.textFont(/*fnSmall*/app.fnMedium);
+    g.textFont(/*fnSmall*/app.gui.fnMedium);
     g.textAlign(PApplet.LEFT, PApplet.BASELINE);
     g.noStroke();
     for (int i = 0; i < NN; i++) {
-      if ((i == r) || (i == ih) || ((aLabels > 1/255.f) && nodes[i].showLabel && (!app.searchMatchesValid || app.searchMatches[i]))) {
+      if ((i == r) || (i == ih) || ((aLabels > 1/255.f) && nodes[i].showLabel && (!app.gui.searchMatchesValid || app.gui.searchMatches[i]))) {
         g.fill(0, 255*aLabels*nodes[i].a);
         g.text(nodes[i].label + (((i == ih) && (val != null)) ? " (" + format(val[i]) + ")" : ""),
                nodes[i].x + nodeSize/4, nodes[i].y - nodeSize/4);

@@ -193,7 +193,7 @@ public class SPaToDocument {
       setSelectedDataset(xmlData.getParent());
     }
     view.setNodeColoringData(xmlData);
-    app.guiUpdateNodeColoring();
+    app.gui.updateNodeColoring();
   }
 
   public XMLElement getDistanceQuantity() { return getChild("dataset/data[@distmat]"); }
@@ -204,7 +204,7 @@ public class SPaToDocument {
     if (view.xmlDistMat != null) view.xmlDistMat.remove("distmat");
     view.setDistanceMatrix(xmlData);
     if (xmlData != null) xmlData.setBoolean("distmat", true);
-    app.guiUpdateProjection();
+    app.gui.updateProjection();
   }
 
   /*
@@ -289,8 +289,8 @@ public class SPaToDocument {
       view.setSlices(getSlices()); view.setTomLayout();
       view.setDistanceMatrix(getDistanceQuantity());
       /* FIXME: layout handling is bad... */ }
-    if (isAlbum || (xml == getSelectedQuantity())) { view.setNodeColoringData(getSelectedQuantity()); app.guiUpdateNodeColoring(); }
-    if (isAlbum || (xml == getDistanceQuantity())) { view.setDistanceMatrix(getDistanceQuantity()); app.guiUpdateProjection(); }
+    if (isAlbum || (xml == getSelectedQuantity())) { view.setNodeColoringData(getSelectedQuantity()); app.gui.updateNodeColoring(); }
+    if (isAlbum || (xml == getDistanceQuantity())) { view.setDistanceMatrix(getDistanceQuantity()); app.gui.updateProjection(); }
   }
 
   public XMLElement getColormap(XMLElement xml) {
@@ -394,7 +394,7 @@ public class SPaToDocument {
     if (xmlDataset.getString("id") == null)
       xmlDataset.setString("id", generateID());
     xmlDocument.addChild(xmlDataset);
-    app.guiUpdateNodeColoring();
+    app.gui.updateNodeColoring();
   }
 
   public void removeDataset(XMLElement xmlDataset) {
@@ -403,7 +403,7 @@ public class SPaToDocument {
     if (xmlDataset.getBoolean("selected"))
       setSelectedDataset((XMLElement)previousOrNext(getDatasets(), xmlDataset));
     xmlDataset.getParent().removeChild(xmlDataset);
-    app.guiUpdateNodeColoring();
+    app.gui.updateNodeColoring();
   }
 
   public void addQuantity(XMLElement xmlDataset, XMLElement xmlData) { addQuantity(xmlDataset, xmlData, null); }
@@ -412,8 +412,8 @@ public class SPaToDocument {
     if (xmlData.getString("id") == null) xmlData.setString("id", generateID());
     xmlDataset.addChild(xmlData);
     if (blob != null) setBlob(xmlData, blob, true);
-    app.guiUpdateNodeColoring();
-    app.guiUpdateProjection();
+    app.gui.updateNodeColoring();
+    app.gui.updateProjection();
   }
 
   public void removeQuantity(XMLElement xmlData) {
@@ -462,7 +462,7 @@ public class SPaToDocument {
         view.setNodes(xmlNodes);
         view.setMapProjection(xmlNodes.getChild("projection"));
       }
-      app.guiUpdateAlbumControls();
+      app.gui.updateAlbumControls();
       // setup links
       view.setLinks(getLinks());
       if (getLinks() != null)
@@ -470,7 +470,7 @@ public class SPaToDocument {
       // setup data
       view.setNodeColoringData(getSelectedQuantity());
       loadBlobs(getAllQuantities());  // make sure all data is loaded
-      app.guiUpdateNodeColoring();
+      app.gui.updateNodeColoring();
       // setup slices
       view.setSlices(getSlices());
       loadBlobs(getSlices());  // make sure all slices snapshots are loaded
@@ -479,7 +479,7 @@ public class SPaToDocument {
       view.tomLayouts = xmlDocument.getString("tomLayouts", null);  // FIXME: layouts should be specified by <layout> tags or something
       view.setTomLayout();
       view.setDistanceMatrix(getDistanceQuantity());
-      app.guiUpdateProjection();
+      app.gui.updateProjection();
     }
     // clean-up and done
     if (compressed) { try { zipfile.close(); } catch (Exception e) {}; zipfile = null; }
