@@ -20,10 +20,16 @@
 
 package net.spato.sve.prelude;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 
-import com.sun.jna.Platform;
-import processing.xml.*;
+import processing.core.PApplet;
+import processing.xml.StdXMLBuilder;
+import processing.xml.StdXMLParser;
+import processing.xml.StdXMLReader;
+import processing.xml.XMLElement;
+import processing.xml.XMLValidator;
 
 
 public class UpdateInstaller implements Runnable {
@@ -35,8 +41,8 @@ public class UpdateInstaller implements Runnable {
   protected XMLElement index = null;
 
   protected void checkForIndex() {
-    cacheFolder = Platform.isMac() ? new File(appRootFolder, "Contents/Resources/update")
-                : Platform.isWindows() ? new File(appRootFolder, "update")
+    cacheFolder = (PApplet.platform == PApplet.MACOSX) ? new File(appRootFolder, "Contents/Resources/update")
+                : (PApplet.platform == PApplet.WINDOWS) ? new File(appRootFolder, "update")
                 : new File(System.getProperty("user.home") + "/.spato/update");
     File indexFile = new File(cacheFolder, "INDEX");
     BufferedReader reader = null;
@@ -70,7 +76,7 @@ public class UpdateInstaller implements Runnable {
       if (dst.exists()) dst.delete();
       if (!src.renameTo(dst))
         throw new RuntimeException("moving " + src + " to " + dst + " failed");
-      if (file.getBoolean("executable") && !Platform.isWindows()) {
+      if (file.getBoolean("executable") && (PApplet.platform != PApplet.WINDOWS)) {
         System.out.println("setting executable flag on " + local.getString("path"));
         try { Runtime.getRuntime().exec(new String[] { "chmod", "+x", dst.getAbsolutePath() }); }
         catch (Exception e) { throw new RuntimeException("chmod failed", e); }

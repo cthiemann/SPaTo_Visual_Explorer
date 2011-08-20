@@ -20,7 +20,7 @@
 
 package net.spato.sve.prelude;
 
-import java.io.*;
+import java.io.File;
 import javax.swing.JOptionPane;
 
 
