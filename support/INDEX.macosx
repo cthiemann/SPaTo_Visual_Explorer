@@ -25,10 +25,6 @@
     <local path="Contents/Resources/Java/jna.jar"/>
   </file>
   <file>
-    <remote path="common/jnmatlib.jar"/>
-    <local path="Contents/Resources/Java/jnmatlib.jar"/>
-  </file>
-  <file>
     <remote path="common/pdf.jar"/>
     <local path="Contents/Resources/Java/pdf.jar"/>
   </file>
