@@ -445,10 +445,11 @@ public class SPaToView {
 
   float a = 0, nodeSize = 0;
   float[] tmpx = null, tmpy = null;
-  float viewWidth = app.width;
+  float viewWidth = Float.NaN;
   float aNodes = 0, aLinks = 0, aSkeleton = 0, aNeighbors = 0, aNetwork = 0, aLabels = 0;
 
   public void draw(PGraphics g) {
+    if (Float.isNaN(viewWidth)) viewWidth = g.width;
     if (!hasNodes || (!hasMapLayout && !hasTomLayout)) return;  // nothing to draw
     if ((showNeighbors || showNetwork) && !hasLinks) {
       showNeighbors = false; aNeighbors = 0; showNetwork = false; aNetwork = 0; }  // can't draw full network
