@@ -34,7 +34,7 @@ import java.io.Reader;
 
 import net.spato.sve.app.SPaTo_Visual_Explorer;
 import processing.core.PApplet;
-import tGUI.*;
+import de.cthiemann.tGUI.*;
 
 
 public class DataTransferHandler implements DropTargetListener {

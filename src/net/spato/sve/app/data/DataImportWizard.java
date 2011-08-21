@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
 
 import processing.core.PApplet;
 import net.spato.sve.app.SPaTo_Visual_Explorer;
-import tGUI.*;
+import de.cthiemann.tGUI.*;
 
 
 public class DataImportWizard extends TFrame {

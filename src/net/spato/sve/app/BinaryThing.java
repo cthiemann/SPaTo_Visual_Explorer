@@ -32,7 +32,7 @@ import java.util.Arrays;
 
 import processing.core.PApplet;
 import processing.xml.XMLElement;
-import tGUI.TConsole;
+import de.cthiemann.tGUI.TConsole;
 
 
 public class BinaryThing {

@@ -23,8 +23,8 @@ package net.spato.sve.app;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.xml.XMLElement;
-import tGUI.TChoice;
-import tGUI.TComponent;
+import de.cthiemann.tGUI.TChoice;
+import de.cthiemann.tGUI.TComponent;
 
 
 // FIXME: This should be refactored such that different colormaps are different subclasses of Colormap

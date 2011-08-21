@@ -48,7 +48,7 @@ import processing.xml.StdXMLReader;
 import processing.xml.XMLElement;
 import processing.xml.XMLValidator;
 import processing.xml.XMLWriter;
-import tGUI.*;
+import de.cthiemann.tGUI.*;
 
 
 public class SPaToDocument {

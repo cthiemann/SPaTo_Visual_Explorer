@@ -30,7 +30,7 @@ import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PGraphics;
 import processing.xml.XMLElement;
-import tGUI.*;
+import de.cthiemann.tGUI.*;
 
 
 public class SPaToGUI extends TransparentGUI {

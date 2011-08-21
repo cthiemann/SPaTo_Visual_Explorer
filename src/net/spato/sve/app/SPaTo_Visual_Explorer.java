@@ -41,7 +41,7 @@ import net.spato.sve.app.util.*;
 import processing.core.PApplet;
 import processing.pdf.PGraphicsPDF;
 import processing.xml.XMLElement;
-import tGUI.*;
+import de.cthiemann.tGUI.*;
 
 
 @SuppressWarnings("serial")

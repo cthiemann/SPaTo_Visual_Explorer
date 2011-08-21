@@ -24,7 +24,7 @@ import net.spato.sve.app.layout.*;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.xml.XMLElement;
-import tGUI.TConsole;
+import de.cthiemann.tGUI.TConsole;
 
 
 public class SPaToView {
