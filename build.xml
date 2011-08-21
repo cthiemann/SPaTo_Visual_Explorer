@@ -18,7 +18,7 @@
   <target name="compile" description="Compile all sources (application &amp; prelude)">
 	  <mkdir dir="build/classes" />
     <javac srcdir="src" destdir="build/classes"
-           target="1.5" source="1.5" encoding="UTF-8" includeantruntime="false">
+           target="1.5" source="1.5" debug="true" encoding="UTF-8" includeantruntime="false">
       <classpath><fileset dir="lib"><include name="**/*.jar" /></fileset></classpath>
       <compilerarg value="-Xlint" />
     </javac>
@@ -133,7 +133,7 @@
 
   <target name="compile-update-builder" depends="compile">
     <javac srcdir="deploy" includes="SPaTo_Update_Builder.java" destdir="build/classes"
-           target="1.5" source="1.5" encoding="UTF-8" includeantruntime="false">
+           target="1.5" source="1.5" debug="true" encoding="UTF-8" includeantruntime="false">
       <classpath>
         <pathelement location="build/classes" />
         <pathelement location="lib/core.jar" />

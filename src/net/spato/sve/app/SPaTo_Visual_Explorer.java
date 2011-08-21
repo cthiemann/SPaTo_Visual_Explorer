@@ -322,6 +322,11 @@ public class SPaTo_Visual_Explorer extends PApplet {
   public JFrame jframe = null;  // FIXME: should not be public
   // overriding main() to create the applet within a JFrame (needed to do much of the Mac magic).
   public static void main(String args[]) {
+    if (args.length > 0) {
+      println("cmd line args:");
+      for (int i = 0; i < args.length; i++)
+        println("  [" + i + "] " + args[i]);
+    }
     SPaTo_Visual_Explorer applet = new SPaTo_Visual_Explorer();
     if (platform == MACOSX) {
       // Wrap the applet into a JFrame for maximum MacMagic!
