@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
-<plist version="0.9">
+<plist>
   <dict>
-    
+
     <key>CFBundleIdentifier</key>
     <string>net.spato.SPaTo-Visual-Explorer</string>
     <key>CFBundleName</key>
     <string>SPaTo Visual Explorer</string>
     <key>CFBundleVersion</key>
-    <string>1.0.5_12</string>
+    <string>${version.long}</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.2.3_04</string>
+    <string>${version.update}</string>
     <key>CFBundleExecutable</key>
-    <string>ApplicationUpdateWrapper</string>
+    <string>JavaApplicationStub</string>
     <key>CFBundleIconFile</key>
     <string>spato.icns</string>
     <key>CFBundleDevelopmentRegion</key>
@@ -31,7 +31,7 @@
       <string>x86_64</string>
       <string>i386</string>
     </array>
-    
+
     <key>Java</key>
     <dict>
       <key>MainClass</key>
@@ -52,7 +52,7 @@
       <key>VMOptions</key>
       <string>-Xmx1024m</string>
     </dict>
-    
+
     <key>CFBundleDocumentTypes</key>
     <array>
       <dict>
@@ -155,6 +155,6 @@
         </dict>
       </dict>
     </array>
-    
+
   </dict>
 </plist>

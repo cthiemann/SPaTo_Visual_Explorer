@@ -44,6 +44,21 @@
     </javadoc>
   </target>
 
+  <target name="compile-deploy" depends="compile">
+    <javac srcdir="deploy" includes="*.java" destdir="build/classes"
+           target="1.5" source="1.5" debug="true" encoding="UTF-8" includeantruntime="false">
+      <classpath>
+        <pathelement location="build/classes" />
+        <pathelement location="lib/core.jar" />
+      </classpath>
+      <compilerarg value="-Xlint" />
+    </javac>
+  </target>
+
+  <target name="version" depends="compile-deploy">
+    <java classname="SPaTo_Version" classpath="build/classes" fork="true" />
+  </target>
+
 
 
   <!-- Application package assembly -->
@@ -75,7 +90,7 @@
     </copy>
   </target>
 
-  <target name="build-macosx" depends="jars">
+  <target name="build-macosx" depends="jars, version">
     <mkdir dir="build/macosx" />
     <copy todir="build/macosx">
       <fileset dir="deploy/macosx"><include name="SPaTo Visual Explorer.app/**" /></fileset>
@@ -83,6 +98,16 @@
     <chmod dir="build/macosx/SPaTo Visual Explorer.app/Contents/MacOS" includes="**" perm="a+x" />
     <copy todir="build/macosx/SPaTo Visual Explorer.app/Contents/Resources/Java" flatten="true">
       <fileset refid="bin.common" />
+    </copy>
+    <property file="build/version.properties" />
+    <concat destfile="build/macosx/SPaTo Visual Explorer.app/Contents/Info.plist">
+      <filelist dir="deploy/macosx/SPaTo Visual Explorer.app/Contents" files="Info.plist" />
+      <filterchain><expandproperties /></filterchain>
+    </concat>
+    <mkdir dir="build/macosx/SPaTo Visual Explorer.app/Contents/Resources/update" />
+    <copy todir="build/macosx/SPaTo Visual Explorer.app/Contents/Resources/update">
+      <filelist dir="deploy" files="INDEX.macosx" />
+      <globmapper from="*" to="INDEX" />
     </copy>
   </target>
 
@@ -131,18 +156,7 @@
   <!-- Deployment (auto-update) -->
 
 
-  <target name="compile-update-builder" depends="compile">
-    <javac srcdir="deploy" includes="SPaTo_Update_Builder.java" destdir="build/classes"
-           target="1.5" source="1.5" debug="true" encoding="UTF-8" includeantruntime="false">
-      <classpath>
-        <pathelement location="build/classes" />
-        <pathelement location="lib/core.jar" />
-      </classpath>
-      <compilerarg value="-Xlint" />
-    </javac>
-  </target>
-
-  <target name="dist-update" depends="compile-update-builder, build"
+  <target name="dist-update" depends="compile-deploy, build"
           description="Create directory containing auto-update files">
     <mkdir dir="build/update" />
     <exec executable="deploy/private-key-password.sh" outputproperty="private.key.password" />
@@ -160,10 +174,11 @@
   <!-- Deployment (upload to webserver) -->
 
 
-  <target name="upload" depends="dist, dist-update"
+  <target name="upload" depends="version, dist, dist-update"
           description="Upload binary packages and auto-update files to webserver">
 
     <property file="build/version.properties" />
+
     <mkdir dir="build/download" />
     <copy todir="build/download">
       <fileset dir="build/linux" includes="SPaTo_Visual_Explorer.tar.gz" />

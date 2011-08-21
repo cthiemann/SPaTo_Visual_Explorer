@@ -21,10 +21,11 @@
 package net.spato.sve.app.platform;
 
 import java.io.File;
+import java.util.List;
 
+import com.apple.eawt.AppEvent;
 import com.apple.eawt.Application;
-import com.apple.eawt.ApplicationAdapter;
-import com.apple.eawt.ApplicationEvent;
+import com.apple.eawt.OpenFilesHandler;
 import net.spato.sve.app.SPaTo_Visual_Explorer;
 
 
@@ -34,41 +35,32 @@ import net.spato.sve.app.SPaTo_Visual_Explorer;
  * so that the class does not get loaded if we are not running on a Mac platform
  * (otherwise the above import statements may cause things to break).
  *
- * http://developer.apple.com/library/mac/#documentation/Java/Conceptual/Java14Development/07-NativePlatformIntegration/NativePlatformIntegration.html%23//apple_ref/doc/uid/TP40001909-SW1
- * http://developer.apple.com/library/mac/documentation/Java/Reference/1.5.0/appledoc/api/index.html
+ * http://developer.apple.com/library/mac/#documentation/Java/Conceptual/Java14Development/00-Intro/JavaDevelopment.html
+ * http://developer.apple.com/library/mac/documentation/Java/Reference/JavaSE6_AppleExtensionsRef/api/com/apple/eawt/package-summary.html
  */
-@SuppressWarnings("deprecation")
-public class MacMagic extends ApplicationAdapter {
+public class MacMagic implements OpenFilesHandler {
 
   protected SPaTo_Visual_Explorer app = null;
 
   public MacMagic(SPaTo_Visual_Explorer app) {
     this.app = app;
-    Application.getApplication().addApplicationListener(this);
+    Application.getApplication().setOpenFileHandler(this);
   }
 
-  public void handleOpenFile(ApplicationEvent event) {
+  public void openFiles(AppEvent.OpenFilesEvent event) {
     // wait for application setup to be done (causes otherwise NullPointerExceptions otherwise)
     while (!app.canHandleOpenFileEvents) try { Thread.sleep(25); } catch (Exception e) {}
-    // check for valid file type and load the file
-    if (event.getFilename().endsWith(".spato")) {
-      app.workspace.openDocument(new File(event.getFilename()));
-      event.setHandled(true);
-    } else if (event.getFilename().endsWith(".sve")) {
-      app.workspace.openWorkspace(new File(event.getFilename()));
-      event.setHandled(true);
-    } else
-      // FIXME: in-app error message?
-      javax.swing.JOptionPane.showMessageDialog(null, "Unknown file type: " + event.getFilename(),
-        "Open Workspace", javax.swing.JOptionPane.ERROR_MESSAGE);
-  }
-
-  public void handleOpenApplication(ApplicationEvent event) {
-    event.setHandled(true);
-  }
-
-  public void handleQuit(ApplicationEvent event) {
-    event.setHandled(true);  // FIXME: check for unsaved files
+    // check for valid file type and load the files
+    for (File f : event.getFiles()) {
+      if (f.getName().endsWith(".spato"))
+        app.workspace.openDocument(f);
+      else if (f.getName().endsWith(".sve"))
+        app.workspace.openWorkspace(f);
+      else
+        // FIXME: in-app error message?
+        javax.swing.JOptionPane.showMessageDialog(null, "Unknown file type: " + f,
+          "Open Files", javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
   }
 
 }

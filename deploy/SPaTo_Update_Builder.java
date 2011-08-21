@@ -140,15 +140,6 @@ public class SPaTo_Update_Builder {
     saveXML(xmlIndex, dstdir + File.separator + xmlIndex.getString("index"));
   }
 
-  public static void saveVersionProperties(XMLElement xmlRelease, String filename) throws Exception {
-    PrintWriter writer = new PrintWriter(filename);
-    String version = xmlRelease.getString("version");
-    writer.println("version.update=" + version);
-    version = version.split("_")[0];
-    writer.println("version.download=" + version);
-    writer.close();
-  }
-
   public static void main(String args[]) {
     try {
       // load private key and release info
@@ -159,8 +150,6 @@ public class SPaTo_Update_Builder {
       processIndex(fixPath("deploy/INDEX.linux"), fixPath("build/linux/SPaTo Visual Explorer"), dstdir, xmlRelease, privKey);
       processIndex(fixPath("deploy/INDEX.macosx"), fixPath("build/macosx/SPaTo Visual Explorer.app"), dstdir, xmlRelease, privKey);
       processIndex(fixPath("deploy/INDEX.windows"), fixPath("build/windows/SPaTo Visual Explorer"), dstdir, xmlRelease, privKey);
-      // output version into a property file for ant to use
-      saveVersionProperties(xmlRelease, fixPath("build/version.properties"));
     } catch (Exception e) {
       e.printStackTrace();
     }

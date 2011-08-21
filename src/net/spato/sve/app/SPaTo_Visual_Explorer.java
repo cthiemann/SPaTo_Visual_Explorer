@@ -322,6 +322,17 @@ public class SPaTo_Visual_Explorer extends PApplet {
   public JFrame jframe = null;  // FIXME: should not be public
   // overriding main() to create the applet within a JFrame (needed to do much of the Mac magic).
   public static void main(String args[]) {
+    if (platform == MACOSX) {
+      // We are skipping the prelude on MacOSX at the moment,
+      // so check whether an update is in the cache and
+      // start the ApplicationUpdateWrapper if that's the case.
+      // FIXME: this is not very pretty...
+      if (new File(System.getProperty("spato.app-dir"), "Contents/Resources/update/INDEX").exists()) try {
+        println("Found updates! Launching SPaTo_Prelude...");
+        new ProcessBuilder(new String[] { System.getProperty("spato.app-dir") + "/Contents/MacOS/ApplicationUpdateWrapper" }).start();
+        System.exit(0);
+      } catch (java.io.IOException e) { /* ignore */ }
+    }
     if (args.length > 0) {
       println("cmd line args:");
       for (int i = 0; i < args.length; i++)

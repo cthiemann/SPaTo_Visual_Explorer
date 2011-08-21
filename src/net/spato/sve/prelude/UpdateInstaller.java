@@ -40,7 +40,7 @@ public class UpdateInstaller implements Runnable {
   protected File cacheFolder = null;
   protected XMLElement index = null;
 
-  protected void checkForIndex() {
+  protected boolean hasUpdates() {
     cacheFolder = (PApplet.platform == PApplet.MACOSX) ? new File(appRootFolder, "Contents/Resources/update")
                 : (PApplet.platform == PApplet.WINDOWS) ? new File(appRootFolder, "update")
                 : new File(System.getProperty("user.home") + "/.spato/update");
@@ -59,6 +59,7 @@ public class UpdateInstaller implements Runnable {
     } finally {
       try { reader.close(); } catch (Exception e) {}
     }
+    return index != null;
   }
 
   protected void moveUpdatesIntoPlace() {
@@ -95,14 +96,12 @@ public class UpdateInstaller implements Runnable {
 
   public void run() {
     try {
-      checkForIndex();
-      if (index == null)
-        System.out.println("Software is up-to-date (no INDEX in " + cacheFolder + ")");
-      else {
+      if (hasUpdates())
         moveUpdatesIntoPlace();
-        deleteRecursively(cacheFolder);
-      }
+      else
+        System.out.println("Software is up-to-date (no INDEX in " + cacheFolder + ")");
     } catch (Exception e) { e.printStackTrace(); }
+    deleteRecursively(cacheFolder);
   }
 
 }
