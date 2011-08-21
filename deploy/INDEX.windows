@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<update base="http://update.spato.net/latest" index="INDEX.macosx">
+<update base="http://update.spato.net/latest" index="INDEX.windows">
   <file>
     <remote path="common/SPaTo_Visual_Explorer.jar"/>
     <local path="lib\SPaTo_Visual_Explorer.jar"/>

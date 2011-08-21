@@ -225,12 +225,16 @@ public class SPaToGUI extends TransparentGUI {
     panel.add(networkDetail, TBorderLayout.NORTH);
     add(panel, TBorderLayout.WEST);
     // setup console
-    console = createConsole(app.versionDebug.equals("alpha"));
+    console = createConsole(SPaTo_Visual_Explorer.VERSION_DEBUG.equals("alpha"));
     int tE = 5000;
     console.logInfo("SPaTo Visual Explorer").tE = tE;
-    console.logNote("Version " + app.version + ((app.versionDebug.length() > 0) ? " " + app.versionDebug : "") + " (" + app.versionDate + ")").tE = tE;
-    if (app.versionDebug.equals("alpha")) console.logError("This is an alpha version \u2013 don't use it unless you know what you are doing").tE = tE;
-    else if (app.versionDebug.equals("beta")) console.logWarning("This is a beta version \u2013 expect unexpected behavior").tE = tE;
+    console.logNote("Version " + SPaTo_Visual_Explorer.VERSION +
+      ((SPaTo_Visual_Explorer.VERSION_DEBUG.length() > 0) ? " " + SPaTo_Visual_Explorer.VERSION_DEBUG : "") +
+      " (" + SPaTo_Visual_Explorer.VERSION_DATE + ")").tE = tE;
+    if (SPaTo_Visual_Explorer.VERSION_DEBUG.equals("alpha"))
+      console.logError("This is an alpha version \u2013 don't use it unless you know what you are doing").tE = tE;
+    else if (SPaTo_Visual_Explorer.VERSION_DEBUG.equals("beta"))
+      console.logWarning("This is a beta version \u2013 expect unexpected behavior").tE = tE;
     console.logNote("Copyright (C) 2008\u20132011 by Christian Thiemann").tE = tE;
     console.logNote("Research on Complex Systems, Northwestern University").tE = tE;
     console.logDebug("--------------------------------------------------------");
@@ -239,7 +243,7 @@ public class SPaToGUI extends TransparentGUI {
     console.logDebug("[JVM] " + System.getProperty("java.vm.name") + " " + System.getProperty("java.vm.version") + " (" + System.getProperty("java.vm.vendor") + ")");
     console.logDebug("[path] " + System.getenv(((PApplet.platform != PApplet.WINDOWS) ? ((PApplet.platform == PApplet.MACOSX) ? "DY" : "") + "LD_LIBRARY_" : "") + "PATH"));
     console.logDebug("[mem] max: " + (Runtime.getRuntime().maxMemory()/1024/1024) + " MB");
-    // if (!JNMatLib.isLoaded() && (versionDebug.length() > 0)) console.logError("[JNMatLib] " + JNMatLib.getError().getMessage());
+    // if (!JNMatLib.isLoaded() && (SPaTo_Visual_Explorer.VERSION_DEBUG.length() > 0)) console.logError("[JNMatLib] " + JNMatLib.getError().getMessage());
     console.logDebug("--------------------------------------------------------");
     add(console);
     // setup hotkeys and drop target
@@ -310,7 +314,7 @@ public class SPaToGUI extends TransparentGUI {
     btnLabels.setSelected(doc.view.showLabels);
     if (app.frameRate < 15) SPaToView.fastNodes = true;
     if (app.frameRate > 30) SPaToView.fastNodes = false;
-    if (app.versionDebug.equals("beta")) {
+    if (app.VERSION_DEBUG.equals("beta")) {
       if (app.frameRate < 14) console.setShowDebug(true);
       if (app.frameRate > 20) console.setShowDebug(false);
     }

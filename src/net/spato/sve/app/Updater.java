@@ -216,7 +216,7 @@ class Updater extends Thread {
 
   public int showReleaseNotesDialog(boolean canRestart) {
     // construct URL request
-    String url = releaseNotesURL + "?version=" + SPaTo_Visual_Explorer.INSTANCE.version + "&index=" + indexName;
+    String url = releaseNotesURL + "?version=" + SPaTo_Visual_Explorer.INSTANCE.VERSION + "&index=" + indexName;
     // setup HTML renderer for release notes
     XHTMLPanel htmlView = new XHTMLPanel();
     try { htmlView.setDocument(url); }
@@ -228,7 +228,7 @@ class Updater extends Thread {
     JPanel panel = new JPanel(new BorderLayout(0, 10));
     panel.add(new JLabel("An update is available and can be applied the next time you start SPaTo Visual Explorer."), BorderLayout.NORTH);
     panel.add(scrollPane, BorderLayout.CENTER);
-    panel.add(new JLabel("<html>You are currently running version <b>" + SPaTo_Visual_Explorer.INSTANCE.version + "</b> (" + SPaTo_Visual_Explorer.INSTANCE.versionDate + ").</html>"), BorderLayout.SOUTH);
+    panel.add(new JLabel("<html>You are currently running version <b>" + SPaTo_Visual_Explorer.INSTANCE.VERSION + "</b> (" + SPaTo_Visual_Explorer.INSTANCE.VERSION_DATE + ").</html>"), BorderLayout.SOUTH);
     panel.setPreferredSize(new Dimension(600, 400));
     panel.setMinimumSize(new Dimension(300, 200));
     // add the auto-check checkbox

@@ -2,18 +2,23 @@
 
 # http://stackoverflow.com/questions/96882/how-do-i-create-a-nice-looking-dmg-for-mac-os-x-using-command-line-tools
 
-pwd
+if [ -e build/macosx/SPaTo_Visual_Explorer.dmg ]; then exit; fi
+
+echo "Creating build/macosx/SPaTo_Visual_Explorer.dmg ..."
 
 # create read/write DMG
-hdiutil create -srcfolder build/macosx -volname "SPaTo Visual Explorer" -fs HFS+ -fsargs "-c c=64,a=16,e=16" -format UDRW -size 10m pack.temp.dmg
+hdiutil create -srcfolder build/macosx -volname "SPaTo Visual Explorer" -fs HFS+ -fsargs "-c c=64,a=16,e=16" -format UDRW -size 10m build/tmp.dmg
 
 # mount DMG
-device=$(hdiutil attach -readwrite -noverify -noautoopen "pack.temp.dmg" | egrep '^/dev/' | sed 1q | awk '{print $1}')
+device=$(hdiutil attach -readwrite -noverify -noautoopen build/tmp.dmg | egrep '^/dev/' | sed 1q | awk '{print $1}')
 sleep 2
 
 # copy background picture
 mkdir -p /Volumes/SPaTo\ Visual\ Explorer/.background
 cp deploy/macosx/background.png /Volumes/SPaTo\ Visual\ Explorer/.background/background.png
+
+# fix permissions
+chmod -Rf go-w /Volumes/SPaTo\ Visual\ Explorer
 
 # set visual appearance
 echo '
@@ -40,11 +45,10 @@ echo '
    end tell
 ' | osascript
 
-# fix permissions and compress
-chmod -Rf go-w /Volumes/SPaTo\ Visual\ Explorer
+# compress
 sync
 sync
 hdiutil detach ${device}
-hdiutil convert pack.temp.dmg -format UDZO -imagekey zlib-level=9 -o build/macosx/SPaTo_Visual_Explorer.dmg
-rm -f pack.temp.dmg
+hdiutil convert build/tmp.dmg -format UDZO -imagekey zlib-level=9 -o build/macosx/SPaTo_Visual_Explorer.dmg
+rm -f build/tmp.dmg
 

@@ -49,10 +49,10 @@ public class SPaTo_Visual_Explorer extends PApplet {
 
   public static SPaTo_Visual_Explorer INSTANCE = null;  // FIXME: this is probably quite evil...
 
-  String version = "1.2.2";
-  String versionDebug = "beta";
-  String versionTimestamp = "20110604T220000";
-  String versionDate = new SimpleDateFormat("MMMM d, yyyy", Locale.US).format(parseISO8601(versionTimestamp));
+  public static final String VERSION = "1.2.2";
+  public static final String VERSION_DEBUG = "beta";
+  public static final String VERSION_TIMESTAMP = "20110604T220000";
+  public static final String VERSION_DATE = new SimpleDateFormat("MMMM d, yyyy", Locale.US).format(parseISO8601(VERSION_TIMESTAMP));
 
   public ExecutorService worker = Executors.newSingleThreadExecutor();  // FIXME: public?
   public Preferences prefs = Preferences.userRoot().node("/net/spato/SPaTo_Visual_Explorer");  // FIXME: should not be public
@@ -90,7 +90,7 @@ public class SPaTo_Visual_Explorer extends PApplet {
     if (w > screenWidth) { w = screenWidth; h = 9*w/16; }
     if (h > screenHeight) { h = round(0.9f*screenHeight); w = 16*h/9; }
     size(w, h);
-    frame.setTitle("SPaTo Visual Explorer " + version + ((versionDebug.length() > 0) ? " (" + versionDebug + ")" : ""));
+    frame.setTitle("SPaTo Visual Explorer " + VERSION + ((VERSION_DEBUG.length() > 0) ? " (" + VERSION_DEBUG + ")" : ""));
     frame.setResizable(true);
     for (java.awt.event.ComponentListener cl : getComponentListeners())
       if (cl.getClass().getName().startsWith("processing.core.PApplet"))
@@ -308,7 +308,7 @@ public class SPaTo_Visual_Explorer extends PApplet {
     gui.setVisible(true);
   }
 
-  public Date parseISO8601(String timestamp) {
+  public static Date parseISO8601(String timestamp) {
     try { return new SimpleDateFormat("yyyyMMdd'T'HHmmss").parse(timestamp); }
     catch (Exception e) { e.printStackTrace(); return null; }
   }

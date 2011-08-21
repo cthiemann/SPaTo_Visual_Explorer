@@ -127,4 +127,88 @@
   </target>
 
 
+
+  <!-- Deployment (auto-update) -->
+
+
+  <target name="compile-update-builder" depends="compile">
+    <javac srcdir="deploy" includes="SPaTo_Update_Builder.java" destdir="build/classes"
+           target="1.5" source="1.5" encoding="UTF-8" includeantruntime="false">
+      <classpath>
+        <pathelement location="build/classes" />
+        <pathelement location="lib/core.jar" />
+      </classpath>
+      <compilerarg value="-Xlint" />
+    </javac>
+  </target>
+
+  <target name="dist-update" depends="compile-update-builder, build"
+          description="Create directory containing auto-update files">
+    <mkdir dir="build/update" />
+    <exec executable="deploy/private-key-password.sh" outputproperty="private.key.password" />
+    <java classname="SPaTo_Update_Builder" fork="true">
+      <arg value="${private.key.password}" />
+      <classpath>
+        <pathelement location="build/classes" />
+        <pathelement location="lib/core.jar" />
+      </classpath>
+    </java>
+  </target>
+
+
+
+  <!-- Deployment (upload to webserver) -->
+
+
+  <target name="upload" depends="dist, dist-update"
+          description="Upload binary packages and auto-update files to webserver">
+
+    <property file="build/version.properties" />
+    <mkdir dir="build/download" />
+    <copy todir="build/download">
+      <fileset dir="build/linux" includes="SPaTo_Visual_Explorer.tar.gz" />
+      <fileset dir="build/macosx" includes="SPaTo_Visual_Explorer.dmg" />
+      <fileset dir="build/windows" includes="SPaTo_Visual_Explorer.zip" />
+      <globmapper from="SPaTo_Visual_Explorer*" to="SPaTo_Visual_Explorer_${version.download}*" />
+    </copy>
+
+    <property name="ftp.host" value="wp255.webpack.hosteurope.de" />
+    <property name="ftp.user" value="ftp1032083-spato" />
+    <exec executable="deploy/ftp-password.sh" outputproperty="ftp.password" />
+
+    <echo message="This will upload version ${version.update} to spato.net." />
+    <echo message="Version ${version.update} will go live immediately!" />
+    <input message="Press Enter to continue, Ctrl-C to cancel..." />
+
+    <property name="ftp.dir.download" value="/www/download" />
+    <ftp server="${ftp.host}" userid="${ftp.user}" password="${ftp.password}"
+         remotedir="${ftp.dir.download}" action="mkdir" />
+    <ftp server="${ftp.host}" userid="${ftp.user}" password="${ftp.password}"
+         remotedir="${ftp.dir.download}">
+      <fileset dir="build/download" />
+    </ftp>
+
+    <property name="ftp.dir.update" value="/update/${version.update}" />
+    <ftp server="${ftp.host}" userid="${ftp.user}" password="${ftp.password}"
+         remotedir="${ftp.dir.update}" action="mkdir" />
+    <ftp server="${ftp.host}" userid="${ftp.user}" password="${ftp.password}"
+         remotedir="${ftp.dir.update}">
+      <fileset dir="build/update" />
+    </ftp>
+
+    <property name="ftp.dir.release-notes" value="/update/release-notes" />
+    <ftp server="${ftp.host}" userid="${ftp.user}" password="${ftp.password}"
+         remotedir="${ftp.dir.release-notes}" action="mkdir" />
+    <ftp server="${ftp.host}" userid="${ftp.user}" password="${ftp.password}"
+         remotedir="${ftp.dir.release-notes}">
+      <fileset dir="docs/release-notes" />
+    </ftp>
+
+    <get src="http://update.spato.net/symlink.php?latest=${version.update}&amp;magic=${ftp.password}"
+         dest="build/update-symlink.txt" />
+    <concat><filelist dir="build" files="update-symlink.txt" /></concat>
+
+  </target>
+
+
 </project>

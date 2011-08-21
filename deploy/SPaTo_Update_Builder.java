@@ -2,7 +2,8 @@
  * Copyright 2011 Christian Thiemann <christian@spato.net>
  * Developed at Northwestern University <http://rocs.northwestern.edu>
  *
- * This file is part of the SPaTo Visual Explorer (SPaTo).
+ * This file is part of the deployment infrastructure for
+ * SPaTo Visual Explorer (SPaTo).
  *
  * SPaTo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,160 +19,148 @@
  * along with SPaTo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.PrintWriter;
 import java.security.KeyStore;
-import java.security.Signature;
+import java.security.MessageDigest;
 import java.security.PrivateKey;
-import processing.xml.*;
+import java.security.Signature;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+
+import net.spato.sve.app.SPaTo_Visual_Explorer;
+import net.spato.sve.app.util.Base64;
+import processing.xml.XMLElement;
+
 
 public class SPaTo_Update_Builder {
 
-  public static final String SITE = "/Users/ct/Sites/spato.net/update/";
-  public static String VERSION = null;
-  public PrivateKey privKey = null;
-  public XMLElement xmlReleaseNotes = null;
-  private static char password[] = null;
-
-  SPaTo_Update_Builder() throws Exception {
-    xmlReleaseNotes = loadXML("release-notes/RELEASE_NOTES.xml");
-    if (password == null) {
-      javax.swing.JPasswordField pw = new javax.swing.JPasswordField(30);
-      javax.swing.JOptionPane.showConfirmDialog(null, pw,
-        "Enter private key password", javax.swing.JOptionPane.OK_CANCEL_OPTION);
-      password = pw.getPassword();
-    }
-    privKey = loadPrivateKey("keystore", "spato.update", password);
+  private static String fixPath(String path) {
+    return path.replace('/', File.separatorChar).replace('\\', File.separatorChar);
   }
 
-  public XMLElement loadXML(String filename) throws Exception {
-    Reader reader = new FileReader(filename);
+  private static PrivateKey getPrivateKey(String keystore, String alias, String password) throws Exception {
+    char pass[] = null;
+    // get password
+    if ((password != null) && (password.length() > 0) && !password.equals("${private.key.password}"))
+      pass = password.toCharArray();
+    else {
+      JPasswordField pw = new JPasswordField(30);
+      int res = JOptionPane.showConfirmDialog(null, pw, "Enter private key password", JOptionPane.OK_CANCEL_OPTION);
+      pass = pw.getPassword();
+      if ((res != JOptionPane.OK_OPTION) || (pass == null) || (pass.length == 0))
+        throw new Exception("No password provided!");
+    }
+    // get key
+    FileInputStream fis = new FileInputStream(keystore);
+    KeyStore store = KeyStore.getInstance("JKS");
+    store.load(fis, pass);
+    fis.close();
+    return (PrivateKey)store.getKey(alias, pass);
+  }
+
+  private static XMLElement getReleaseInfo(String releaseNotes) throws Exception {
+    XMLElement xmlRelease = loadXML(releaseNotes).getChild(0);
+    while (xmlRelease.getChildCount() > 0) xmlRelease.removeChild(0);  // purge the actual release notes
+    System.out.println(xmlRelease);
+    if (!xmlRelease.getString("version").equals(SPaTo_Visual_Explorer.VERSION))
+      throw new Exception("Version mismatch: " + xmlRelease.getString("version") + " != " + SPaTo_Visual_Explorer.VERSION);
+    if (!xmlRelease.getString("debug").equals(SPaTo_Visual_Explorer.VERSION_DEBUG))
+      throw new Exception("Version debug mismatch: " + xmlRelease.getString("debug") + " != " + SPaTo_Visual_Explorer.VERSION_DEBUG);
+    if (!xmlRelease.getString("date").equals(SPaTo_Visual_Explorer.VERSION_TIMESTAMP))
+      throw new Exception("Version date mismatch: " + xmlRelease.getString("date") + " != " + SPaTo_Visual_Explorer.VERSION_TIMESTAMP);
+    return xmlRelease;
+  }
+
+  private static XMLElement loadXML(String filename) throws Exception {
+    FileReader reader = new FileReader(filename);
     XMLElement xml = XMLElement.parse(reader);
     reader.close();
-    if (xml == null) throw new Exception("XMLElement.parse returned null");
+    if (xml == null) throw new Exception("XMLElement.parse returned null for " + filename);
     return xml;
   }
 
-  public void saveXML(XMLElement xml, String filename) throws Exception {
+  private static void saveXML(XMLElement xml, String filename) throws Exception {
     PrintWriter writer = new PrintWriter(filename);
-    if (!xml.write(writer)) throw new Exception("XMLElement.write returned false");
+    if (!xml.write(writer)) throw new Exception("XMLElement.write returned false writing to " + filename);
     writer.close();
   }
 
-  public PrivateKey loadPrivateKey(String keystore, String alias, char password[]) throws Exception {
-    InputStream is = new FileInputStream(keystore);
-    KeyStore store = KeyStore.getInstance("JKS");
-    store.load(is, password);
-    is.close();
-    return (PrivateKey)store.getKey(alias, password);
+  public static String serializeDigest(byte digest[]) {
+    return String.format("%032x", new java.math.BigInteger(1, digest));
   }
 
-  public static void copyFile(String srcFilename, String dstFilename) throws Exception {
-    if (new File(dstFilename).isDirectory()) dstFilename += "/" + new File(srcFilename).getName();
-    System.out.println("Copying " + srcFilename + " to " + dstFilename);
-    InputStream is = new FileInputStream(srcFilename);
-    OutputStream os = new FileOutputStream(dstFilename);
-    byte buf[] = new byte[8*1024]; int len;
-    while ((len = is.read(buf)) > 0)
-      os.write(buf, 0, len);
-    is.close(); os.close();
-    new File(dstFilename).setLastModified(new File(srcFilename).lastModified());
+  public static XMLElement serializeSignature(byte signature[]) {
+    XMLElement xmlSignature = new XMLElement("signature");
+    String sigStr = "";
+    for (String line : Base64.encode(signature, 43).split("\r\n"))
+      sigStr += "      " + line + "\n";
+    xmlSignature.setContent("\n" + sigStr + "    ");
+    return xmlSignature;
   }
 
-  public static String commonJars[] = new String[] {
-    "SPaTo_Visual_Explorer.jar", "SPaTo_Prelude.class", "SPaTo_Prelude.jar",
-    "core.jar", "itext.jar", "jna.jar", "jnmatlib.jar", "pdf.jar", "tGUI.jar", "xhtmlrenderer.jar" };
-
-  public void copyFiles(String platform) throws Exception {
-    File dir = new File(SITE + VERSION + "/" + platform);
-    //if (dir.exists()) throw new Exception("directory exists: " + dir);
-    if (!dir.exists() && !dir.mkdirs()) throw new Exception("could not create directory " + dir);
-    //
-    if (platform.equals("common")) {
-      //
-      for (String jar : commonJars)
-        copyFile("../application.windows/SPaTo Visual Explorer/lib/" + jar, dir.getAbsolutePath());
-      //
-    } else if (platform.equals("linux")) {
-      //
-      copyFile("INDEX.linux", SITE + VERSION + "/INDEX.linux");
-      for (String f : new String[] {
-          "SPaTo_Visual_Explorer", "SPaTo_Visual_Explorer.desktop",
-          "SPaTo_Visual_Explorer.png", "application-x-spato.png",
-          "application-x-spato-uncompressed.png", "application-x-spato-workspace.png",
-          "spato-mime.xml", "config.sh" })
-            copyFile("linux/" + f, dir.getAbsolutePath());
-          copyFile("linux/config.sh", dir + "/config.sh.orig");
-      //
-    } else if (platform.equals("macosx")) {
-      //
-      copyFile("INDEX.macosx", SITE + VERSION + "/INDEX.macosx");
-      for (String f : new String[] {
-          "ApplicationUpdateWrapper", "spato.icns",
-          "spato-document.icns", "spato-document-uncompressed.icns", "spato-workspace.icns" })
-        copyFile("macosx/" + f, dir.getAbsolutePath());
-      copyFile("macosx/Info.plist", dir + "/Info.plist.orig");
-      //
-    } else if (platform.equals("windows")) {
-      //
-      copyFile("INDEX.windows", SITE + VERSION + "/INDEX.windows");
-      for (String f : new String[] { "SPaTo_Prelude.ini", "spato-16x16.png", "splash.gif", "WinRun4J.jar" })
-        copyFile("windows/" + f, dir.getAbsolutePath());
-      copyFile("windows/SPaTo_Visual_Explorer.ini", dir + "/SPaTo_Visual_Explorer.ini.orig");
-      copyFile("windows/SPaTo Visual Explorer.exe", dir + "/_SPaTo_Visual_Explorer.exe");
-      copyFile("windows/SPaTo Visual Explorer.ini", dir + "/_SPaTo_Visual_Explorer.ini");
-      //
-    }
-  }
-
-  public void createIndex(String platform) throws Exception {
-    System.out.println("Creating INDEX." + platform);
-    XMLElement xmlIndex = loadXML(SITE + VERSION + "/INDEX." + platform);
-    // update release notes
-    XMLElement xmlRelease = xmlIndex.getChild("release");
-    if (xmlRelease != null) xmlIndex.removeChild(xmlRelease);
-    xmlRelease = xmlReleaseNotes.getChild("release");
+  public static void processIndex(String filename, String srcdir, String dstdir,
+                                  XMLElement xmlRelease, PrivateKey privKey) throws Exception {
+    // load index and add release info
+    XMLElement xmlIndex = loadXML(filename);
     xmlIndex.insertChild(xmlRelease, 0);
-    // update files
+    System.out.println("Processing " + xmlIndex.getString("index") + " (" + xmlIndex.getChildren("file").length + " files)");
+    // set up crypto-stuff
+    byte buf[] = new byte[8*1024];
+    MessageDigest md5 = MessageDigest.getInstance("md5");
+    Signature sig = Signature.getInstance("MD5withRSA");
+    sig.initSign(privKey);
+    // copy files to update directory (dstdir) and add MD5 checksums and signatures to index
     for (XMLElement xmlFile : xmlIndex.getChildren("file")) {
-      File f = new File(SITE + VERSION, xmlFile.getChild("remote").getString("path"));
-      // update size and MD5
-      xmlFile.getChild("remote").setString("size", "" + f.length());
-      xmlFile.getChild("remote").setString("md5", SPaTo_Visual_Explorer.MD5.digest(f.getAbsolutePath()));
-      // update RSA signature
-      XMLElement xmlSignature = xmlFile.getChild("signature");
-      if (xmlSignature == null) xmlFile.addChild(xmlSignature = new XMLElement("signature"));
-      Signature sig = Signature.getInstance("MD5withRSA");
-      sig.initSign(privKey);
-      InputStream is = new FileInputStream(f);
-      byte buf[] = new byte[8*1024]; int len;
-      while ((len = is.read(buf)) > 0)
-        sig.update(buf, 0, len);
-      // pretty-format signature
-      String sigStr = "\n";
-      for (String line : SPaTo_Visual_Explorer.Base64.encode(sig.sign(), 43).split("\r\n"))
-        sigStr += "      " + line + "\n";
-      sigStr += "    ";
-      xmlSignature.setContent(sigStr);
+      File fsrc = new File(srcdir, fixPath(xmlFile.getChild("local").getString("path")));
+      File fdst = new File(dstdir, fixPath(xmlFile.getChild("remote").getString("path")));
+      fdst.getParentFile().mkdirs();  // make sure the destination directory exists
+      // feed the file contents through MD5 and RSA while copying...
+      FileInputStream fis = new FileInputStream(fsrc);
+      FileOutputStream fos = new FileOutputStream(fdst);
+      int n, size = 0;
+      while ((n = fis.read(buf)) > 0) {
+        size += n;
+        md5.update(buf, 0, n);
+        sig.update(buf, 0, n);
+        fos.write(buf, 0, n);
+      }
+      fis.close(); fos.close();
+      // copy last-modified timestamp
+      fdst.setLastModified(fsrc.lastModified());
+      // add file size, digest and signature to the index
+      xmlFile.getChild("remote").setString("size", "" + size);
+      xmlFile.getChild("remote").setString("md5", serializeDigest(md5.digest()));
+      xmlFile.addChild(serializeSignature(sig.sign()));
     }
-    // save index
-    saveXML(xmlIndex, SITE + VERSION + "/INDEX." + platform);
+    // save index file
+    saveXML(xmlIndex, dstdir + File.separator + xmlIndex.getString("index"));
+  }
+
+  public static void saveVersionProperties(XMLElement xmlRelease, String filename) throws Exception {
+    PrintWriter writer = new PrintWriter(filename);
+    String version = xmlRelease.getString("version");
+    writer.println("version.update=" + version);
+    version = version.split("_")[0];
+    writer.println("version.download=" + version);
+    writer.close();
   }
 
   public static void main(String args[]) {
     try {
-      if (args.length > 0) password = args[0].toCharArray();
-      SPaTo_Update_Builder update = new SPaTo_Update_Builder();
-      if (!new File(SITE).exists()) throw new Exception("directory does not exist: " + SITE);
-      System.out.println("SITE = " + SITE);
-      VERSION = update.xmlReleaseNotes.getChild("release").getString("version");
-      System.out.println("VERSION = " + VERSION);
-      update.copyFiles("common");
-      for (String platform : new String[] { "linux", "macosx", "windows" }) {
-        update.copyFiles(platform);
-        update.createIndex(platform);
-      }
-      for (String f : new File("release-notes").list())
-        copyFile("release-notes/" + f, SITE + "/release-notes");
+      // load private key and release info
+      PrivateKey privKey = getPrivateKey(fixPath("deploy/keystore"), "spato.update", (args.length > 0) ? args[0] : null);
+      XMLElement xmlRelease = getReleaseInfo(fixPath("docs/release-notes/RELEASE_NOTES.xml"));
+      // copy files into place and add crypto-stuff to indices
+      String dstdir = fixPath("build/update");
+      processIndex(fixPath("deploy/INDEX.linux"), fixPath("build/linux/SPaTo Visual Explorer"), dstdir, xmlRelease, privKey);
+      processIndex(fixPath("deploy/INDEX.macosx"), fixPath("build/macosx/SPaTo Visual Explorer.app"), dstdir, xmlRelease, privKey);
+      processIndex(fixPath("deploy/INDEX.windows"), fixPath("build/windows/SPaTo Visual Explorer"), dstdir, xmlRelease, privKey);
+      // output version into a property file for ant to use
+      saveVersionProperties(xmlRelease, fixPath("build/version.properties"));
     } catch (Exception e) {
       e.printStackTrace();
     }
