@@ -47,8 +47,6 @@ import tGUI.*;
 @SuppressWarnings("serial")
 public class SPaTo_Visual_Explorer extends PApplet {
 
-  public static SPaTo_Visual_Explorer INSTANCE = null;  // FIXME: this is probably quite evil...
-
   public static final String VERSION = "1.2.2";
   public static final String VERSION_DEBUG = "beta";
   public static final String VERSION_TIMESTAMP = "20110604T220000";
@@ -73,8 +71,7 @@ public class SPaTo_Visual_Explorer extends PApplet {
   public TConsole console;  // FIXME: get rid of this variable
 
   public void setup() {
-    INSTANCE = this;
-    platformMagic = new PlatformMagic();
+    platformMagic = new PlatformMagic(this);
     workspace = new Workspace(this);
     checkForUpdates(false);
     // start caching PDF fonts in a new thread (otherwise the program might stall for up
@@ -286,7 +283,7 @@ public class SPaTo_Visual_Explorer extends PApplet {
   public void checkForUpdates(boolean force) {
     if (force) prefs.remove("update.skip");
     if (prefs.getBoolean("update.check", true) || force)
-      new Updater(force).start();
+      new Updater(this, force).start();
   }
 
 
@@ -296,7 +293,7 @@ public class SPaTo_Visual_Explorer extends PApplet {
   public void startFireworks() {
     gui.setVisible(false);
     gui.setEnabled(false);
-    fw = new Fireworks();
+    fw = new Fireworks(this);
     fireworks = true;
     fw.setup();
   }

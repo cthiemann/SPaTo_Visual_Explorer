@@ -25,7 +25,9 @@ import processing.core.PApplet;
 
 public class Fireworks {
 
-  PApplet app = SPaTo_Visual_Explorer.INSTANCE;
+  PApplet app = null;
+
+  public Fireworks(PApplet app) { this.app = app; }
 
   Launcher ll[] = null;
   float t0, tt, t, dt, t0max, tFinish = Float.NaN;

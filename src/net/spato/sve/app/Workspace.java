@@ -74,7 +74,7 @@ public class Workspace {
   };
 
   public File[] selectDocumentFilesToOpen() {
-    File result[] = FileDialogUtils.selectFiles(FileDialogUtils.OPENMULTIPLE, "Open document", ffDocuments);
+    File result[] = FileDialogUtils.selectFiles(app, FileDialogUtils.OPENMULTIPLE, "Open document", ffDocuments);
     for (int i = 0; i < result.length; i++)            // normalize filename if some
       if (result[i].getName().equals("document.xml"))  // blabla.spato/document.xml
         result[i] = result[i].getParentFile();         // was selected
@@ -83,7 +83,7 @@ public class Workspace {
   public File selectDocumentFileToWrite() { return selectDocumentFileToWrite(null); }
   public File selectDocumentFileToWrite(File selectedFile) {
     return FileDialogUtils.ensureExtension("spato",
-      FileDialogUtils.selectFile(FileDialogUtils.SAVE, "Save document", ffDocuments, selectedFile));
+      FileDialogUtils.selectFile(app, FileDialogUtils.SAVE, "Save document", ffDocuments, selectedFile));
   }
 
   public void newDocument() {
@@ -158,11 +158,11 @@ public class Workspace {
 
   public static final FileFilter ffWorkspace = FileDialogUtils.createFileFilter("sve", "SVE Workspaces");
 
-  public File selectWorkspaceFileToOpen() { return FileDialogUtils.selectFile(FileDialogUtils.OPEN, "Open workspace", ffWorkspace); }
+  public File selectWorkspaceFileToOpen() { return FileDialogUtils.selectFile(app, FileDialogUtils.OPEN, "Open workspace", ffWorkspace); }
   public File selectWorkspaceFileToWrite() { return selectWorkspaceFileToWrite(null); }
   public File selectWorkspaceFileToWrite(File selectedFile) {
     return FileDialogUtils.ensureExtension("sve",
-      FileDialogUtils.selectFile(FileDialogUtils.SAVE, "Save workspace", ffWorkspace, selectedFile));
+      FileDialogUtils.selectFile(app, FileDialogUtils.SAVE, "Save workspace", ffWorkspace, selectedFile));
   }
 
   public void openWorkspace() { openWorkspace(selectWorkspaceFileToOpen()); }

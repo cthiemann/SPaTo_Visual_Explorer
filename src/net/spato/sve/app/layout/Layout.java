@@ -30,6 +30,8 @@ import net.spato.sve.app.SPaTo_Visual_Explorer;
 
 
 public class Layout {
+  
+  protected SPaTo_Visual_Explorer app = null;
 
   public Projection proj;
   public Scaling scal;
@@ -83,7 +85,8 @@ public class Layout {
   }
 
 
-  public Layout(int[][] pred, String spec) {
+  public Layout(SPaTo_Visual_Explorer app, int[][] pred, String spec) {
+    this.app = app;
     this.pred = pred;
     NN = pred.length;
     parseSpecification(spec);
@@ -103,7 +106,7 @@ public class Layout {
 
   public void setupProjection(String projection) {
     if (!TomProjectionFactory.canProduce(projection)) {
-      SPaTo_Visual_Explorer.INSTANCE.console.logWarning("Unknown tomogram projection " + projection + ", using default");
+      app.console.logWarning("Unknown tomogram projection " + projection + ", using default");
       projection = TomProjectionFactory.getDefaultProduct();
     }
     proj = TomProjectionFactory.produce(projection, NN);
@@ -113,7 +116,7 @@ public class Layout {
   public void setupScaling(String scaling) { setupScaling(scaling, 1); }
   public void setupScaling(String scaling, float x0) {
     if (!ScalingFactory.canProduce(scaling)) {
-      SPaTo_Visual_Explorer.INSTANCE.console.logWarning("Unknown scaling " + scaling + ", using default");
+      app.console.logWarning("Unknown scaling " + scaling + ", using default");
       scaling = ScalingFactory.getDefaultProduct();
     }
     scal = ScalingFactory.produce(scaling, NN);
@@ -156,14 +159,14 @@ public class Layout {
   }
 
   private void calculateLayout(float sortData[]) {
-    SPaTo_Visual_Explorer.INSTANCE.console.logProgress("Calculating layout " + getSpecification());
+    app.console.logProgress("Calculating layout " + getSpecification());
     for (int r = 0; r < NN; r++) {
       Cache cache = new Cache(r, sortData, order.endsWith("_r"));
       phi[r][r] = PApplet.PI;  // we do this to move the root in the middle in LinearProjection
       calculateLayoutRecursively(cache, r, r, 0, 0, 2*PApplet.PI);
-      SPaTo_Visual_Explorer.INSTANCE.console.updateProgress(r, NN);
+      app.console.updateProgress(r, NN);
     }
-    SPaTo_Visual_Explorer.INSTANCE.console.finishProgress();
+    app.console.finishProgress();
   }
 
   // cache, root node, current layout node, tree depth of node j, min and max angles

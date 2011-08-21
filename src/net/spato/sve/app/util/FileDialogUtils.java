@@ -74,30 +74,42 @@ public class FileDialogUtils {
   public static final int OPENMULTIPLE = 1;
   public static final int SAVE = 2;
 
-  public static File selectFile(int mode) { return selectFile(mode, null, null, null); }
-  public static File selectFile(int mode, String title) { return selectFile(mode, title, null, null); }
-  public static File selectFile(int mode, String title, FileFilter ff) { return selectFile(mode, title, ff, null); }
-  public static File selectFile(int mode, String title, FileFilter ff, File selectedFile) {
-    File res[] = selectFiles(mode, title, ff, selectedFile);
+  public static File selectFile(SPaTo_Visual_Explorer app, int mode) {
+    return selectFile(app, mode, null, null, null);
+  }
+  public static File selectFile(SPaTo_Visual_Explorer app, int mode, String title) {
+    return selectFile(app, mode, title, null, null);
+  }
+  public static File selectFile(SPaTo_Visual_Explorer app, int mode, String title, FileFilter ff) {
+    return selectFile(app, mode, title, ff, null);
+  }
+  public static File selectFile(SPaTo_Visual_Explorer app, int mode, String title, FileFilter ff, File selectedFile) {
+    File res[] = selectFiles(app, mode, title, ff, selectedFile);
     return ((res != null) && (res.length > 0)) ? res[0] : null;
   }
 
   private static File selectFilesResult[];  // FIXME: there must be a better way than using this static variable
 
-  public static File[] selectFiles(int mode) { return selectFiles(mode, null, null, null); }
-  public static File[] selectFiles(int mode, String title) { return selectFiles(mode, title, null, null); }
-  public static File[] selectFiles(int mode, String title, FileFilter ff) { return selectFiles(mode, title, ff, null); }
-  public static File[] selectFiles(final int mode, final String title, final FileFilter ff, final File selectedFile) {
+  public static File[] selectFiles(SPaTo_Visual_Explorer app, int mode) {
+    return selectFiles(app, mode, null, null, null);
+  }
+  public static File[] selectFiles(SPaTo_Visual_Explorer app, int mode, String title) {
+    return selectFiles(app, mode, title, null, null);
+  }
+  public static File[] selectFiles(SPaTo_Visual_Explorer app, int mode, String title, FileFilter ff) {
+    return selectFiles(app, mode, title, ff, null);
+  }
+  public static File[] selectFiles(final SPaTo_Visual_Explorer app, final int mode, final String title,
+                                   final FileFilter ff, final File selectedFile) {
     try {
       selectFilesResult = null;
       SwingUtilities.invokeAndWait(new Runnable() {
         public void run() {
-          File lastDir = new File(SPaTo_Visual_Explorer.INSTANCE.prefs.get("workspace.lastDirectory", ""));
+          File lastDir = new File(app.prefs.get("workspace.lastDirectory", ""));
           if (lastDir.getAbsolutePath().equals("")) lastDir = null;
-          if (SPaTo_Visual_Explorer.INSTANCE.platform == PApplet.MACOSX) {
-            // Use FileDialog instead of JFileChooser as per Apple recommendation.
-            // This is possible again because .spato-directories are Mac bundles now.
-            FileDialog fd = new FileDialog(SPaTo_Visual_Explorer.INSTANCE.getParentFrame(),
+          if (app.platform == PApplet.MACOSX) {
+            // use FileDialog instead of JFileChooser as per Apple recommendation
+            FileDialog fd = new FileDialog(app.getParentFrame(),
               (title != null) ? title : (mode == SAVE) ? "Save..." : "Open...",
               (mode == SAVE) ? FileDialog.SAVE : FileDialog.LOAD);
             fd.setFilenameFilter(new FilenameFileFilterAdapter(ff));
@@ -122,12 +134,12 @@ public class FileDialogUtils {
             fc.setMultiSelectionEnabled(mode == OPENMULTIPLE);  // allow selecting multiple documents to load
             fc.setAcceptAllFileFilterUsed(ff == null);
             if (ff != null)
-              fc.setFileFilter((SPaTo_Visual_Explorer.INSTANCE.platform == PApplet.WINDOWS) ? new WindowsFileFilterAdapter(ff) : ff);
+              fc.setFileFilter((app.platform == PApplet.WINDOWS) ? new WindowsFileFilterAdapter(ff) : ff);
             // run dialog
-            if (fc.showDialog(SPaTo_Visual_Explorer.INSTANCE.getParentFrame(), (mode == SAVE) ? "Save" : "Open") == JFileChooser.APPROVE_OPTION) {
+            if (fc.showDialog(app.getParentFrame(), (mode == SAVE) ? "Save" : "Open") == JFileChooser.APPROVE_OPTION) {
               // save current directory to preferences
               File dir = fc.getCurrentDirectory();
-              SPaTo_Visual_Explorer.INSTANCE.prefs.put("workspace.lastDirectory", (dir != null) ? dir.getAbsolutePath() : null);
+              app.prefs.put("workspace.lastDirectory", (dir != null) ? dir.getAbsolutePath() : null);
               // evaluate selection
               File files[] = fc.isMultiSelectionEnabled()
                 ? fc.getSelectedFiles() : new File[] { fc.getSelectedFile() };
@@ -146,7 +158,7 @@ public class FileDialogUtils {
       });
       return selectFilesResult;
     } catch (Exception e) {
-      SPaTo_Visual_Explorer.INSTANCE.console.logError("Something went wrong: ", e);
+      app.console.logError("Something went wrong: ", e);
       e.printStackTrace();
       return null;
     }

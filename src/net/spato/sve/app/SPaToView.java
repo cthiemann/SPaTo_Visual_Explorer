@@ -380,8 +380,8 @@ public class SPaToView {
     XMLElement xmlColormap = doc.getColormap(xmlData);
     if (xmlColormap == null)  // make sure there is a <colormap> tag we can write to later
       xmlData.addChild(xmlColormap = new XMLElement("colormap"));
-    colormap = new Colormap(xmlColormap, mindata, maxdata);
-    //colormap = new Colormap(xmlColormap.getString("name", "default"), xmlColormap.getBoolean("log"), mindata, maxdata);  // FIXME
+    colormap = new Colormap(app, xmlColormap, mindata, maxdata);
+    //colormap = new Colormap(app, xmlColormap.getString("name", "default"), xmlColormap.getBoolean("log"), mindata, maxdata);  // FIXME
     // finished
     hasData = true;
   }
@@ -393,7 +393,7 @@ public class SPaToView {
     String layoutNames[] = PApplet.split(tomLayouts, ' ');
     layouts = new Layout[NL = layoutNames.length];
     for (int l = 0; l < NL; l++)
-      layouts[l] = new Layout(pred, layoutNames[l]);
+      layouts[l] = new Layout(app, pred, layoutNames[l]);
     layouts[this.l = 0].updateProjection(r, D);
     hasTomLayout = true;
   }

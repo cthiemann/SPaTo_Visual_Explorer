@@ -145,7 +145,7 @@ public class DataTransferHandler implements DropTargetListener {
         }
         handleDroppedFiles(ff);
       } else
-        new DataImportWizard(str).start();
+        new DataImportWizard(app, str).start();
       return true;
     }
     // don't know what to do
@@ -159,7 +159,7 @@ public class DataTransferHandler implements DropTargetListener {
       else if (f.getName().endsWith(".mat"))
         ;//FIXME//new Thread(new MatFileImport(f)).start();
       else
-        new DataImportWizard(f).start();
+        new DataImportWizard(app, f).start();
     }
   }
 

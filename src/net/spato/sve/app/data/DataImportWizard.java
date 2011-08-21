@@ -35,6 +35,8 @@ import tGUI.*;
 
 public class DataImportWizard extends TFrame {
 
+  protected SPaTo_Visual_Explorer app = null;
+
   protected TConsole console;
   protected File file = null;
   protected String str = null;
@@ -42,15 +44,16 @@ public class DataImportWizard extends TFrame {
   protected BufferedReader reader = null;
   protected String lines[] = null;
 
-  private DataImportWizard() {
-    super(SPaTo_Visual_Explorer.INSTANCE.gui, "Data Import Wizard");
+  private DataImportWizard(SPaTo_Visual_Explorer app) {
+    super(app.gui, "Data Import Wizard");
+    this.app = app;
     setActionEventHandler(this);
     guiSetup();
     worker = Executors.newSingleThreadExecutor();
   }
 
-  public DataImportWizard(File file) {
-    this(); setTitle(file.getName());
+  public DataImportWizard(SPaTo_Visual_Explorer app, File file) {
+    this(app); setTitle(file.getName());
     this.file = file;
     try {
       reader = new BufferedReader(new FileReader(file));
@@ -60,8 +63,8 @@ public class DataImportWizard extends TFrame {
     }
   }
 
-  public DataImportWizard(String str) {
-    this(); setTitle("Pasted/dropped text data");
+  public DataImportWizard(SPaTo_Visual_Explorer app, String str) {
+    this(app); setTitle("Pasted/dropped text data");
     this.str = str;
     try {
       reader = new BufferedReader(new StringReader(str));

@@ -48,7 +48,9 @@ import processing.xml.XMLException;
 import processing.xml.XMLValidator;
 
 
-class Updater extends Thread {
+public class Updater extends Thread {
+
+  protected SPaTo_Visual_Explorer app = null;
 
   boolean force = false;
   String updateURL = "http://update.spato.net/latest/";
@@ -65,11 +67,10 @@ class Updater extends Thread {
     "nuArSltlIV9AnBKxb8h28xoBsEx1ek04jvJEtd93Bw7ILa3eF4MDGl" +
     "ZxwPnmTaTICIVUXtiZveOHDl1dQBKvinyU8fe3Xi7+j9klnwIDAQAB";
 
-  public Updater(boolean force) {
+  public Updater(SPaTo_Visual_Explorer app, boolean force) {
     setPriority(Thread.MIN_PRIORITY);
+    this.app = app;
     this.force = force;
-    // if (System.getProperty("spato.app-dir") == null)
-    //   System.setProperty("spato.app-dir", "/Users/ct/Documents/Processing/SPaTo/SPaTo_Visual_Explorer/application.macosx/SPaTo_Visual_Explorer.app");
   }
 
   public void printOut(String msg) { System.out.println("+++ SPaTo Updater: " + msg); }
@@ -131,11 +132,11 @@ class Updater extends Thread {
     // check whether the user wants to ignore this update
     try { updateVersion = index.getChild("release").getString("version"); } catch (Exception e) {}
     printOut("INDEX is for version " + updateVersion);
-    if ((updateVersion != null) && updateVersion.equals(SPaTo_Visual_Explorer.INSTANCE.prefs.get("update.skip", null))) {
+    if ((updateVersion != null) && updateVersion.equals(app.prefs.get("update.skip", null))) {
       printOut("user requested to skip this version");
       return false;
     } else
-      SPaTo_Visual_Explorer.INSTANCE.prefs.remove("update.skip");
+      app.prefs.remove("update.skip");
     // delete possibly existing locally cached index
     new File(cacheFolder + "INDEX").delete();
     // setup signature verification
@@ -181,7 +182,7 @@ class Updater extends Thread {
           }
           try { sig.update(buf); if (!sig.verify(signature)) throw new Exception("signature verification failure"); }
           catch (Exception e) { printErr("failed to verify file"); e.printStackTrace(); return false; }
-          SPaTo_Visual_Explorer.INSTANCE.saveBytes(cacheFilename, buf);
+          app.saveBytes(cacheFilename, buf);
           totalSize += remote.getInt("size");  // keep track of total download volume
           if (!remote.getString("md5").equals(MD5.digest(cacheFilename)))
             throw new RuntimeException("md5 mismatch: " + file);
@@ -216,7 +217,7 @@ class Updater extends Thread {
 
   public int showReleaseNotesDialog(boolean canRestart) {
     // construct URL request
-    String url = releaseNotesURL + "?version=" + SPaTo_Visual_Explorer.INSTANCE.VERSION + "&index=" + indexName;
+    String url = releaseNotesURL + "?version=" + app.VERSION + "&index=" + indexName;
     // setup HTML renderer for release notes
     XHTMLPanel htmlView = new XHTMLPanel();
     try { htmlView.setDocument(url); }
@@ -228,12 +229,12 @@ class Updater extends Thread {
     JPanel panel = new JPanel(new BorderLayout(0, 10));
     panel.add(new JLabel("An update is available and can be applied the next time you start SPaTo Visual Explorer."), BorderLayout.NORTH);
     panel.add(scrollPane, BorderLayout.CENTER);
-    panel.add(new JLabel("<html>You are currently running version <b>" + SPaTo_Visual_Explorer.INSTANCE.VERSION + "</b> (" + SPaTo_Visual_Explorer.INSTANCE.VERSION_DATE + ").</html>"), BorderLayout.SOUTH);
+    panel.add(new JLabel("<html>You are currently running version <b>" + app.VERSION + "</b> (" + app.VERSION_DATE + ").</html>"), BorderLayout.SOUTH);
     panel.setPreferredSize(new Dimension(600, 400));
     panel.setMinimumSize(new Dimension(300, 200));
     // add the auto-check checkbox
     JCheckBox cbAutoUpdate = new JCheckBox("Automatically check for updates in the future",
-      SPaTo_Visual_Explorer.INSTANCE.prefs.getBoolean("update.check", true));
+      app.prefs.getBoolean("update.check", true));
     JPanel panel2 = new JPanel(new BorderLayout(0, 20));
     panel2.add(panel, BorderLayout.CENTER);
     panel2.add(cbAutoUpdate, BorderLayout.SOUTH);
@@ -242,11 +243,11 @@ class Updater extends Thread {
       ? new Object[] { "Restart now", "Restart later", "Skip this update" }
       : new Object[] { "Awesome!", "Skip this update" };
     // show the dialog
-    int result = JOptionPane.showOptionDialog(SPaTo_Visual_Explorer.INSTANCE.frame, panel2, "Good news, everyone!",
+    int result = JOptionPane.showOptionDialog(app.frame, panel2, "Good news, everyone!",
       JOptionPane.INFORMATION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null,
       options, options[0]);
     // save the auto-check selection
-    SPaTo_Visual_Explorer.INSTANCE.prefs.putBoolean("update.check", cbAutoUpdate.isSelected());
+    app.prefs.putBoolean("update.check", cbAutoUpdate.isSelected());
     // return the proper action constant
     if (result == (canRestart ? 2 : 1)) return IGNORE;  // skip this update
     if (result == (canRestart ? 1 : 0)) return INSTALL;  // install on next application launch
@@ -255,22 +256,22 @@ class Updater extends Thread {
   }
 
   public void askAndAct() {
-    while (SPaTo_Visual_Explorer.INSTANCE.fireworks) try { Thread.sleep(5000); } catch (Exception e) {}
+    while (app.fireworks) try { Thread.sleep(5000); } catch (Exception e) {}
     String cmd[] = getRestartCmd();
     int action = showReleaseNotesDialog(cmd != null);
     // check if the user wants to ignore this update
     if (action == IGNORE)
-      SPaTo_Visual_Explorer.INSTANCE.prefs.put("update.skip", updateVersion);
+      app.prefs.put("update.skip", updateVersion);
     // save the INDEX into the update cache folder to indicate that the update should be installed
     if ((action == INSTALL) || (action == RESTART))
-      index.write(SPaTo_Visual_Explorer.INSTANCE.createWriter(cacheFolder + "INDEX"));
+      index.write(app.createWriter(cacheFolder + "INDEX"));
     // restart application if requested
     if (action == RESTART) try {
       new ProcessBuilder(cmd).start();
-      SPaTo_Visual_Explorer.INSTANCE.exit();  // FIXME: unsaved documents?
+      app.exit();  // FIXME: unsaved documents?
     } catch (Exception e) {  // catch this one here to give a slightly more optimistic error message
       printErr("could not restart application"); e.printStackTrace();
-      JOptionPane.showMessageDialog(SPaTo_Visual_Explorer.INSTANCE.frame,
+      JOptionPane.showMessageDialog(app.frame,
         "<html>The restart application could not be lauched:<br><br>" +
         PApplet.join(cmd, " ") + "<br>" + e.getClass().getName() + ": " + e.getMessage() + "<br><br>" +
         "However, the update should install automatically when you manually restart the application.</html>",
@@ -285,7 +286,7 @@ class Updater extends Thread {
       if (checkAndFetch())
         askAndAct();
       else if (force)
-        JOptionPane.showMessageDialog(SPaTo_Visual_Explorer.INSTANCE.frame,
+        JOptionPane.showMessageDialog(app.frame,
           "No updates available", "Update", JOptionPane.INFORMATION_MESSAGE);
     } catch (Exception e) {
       printErr("Something's wrong. Stack trace follows..."); e.printStackTrace();
@@ -298,12 +299,12 @@ class Updater extends Thread {
       str += "</html>";
       panel.add(new JLabel(str), BorderLayout.CENTER);
       JCheckBox cbAutoUpdate = new JCheckBox("Automatically check for updates in the future",
-        SPaTo_Visual_Explorer.INSTANCE.prefs.getBoolean("update.check", true));
+        app.prefs.getBoolean("update.check", true));
       panel.add(cbAutoUpdate, BorderLayout.SOUTH);
       // show dialog
-      JOptionPane.showMessageDialog(SPaTo_Visual_Explorer.INSTANCE.frame, panel, "Bollocks!", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(app.frame, panel, "Bollocks!", JOptionPane.ERROR_MESSAGE);
       // save the auto-check selection
-      SPaTo_Visual_Explorer.INSTANCE.prefs.putBoolean("update.check", cbAutoUpdate.isSelected());
+      app.prefs.putBoolean("update.check", cbAutoUpdate.isSelected());
     }
   }
 

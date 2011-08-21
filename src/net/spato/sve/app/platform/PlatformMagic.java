@@ -29,11 +29,14 @@ import processing.core.PApplet;
 
 public class PlatformMagic {
 
+  protected SPaTo_Visual_Explorer app = null;
+
   protected String defaultTitle = null;
   protected Object macmagic = null;  // holds a MacMagic instance if platform is MACOSX
   protected Object winmagic = null;  // holds a WindowsMagic instance if platform is WINDOWS
 
-  public PlatformMagic() {
+  public PlatformMagic(SPaTo_Visual_Explorer app) {
+    this.app = app;
     if (PApplet.platform == PApplet.MACOSX)
       macmagic = loadMagicClass("Mac");
     if (PApplet.platform == PApplet.WINDOWS) {
@@ -44,12 +47,12 @@ public class PlatformMagic {
 
   public void update() {
     if (PApplet.platform == PApplet.MACOSX) {
-      SPaToDocument doc = SPaTo_Visual_Explorer.INSTANCE.doc;
-      boolean showDoc = ((doc != null) && !SPaTo_Visual_Explorer.INSTANCE.fireworks);
-      if (defaultTitle == null) defaultTitle = SPaTo_Visual_Explorer.INSTANCE.frame.getTitle();
-      SPaTo_Visual_Explorer.INSTANCE.frame.setTitle(showDoc ? ((doc.getFile() != null) ? doc.getFile().getAbsolutePath() : doc.getName()) : defaultTitle);
-      SPaTo_Visual_Explorer.INSTANCE.jframe.getRootPane().putClientProperty("Window.documentFile", showDoc ? doc.getFile() : null);
-      SPaTo_Visual_Explorer.INSTANCE.jframe.getRootPane().putClientProperty("Window.documentModified", showDoc && doc.isModified());
+      SPaToDocument doc = app.doc;
+      boolean showDoc = ((doc != null) && !app.fireworks);
+      if (defaultTitle == null) defaultTitle = app.frame.getTitle();
+      app.frame.setTitle(showDoc ? ((doc.getFile() != null) ? doc.getFile().getAbsolutePath() : doc.getName()) : defaultTitle);
+      app.jframe.getRootPane().putClientProperty("Window.documentFile", showDoc ? doc.getFile() : null);
+      app.jframe.getRootPane().putClientProperty("Window.documentModified", showDoc && doc.isModified());
     }
   }
 
@@ -57,7 +60,7 @@ public class PlatformMagic {
     try {
       return Class.forName("net.spato.sve.app.platform." + platform + "Magic").
         getConstructor(new Class[] { SPaTo_Visual_Explorer.class }).
-        newInstance(new Object[] { SPaTo_Visual_Explorer.INSTANCE });
+        newInstance(new Object[] { app });
     } catch (Exception e) {
       e.printStackTrace();
       return null;

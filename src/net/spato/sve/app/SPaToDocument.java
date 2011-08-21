@@ -491,7 +491,7 @@ public class SPaToDocument {
       for (XMLElement snapshot : xml.getChildren("snapshot"))  // FIXME
         generateLayouts(snapshot);  // FIXME
     else  // FIXME
-      new Layout(getBlob(xml).getIntArray(), "radial_id");  // FIXME: the horror!
+      new Layout(app, getBlob(xml).getIntArray(), "radial_id");  // FIXME: the horror!
   }  // FIXME
 
   public void saveToDisk() {
