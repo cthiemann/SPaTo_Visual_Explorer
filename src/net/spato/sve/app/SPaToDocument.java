@@ -843,4 +843,6 @@ public class SPaToDocument {
       return xml;
   }
 
+  public String toString() { return super.toString() + "[" + getName() + "]"; }
+
 }

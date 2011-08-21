@@ -115,7 +115,6 @@ public class Workspace {
     if (i == -1) return;
     docs.remove(i);
     switchToNetwork((docs.size() > 0) ? docs.get(i % docs.size()) : null);
-    //worker.remove(doc);  // cancel any jobs in the worker thread that are related to this document
   }
 
   public void saveDocument() { saveDocument(false); }
@@ -134,7 +133,6 @@ public class Workspace {
     app.worker.submit(doc.newSavingTask());
   }
 
-  public boolean switchToNetwork(int i) { return switchToNetwork(((i < 0) || (i >= docs.size())) ? docs.get(i) : null); }
   public boolean switchToNetwork(String name) {
     SPaToDocument newdoc = null;
     for (int i = 0; i < docs.size(); i++)

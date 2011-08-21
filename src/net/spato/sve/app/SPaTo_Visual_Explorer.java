@@ -280,6 +280,10 @@ public class SPaTo_Visual_Explorer extends PApplet {
     doc.view.yoff[doc.view.viewMode] *= f;
   }
 
+  public void actionPerformed(String cmd) {
+    gui.actionPerformed(cmd);
+  }
+
   public void checkForUpdates(boolean force) {
     if (force) prefs.remove("update.skip");
     if (prefs.getBoolean("update.check", true) || force)

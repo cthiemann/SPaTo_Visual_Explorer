@@ -92,7 +92,7 @@ public class SPaToGUI extends TransparentGUI {
     //
     tfSearch = createTextField("search");
     tfSearch.setEmptyText("Search");
-    btnRegexpSearch = createToggleButton("RegExp", prefs.getBoolean("search.regexp", false));
+    btnRegexpSearch = createToggleButton("RegExp", app.prefs.getBoolean("search.regexp", false));
     panel.add(createCompactGroup(new TComponent[] { tfSearch, btnRegexpSearch }), TBorderLayout.EAST);
     //
     btnNodes = createToggleButton("Nodes", true);
@@ -143,7 +143,7 @@ public class SPaToGUI extends TransparentGUI {
     panel.add(createCompactGroup(new TComponent[] { btnMap, btnTom }, 5), TBorderLayout.EAST);
     add(panel, TBorderLayout.NORTH);
     // setup workspace recovery button
-    XMLElement xmlWorkspace = XMLElement.parse(prefs.get("workspace", "<workspace />"));
+    XMLElement xmlWorkspace = XMLElement.parse(app.prefs.get("workspace", "<workspace />"));
     if ((xmlWorkspace != null) && (xmlWorkspace.getChildren("document").length > 0)) {
       btnWorkspaceRecovery = createButton("Recover previous workspace");
       btnWorkspaceRecovery.setActionCommand("workspace##recover");
@@ -279,6 +279,7 @@ public class SPaToGUI extends TransparentGUI {
   public void update() { update(false); }
   public void update(boolean fast) {
     SPaToDocument doc = app.doc;
+    if (!fast) updateWorkspace();
     // update visibility of components
     btnNodes.getParent().setVisibleAndEnabled(doc != null);
     tfSearch.getParent().setVisibleAndEnabled(doc != null);
@@ -323,7 +324,6 @@ public class SPaToGUI extends TransparentGUI {
       updateSearchMatches();
     // thorough updates
     if (!fast) {
-      updateWorkspace();
       updateProjection();
       updateNodeColoring();
       updateAlbumControls();
@@ -485,7 +485,7 @@ public class SPaToGUI extends TransparentGUI {
       if (argv[1].equals("open")) app.workspace.openWorkspace();
       if (argv[1].equals("save")) app.workspace.saveWorkspace();
       if (argv[1].equals("saveAs")) app.workspace.saveWorkspace(true);
-      if (argv[1].equals("recover")) app.workspace.replaceWorkspace(XMLElement.parse(prefs.get("workspace", "<workspace />")));
+      if (argv[1].equals("recover")) app.workspace.replaceWorkspace(XMLElement.parse(app.prefs.get("workspace", "<workspace />")));
     } else if (argv[0].equals("document")) {
       if (argv[1].equals("new")) app.workspace.newDocument();
       if (argv[1].equals("open")) app.workspace.openDocument();
@@ -501,7 +501,7 @@ public class SPaToGUI extends TransparentGUI {
       }
     } else if (argv[0].equals("RegExp")) {
       searchMatchesValid = false;
-      prefs.putBoolean("search.regexp", btnRegexpSearch.isSelected());
+      app.prefs.putBoolean("search.regexp", btnRegexpSearch.isSelected());
     } else if (argv[0].equals("network"))
       app.workspace.switchToNetwork(argv[1]);
     else if (argv[0].equals("projMap"))
@@ -689,7 +689,7 @@ public class SPaToGUI extends TransparentGUI {
       app.textFont(fnMedium);
       String networkMeta[] = PApplet.split(doc.getDescription(), '\n');
       for (int i = 0; i < networkMeta.length; i++) {
-        width = PApplet.max(app.width, app.textWidth(networkMeta[i]));
+        width = PApplet.max(width, app.textWidth(networkMeta[i]));
         height += app.textAscent() + 1.5f*app.textDescent();
       }
       return new TComponent.Dimension(width, height);
