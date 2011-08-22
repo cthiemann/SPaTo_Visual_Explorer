@@ -71,6 +71,7 @@ public class SPaTo_Visual_Explorer extends PApplet {
   public TConsole console;  // FIXME: get rid of this variable
 
   public void setup() {
+    randomSeed(second() + 60*minute() + 3600*hour());
     platformMagic = new PlatformMagic(this);
     workspace = new Workspace(this);
     checkForUpdates(false);
@@ -82,12 +83,35 @@ public class SPaTo_Visual_Explorer extends PApplet {
     th.setPriority(Thread.MIN_PRIORITY);
     th.start();
     // setup window
-    int w = prefs.getInt("window.width", 1280);
-    int h = prefs.getInt("window.height", 720);
+    setupWindow();
+    // setup GUI
+    gui = new SPaToGUI(this);
+    console = gui.console;
+    gui.update();
+    // go
+    smooth();
+    tt = millis()/1000.f;
+    if (prefs.getBoolean("workspace.auto-recover", false))
+      workspace.replaceWorkspace(XMLElement.parse(prefs.get("workspace", "<workspace />")));
+    canHandleOpenFileEvents = true;
+  }
+
+  public void setupWindow() {
+    frame.setTitle("SPaTo Visual Explorer " + VERSION + ((VERSION_DEBUG.length() > 0) ? " (" + VERSION_DEBUG + ")" : ""));
+    // set window size
+    int w = prefs.getInt("window.width", 1280);  // technically, that's not the window size
+    int h = prefs.getInt("window.height", 720);  // but the size of the PApplet (but what the heck...)
     if (w > screenWidth) { w = screenWidth; h = 9*w/16; }
     if (h > screenHeight) { h = round(0.9f*screenHeight); w = 16*h/9; }
     size(w, h);
-    frame.setTitle("SPaTo Visual Explorer " + VERSION + ((VERSION_DEBUG.length() > 0) ? " (" + VERSION_DEBUG + ")" : ""));
+    // set window location
+    int x = prefs.getInt("window.posx", screenWidth/2 - w/2);
+    int y = prefs.getInt("window.posy", screenHeight/2 - h/2);
+    x = max(x, 0); y = max(y, 0);
+    x = min(x, screenWidth - frame.getWidth());
+    y = min(y, screenHeight - frame.getHeight());
+    frame.setLocation(x, y);
+    // set up event handlers
     frame.setResizable(true);
     for (java.awt.event.ComponentListener cl : getComponentListeners())
       if (cl.getClass().getName().startsWith("processing.core.PApplet"))
@@ -110,20 +134,15 @@ public class SPaTo_Visual_Explorer extends PApplet {
         prefs.putInt("window.width", cw); prefs.putInt("window.height", ch);
       }
     });
+    frame.addComponentListener(new java.awt.event.ComponentAdapter() {
+      public void componentMoved(java.awt.event.ComponentEvent e) {
+        prefs.putInt("window.posx", e.getComponent().getLocation().x);
+        prefs.putInt("window.posy", e.getComponent().getLocation().y);
+      }
+    });
     addMouseWheelListener(new java.awt.event.MouseWheelListener() {
       public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
         mouseWheel(evt.getWheelRotation()); } });
-    smooth();
-    randomSeed(second() + 60*minute() + 3600*hour());
-    // setup GUI
-    gui = new SPaToGUI(this);
-    console = gui.console;
-    gui.update();
-    // go
-    tt = millis()/1000.f;
-    if (prefs.getBoolean("workspace.auto-recover", false))
-      workspace.replaceWorkspace(XMLElement.parse(prefs.get("workspace", "<workspace />")));
-    canHandleOpenFileEvents = true;
   }
 
   public void focusGained() { loop(); }
@@ -359,7 +378,6 @@ public class SPaTo_Visual_Explorer extends PApplet {
       while (applet.defaultSize && !applet.finished)  // see PApplet.runSketch
         try { Thread.sleep(5); } catch (InterruptedException e) {}
       applet.jframe.pack();
-      applet.jframe.setLocation((applet.screenWidth - applet.width)/2, (applet.screenHeight - applet.height)/2);
       if (applet.displayable())
         applet.jframe.setVisible(true);
       applet.requestFocus();
