@@ -187,10 +187,10 @@ public class DataTransferHandler implements DropTargetListener {
 //        showDropStatus(event.toString(), event.getTransferable());
 //        hideDropStatus();
       event.dropComplete(true);
+      if (!app.focused) app.requestFocusInWindow();
     } else {
       event.rejectDrop();
     }
-    if (!app.focused) app.redraw();  // go back into CPU-cycle saving mode, but erase drop status
   }
 
   public void dropActionChanged(DropTargetDragEvent event) {
