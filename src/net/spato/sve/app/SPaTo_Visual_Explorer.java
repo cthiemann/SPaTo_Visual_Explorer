@@ -304,6 +304,14 @@ public class SPaTo_Visual_Explorer extends PApplet {
   }
 
   public void checkForUpdates(boolean force) {
+    // on first start, ask user for permission to check for updates
+    if (prefs.get("update.check", null) == null) {
+      int res = javax.swing.JOptionPane.showConfirmDialog(frame,
+        "Do you want me to automatically check for updates?", "SPaTo Updater",
+        javax.swing.JOptionPane.YES_NO_OPTION);
+      prefs.putBoolean("update.check", res == javax.swing.JOptionPane.YES_OPTION);
+    }
+    // check for updates if requested
     if (force) prefs.remove("update.skip");
     if (prefs.getBoolean("update.check", true) || force)
       new Updater(this, force).start();
