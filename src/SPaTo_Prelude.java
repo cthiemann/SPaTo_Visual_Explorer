@@ -18,137 +18,156 @@
  * along with SPaTo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 
 
 public class SPaTo_Prelude implements Runnable {
 
-  // start time
-  protected static final long t0 = System.currentTimeMillis();
-  // are we on a Mac? or Windows?
-  protected static final boolean isMac = System.getProperty("os.name").startsWith("Mac");
-  protected static final boolean isWindows = System.getProperty("os.name").startsWith("Windows");
-  // name of log file into which to divert stdout and stderr
-  protected static final String logFilename = System.getProperty("spato.logfile");
-  // stream to log file
-  protected PrintStream out = null;
+  public static final String VERSION = "20110823T180000";
 
-  // application's root folder
-  protected static final String appRootFolder = System.getProperty("spato.app-dir");
-  // folder containing the production jars
-  protected static final File jarFolder = new File(appRootFolder, isMac ? "Contents/Resources/Java" : "lib");
-  // update cache folder
-  protected static final File cacheFolder = new File(appRootFolder, isMac ? "Contents/Resources/update" : isWindows ? "update" : System.getProperty("user.home") + "/.spato/update");
-  // update cache folder containing the prelude jars
-  protected static final File cacheJarFolder = new File(cacheFolder, "common");
+  private static final boolean isMac = System.getProperty("os.name").startsWith("Mac");
+  private static final boolean isWin = System.getProperty("os.name").startsWith("Windows");
+  private static final boolean isLin = !isMac && !isWin;  // quartum non datur
 
-  // name of main prelude class (this class)
-  protected static final String preludeClass = "SPaTo_Prelude";
-  // list of jar files needed to run all tasks
-  protected static final String preludeJars[] = { "SPaTo_Prelude.jar", "core.jar" };
-  // list of tasks to run from preludeJars (class names)
-  protected static final String taskNames[] = isWindows
-    ? new String[] { "UpdateInstaller", "WindowsPrelude" }
-    : new String[] { "UpdateInstaller" };
-    // ? new String[] { "UpdateInstaller", "MaxMemDetector", "WindowsPrelude" }
-    // : new String[] { "UpdateInstaller", "MaxMemDetector" };
+  private static final File jarFolder =
+    new File(System.getProperty("spato.app-dir"), isMac ? "Contents/Resources/Java" : "lib");
 
+  private static final File updateCacheFolder =
+    isLin ? new File(System.getProperty("user.home"), ".spato/update")
+          : new File(System.getProperty("spato.app-dir"), isMac ? "Contents/Resources/update" : "update");
 
-  protected void setup() {
-    // divert stdout and stderr into log file, if requested
-    if (logFilename != null) try {
-      out = new PrintStream(new FileOutputStream(logFilename), true);
-      System.setOut(out);
-      System.setErr(out);
-    } catch (Exception e) {
-      e.printStackTrace();
-      System.err.println("failed to redirect output to " + logFilename);
-    }
-  }
+  public static String args[] = new String[0];  // command line arguments
 
-  protected void processCommandLine(String args[]) {
-    for (int i = 0; i < args.length - 1; i++) {
-      if (args[i].equals("sleep")) {  // sleep for some time
-        try {
-          int secs = Integer.parseInt(args[i+1].trim());
-          System.out.println("going to sleep for some " + secs + " seconds");
-          Thread.sleep(1000*secs);
-        } catch (Exception e) {}
-      }
-    }
-  }
+  private static void printOut(String msg) { System.out.println("+++ SPaTo Prelude: " + msg); }
+  private static void printErr(String msg) { System.err.println("!!! SPaTo Prelude: " + msg); }
 
-  protected boolean doTheMunchhausenTrick() {
-    File update = new File(cacheJarFolder, preludeClass + ".class");
-    if (update.exists()) {
-      // ...and I escaped the swamp by pulling myself up by my own hair...
-      System.out.println("+++ SPaTo Prelude: loading update for " + preludeClass + ".class");
-      try {
-        ClassLoader cl = new URLClassLoader(new URL[] { update.toURI().toURL() });
-        ((Runnable)cl.loadClass(preludeClass).newInstance()).run();
-        return true;
-      } catch (Exception e) { e.printStackTrace(); return false; }
-    } else
-      return false;  // we are up-to-date and can run the tasks ourselves
-  }
-
-  protected void copyFile(File src, File dst) throws Exception {
+  private static void copy(File src, File dst) throws IOException {
     FileInputStream fis = new FileInputStream(src);
     FileOutputStream fos = new FileOutputStream(dst);
-    byte buf[] = new byte[8*1024];
-    int len = 0;
+    byte buf[] = new byte[8*1024]; int len = 0;
     while ((len = fis.read(buf)) > 0)
       fos.write(buf, 0, len);
-    fos.close();
-    fis.close();
+    fos.close(); fis.close();
   }
 
-  public void run() {
-    try {
-      ClassLoader cl = null;
-      // setup temp folder for prelude code
-      File tmp = File.createTempFile("spato", "");
-      if (!tmp.delete()) throw new RuntimeException("could not delete " + tmp);
-      if (!tmp.mkdir()) throw new RuntimeException("could not create directory " + tmp);
-      tmp.deleteOnExit();
-      System.setProperty("spato.tmp-dir", tmp.getAbsolutePath());  // some tasks might make use of this
-      // load jars
-      boolean hasUpdate = new File(cacheFolder, "INDEX").exists();
-      URL urls[] = new URL[preludeJars.length];
-      for (int i = 0; i < preludeJars.length; i++) {
-        File oldJar = new File(jarFolder, preludeJars[i]);
-        File newJar = new File(cacheJarFolder, preludeJars[i]);
-        File tmpJar = new File(tmp, preludeJars[i]);
-        System.out.println("+++ SPaTo Prelude: loading " + preludeJars[i] + (hasUpdate && newJar.exists() ? " (updated)" : ""));
-        copyFile(hasUpdate && newJar.exists() ? newJar : oldJar, tmpJar);
-        urls[i] = tmpJar.toURI().toURL();
-        tmpJar.deleteOnExit();
+  /*
+   * Bootstrapping mechanism (set up log file and check for updated SPaTo_Prelude.class)
+   */
+
+  private static OutputStream initLog() {
+    OutputStream os = null;
+    if (System.getProperty("spato.logfile") != null) {
+      try {
+        os = new FileOutputStream(System.getProperty("spato.logfile"));
+      } catch (IOException e) {
+        printErr("failed to redirect output to " + System.getProperty("spato.logfile"));
       }
-      cl = new URLClassLoader(urls);
-      // run tasks
-      for (int i = 0; i < taskNames.length; i++) {
-        System.out.println("========== " + taskNames[i] + " ==========");
-        try { ((Runnable)cl.loadClass("net.spato.sve.prelude." + taskNames[i]).newInstance()).run(); }
-        catch (Exception e) { e.printStackTrace(); System.err.println("!!! Failed to run " + taskNames[i]); }
-      }
-    } catch (Exception e) { e.printStackTrace(); }
+      PrintStream ps = new PrintStream(os, true);
+      System.setOut(ps);
+      System.setErr(ps);
+    }
+    return os;
   }
 
-  protected void waveGoodbye() {
-    long t1 = System.currentTimeMillis();
-    System.out.println("========== End of Prelude (" + (t1 - t0) + " ms) ==========");
-    try { out.close(); } catch (Exception e) {}
+  private static void bootstrap() {
+    printOut("version " + VERSION + " [bootstrap]");
+    File update = new File(updateCacheFolder, "common" + File.separator + "SPaTo_Prelude.class");
+    if (update.exists() && new File(updateCacheFolder, "INDEX").exists()) {
+      printOut("loading updated SPaTo_Prelude");
+      Runnable prelude = null;
+      // load updated class
+      try {
+        URL urls[] = new URL[] { updateCacheFolder.toURI().toURL() };
+        ClassLoader cl = new URLClassLoader(urls, null);
+        prelude = (Runnable)cl.loadClass("SPaTo_Prelude").newInstance();
+      } catch (Exception e) {
+        printErr("could not instantiate updated SPaTo_Prelude");
+        printErr(e.getClass().getName() + ": " + e.getMessage());
+        javax.swing.JOptionPane.showMessageDialog(null,
+          "<html>Updating SPaTo Visual Explorer has failed horribly.<br><br>" +
+          "Please delete the application and manually download<br>" +
+          "the lastest version from http://www.spato.net/",
+          "SPaTo Updater", javax.swing.JOptionPane.ERROR_MESSAGE);
+        return;
+      }
+      // try to hand down command line arguments
+      try {
+        prelude.getClass().getField("args").set(prelude, args);
+      } catch (Exception e) {
+        printErr("could not pass command line arguments to updated SPaTo_Prelude");
+      }
+      // run updated class
+      prelude.run();
+    } else {
+      // run an instance of this class
+      new SPaTo_Prelude().run();
+    }
   }
 
   public static void main(String args[]) {
-    SPaTo_Prelude prelude = new SPaTo_Prelude();
-    prelude.setup();
-    prelude.processCommandLine(args);
-    if (!prelude.doTheMunchhausenTrick())
-      prelude.run();
-    prelude.waveGoodbye();
+    SPaTo_Prelude.args = args;
+    OutputStream out = initLog();
+    bootstrap();
+    try { out.close(); } catch (Exception e) {}
+  }
+
+  /*
+   * Main prelude stuff (can be overridden by an updated SPaTo_Prelude.class)
+   */
+
+  private static final String preludeJars[] = { "SPaTo_Prelude.jar", "core.jar" };
+
+  private ClassLoader createClassLoader() throws Exception {
+    boolean hasUpdate = new File(updateCacheFolder, "INDEX").exists();
+    // create temporary directory if needed
+    File tmpDir = null;
+    if (hasUpdate) {
+      tmpDir = File.createTempFile("spato", "");
+      if (!tmpDir.delete()) throw new IOException("could not delete " + tmpDir);
+      if (!tmpDir.mkdir()) throw new IOException("could not create directory " + tmpDir);
+      tmpDir.deleteOnExit();
+    }
+    // collect jar files (copy updates into tmpdir)
+    URL urls[] = new URL[preludeJars.length];
+    for (int i = 0; i < preludeJars.length; i++) {
+      File oldJar = new File(jarFolder, preludeJars[i]);
+      File newJar = new File(updateCacheFolder, "common" + File.separator + preludeJars[i]);
+      File tmpJar = new File(tmpDir, preludeJars[i]);
+      if (hasUpdate && newJar.exists()) {
+        copy(newJar, tmpJar);
+        tmpJar.deleteOnExit();
+        printOut("using updated " + preludeJars[i]);
+        urls[i] = tmpJar.toURI().toURL();
+      } else
+        urls[i] = oldJar.toURI().toURL();
+    }
+    // finished
+    return new URLClassLoader(urls);
+  }
+
+  private void run(ClassLoader cl, String className) throws Exception {
+    Runnable task = (Runnable)cl.loadClass("net.spato.sve.prelude." + className).newInstance();
+    try { task.getClass().getField("args").set(task, args); } catch (Exception e) {}
+    task.run();
+  }
+
+  public void run() {
+    printOut("version " + VERSION + " [run]");
+    try {
+      ClassLoader cl = createClassLoader();
+      run(cl, "UpdateInstaller");
+      run(cl, "ApplicationLauncher");
+    } catch (Exception e) {
+      printErr("something went wrong");
+      e.printStackTrace();
+    }
   }
 
 }

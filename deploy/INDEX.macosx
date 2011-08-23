@@ -37,8 +37,8 @@
     <local path="Contents/Info.plist"/>
   </file>
   <file executable="true">
-    <remote path="macosx/ApplicationUpdateWrapper"/>
-    <local path="Contents/MacOS/ApplicationUpdateWrapper"/>
+    <remote path="macosx/restart.sh"/>
+    <local path="Contents/Resources/restart.sh"/>
   </file>
   <file>
     <remote path="macosx/spato.icns"/>

@@ -74,7 +74,7 @@ public class Updater extends Thread {
   }
 
   public void printOut(String msg) { System.out.println("+++ SPaTo Updater: " + msg); }
-  public void printErr(String msg) { System.err.println("+++ SPaTo Updater: " + msg); }
+  public void printErr(String msg) { System.err.println("!!! SPaTo Updater: " + msg); }
 
   public void setupEnvironment() {
     printOut("updateURL = " + updateURL);
@@ -205,7 +205,7 @@ public class Updater extends Thread {
       case PApplet.LINUX:
         return new String[] { appRootFolder + "SPaTo_Visual_Explorer", "--restart" };
       case PApplet.MACOSX:
-        return new String[] { appRootFolder + "Contents/MacOS/ApplicationUpdateWrapper", "--restart" };
+        return new String[] { appRootFolder + "Contents/Resources/restart.sh" };
       case PApplet.WINDOWS:
         return new String[] { appRootFolder + "SPaTo Visual Explorer.exe", "sleep", "3" };
       default:

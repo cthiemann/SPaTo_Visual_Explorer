@@ -41,14 +41,6 @@
     <local path="SPaTo Visual Explorer.ini"/>
   </file>
   <file>
-    <remote path="windows/SPaTo_Visual_Explorer.ini"/>
-    <local path="lib\SPaTo_Visual_Explorer.ini"/>
-  </file>
-  <file>
-    <remote path="windows/SPaTo_Prelude.ini"/>
-    <local path="lib\SPaTo_Prelude.ini"/>
-  </file>
-  <file>
     <remote path="windows/WinRun4J.jar"/>
     <local path="lib\WinRun4J.jar"/>
   </file>

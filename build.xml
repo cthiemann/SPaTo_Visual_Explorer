@@ -69,7 +69,7 @@
 
   <target name="jars" depends="compile">
     <jar destfile="build/SPaTo_Visual_Explorer.jar" basedir="build/classes" includes="net/spato/sve/app/**" />
-    <jar destfile="build/SPaTo_Prelude.jar" basedir="build/classes" includes="net/spato/sve/prelude/**" />
+    <jar destfile="build/SPaTo_Prelude.jar" basedir="build/classes" includes="net/spato/sve/prelude/**, UpdateInstaller.class" />
   </target>
 
   <fileset dir="." id="bin.common">
@@ -96,6 +96,7 @@
       <fileset dir="deploy/macosx"><include name="SPaTo Visual Explorer.app/**" /></fileset>
     </copy>
     <chmod dir="build/macosx/SPaTo Visual Explorer.app/Contents/MacOS" includes="**" perm="a+x" />
+    <chmod dir="build/macosx/SPaTo Visual Explorer.app/Contents/Resources" includes="restart.sh" perm="a+x" />
     <copy todir="build/macosx/SPaTo Visual Explorer.app/Contents/Resources/Java" flatten="true">
       <fileset refid="bin.common" />
     </copy>
@@ -104,11 +105,6 @@
       <filelist dir="deploy/macosx/SPaTo Visual Explorer.app/Contents" files="Info.plist" />
       <filterchain><expandproperties /></filterchain>
     </concat>
-    <mkdir dir="build/macosx/SPaTo Visual Explorer.app/Contents/Resources/update" />
-    <copy todir="build/macosx/SPaTo Visual Explorer.app/Contents/Resources/update">
-      <filelist dir="deploy" files="INDEX.macosx" />
-      <globmapper from="*" to="INDEX" />
-    </copy>
   </target>
 
   <target name="build-windows" depends="jars">

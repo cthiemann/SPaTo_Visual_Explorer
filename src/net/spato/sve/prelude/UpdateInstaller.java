@@ -23,6 +23,7 @@ package net.spato.sve.prelude;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Date;
 
 import processing.core.PApplet;
 import processing.xml.StdXMLBuilder;
@@ -34,20 +35,36 @@ import processing.xml.XMLValidator;
 
 public class UpdateInstaller implements Runnable {
 
-  // the application's root folder
-  protected String appRootFolder = System.getProperty("spato.app-dir");
-  // the update cache folder and index
-  protected File cacheFolder = null;
-  protected XMLElement index = null;
+  private static final boolean isMac = System.getProperty("os.name").startsWith("Mac");
+  private static final boolean isWin = System.getProperty("os.name").startsWith("Windows");
+  private static final boolean isLin = !isMac && !isWin;  // quartum non datur
 
-  protected boolean hasUpdates() {
-    cacheFolder = (PApplet.platform == PApplet.MACOSX) ? new File(appRootFolder, "Contents/Resources/update")
-                : (PApplet.platform == PApplet.WINDOWS) ? new File(appRootFolder, "update")
-                : new File(System.getProperty("user.home") + "/.spato/update");
-    File indexFile = new File(cacheFolder, "INDEX");
+  private static final File updateCacheFolder =
+    isLin ? new File(System.getProperty("user.home"), ".spato/update")
+          : new File(System.getProperty("spato.app-dir"), isMac ? "Contents/Resources/update" : "update");
+
+  private static void printOut(String msg) { System.out.println("+++ SPaTo Update Installer: " + msg); }
+  private static void printErr(String msg) { System.err.println("!!! SPaTo Update Installer: " + msg); }
+
+  private static void rmdir(File f) {
+    if (f.getName().equals(".") || f.getName().equals("..")) return;  // don't delete funny directories
+    if (f.isDirectory()) for (File ff : f.listFiles()) rmdir(ff);  // recursively empty directory
+    f.delete();  // delete file or directory
+  }
+
+  private static void setExecutable(File f) throws Exception {
+    try {
+      Runtime.getRuntime().exec(new String[] { "chmod", "+x", f.getAbsolutePath() });
+    } catch (Exception e) {
+      throw new Exception("chmod on " + f + " failed", e);
+    }
+  }
+
+  private XMLElement loadIndex(File indexFile) throws Exception {
+    printOut("loading " + indexFile);
     BufferedReader reader = null;
-    if (indexFile.exists()) try {
-      System.out.println("parsing index from " + indexFile);
+    XMLElement index = null;
+    try {
       reader = new BufferedReader(new FileReader(indexFile));
       StdXMLParser parser = new StdXMLParser();    // XML parsing code copied
       parser.setBuilder(new StdXMLBuilder());      // from XMLElement.parse()
@@ -55,53 +72,47 @@ public class UpdateInstaller implements Runnable {
       parser.setReader(new StdXMLReader(reader));  // handle exceptions here
       index = (XMLElement)parser.parse();          // instead of ignoring them.
     } catch (Exception e) {
-      throw new RuntimeException("error reading the INDEX from " + indexFile, e);
+      throw new Exception("error reading the INDEX from " + indexFile, e);
     } finally {
       try { reader.close(); } catch (Exception e) {}
     }
-    return index != null;
+    printOut("found INDEX for version " + index.getChild("release").getString("version"));
+    return index;
   }
 
-  protected void moveUpdatesIntoPlace() {
+  protected void moveUpdatesIntoPlace(XMLElement index) throws Exception {
     for (XMLElement file : index.getChildren("file")) {
       XMLElement remote = file.getChild("remote"), local = file.getChild("local");
       // check if all information is present
-      if ((remote == null) || (remote.getString("path") == null) || (remote.getString("md5") == null) ||
+      if ((remote == null) || (remote.getString("path") == null) ||
           (local == null) || (local.getString("path") == null))
-        throw new RuntimeException("malformed file record:\n" + file);
-      File src = new File(cacheFolder, remote.getString("path").replace('/', File.separatorChar));
-      File dst = new File(appRootFolder, local.getString("path"));
-      // move file into place
-      if (!src.exists()) continue;  // not part of this update...
-      System.out.println("moving " + remote.getString("path") + " to " + local.getString("path"));
-      if (dst.exists()) dst.delete();
-      if (!src.renameTo(dst))
-        throw new RuntimeException("moving " + src + " to " + dst + " failed");
-      if (file.getBoolean("executable") && (PApplet.platform != PApplet.WINDOWS)) {
-        System.out.println("setting executable flag on " + local.getString("path"));
-        try { Runtime.getRuntime().exec(new String[] { "chmod", "+x", dst.getAbsolutePath() }); }
-        catch (Exception e) { throw new RuntimeException("chmod failed", e); }
+        throw new Exception("malformed file record:\n" + file);
+      // move file into place, if an update for it exists
+      File src = new File(updateCacheFolder, remote.getString("path").replace('/', File.separatorChar));
+      File dst = new File(System.getProperty("spato.app-dir"), local.getString("path"));
+      if (src.exists()) {
+        printOut("installing updated " + local.getString("path"));
+        if (dst.exists())
+          dst.delete();
+        if (!src.renameTo(dst))
+          throw new Exception("renaming " + src + " to " + dst + " failed");
+        if (file.getBoolean("executable") && !isWin)
+          setExecutable(dst);
       }
     }
-  }
-
-  protected void deleteRecursively(File f) {
-    if (f.isDirectory())
-      for (File ff : f.listFiles())
-        if (!ff.getName().equals(".") && !ff.getName().equals(".."))
-          deleteRecursively(ff);
-    if (!f.delete())
-      System.err.println("Warning: could not delete " + f);
+    // touch the application directory (Mac OS X caches the Info.plist and needs to be poked to see changes to it)
+    new File(System.getProperty("spato.app-dir")).setLastModified(new Date().getTime());
   }
 
   public void run() {
-    try {
-      if (hasUpdates())
-        moveUpdatesIntoPlace();
-      else
-        System.out.println("Software is up-to-date (no INDEX in " + cacheFolder + ")");
-    } catch (Exception e) { e.printStackTrace(); }
-    deleteRecursively(cacheFolder);
+    File indexFile = new File(updateCacheFolder, "INDEX");
+    if (indexFile.exists()) try {
+      moveUpdatesIntoPlace(loadIndex(indexFile));
+    } catch (Exception e) {
+      printErr("something went wrong");
+      e.printStackTrace();
+    }
+    rmdir(updateCacheFolder);
   }
 
 }
