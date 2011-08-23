@@ -168,13 +168,12 @@ public class Updater extends Thread {
           printOut(remote.getString("path") + " is outdated, but update is already cached");
         else {
           printOut(remote.getString("path") + " is outdated, downloading update (" + remote.getInt("size") + " bytes)");
-          byte buf[] = new byte[remote.getInt("size", 0)];
+          byte buf[] = new byte[remote.getInt("size", 0)]; int len = 0;
           InputStream is = null;
           try {
-            int read = 0;
             is = new URL(updateURL + remote.getString("path")).openStream();
-            while (read < buf.length)
-              is.read(buf, read, buf.length - read);
+            while (len < buf.length)
+              len += is.read(buf, len, buf.length - len);
           } catch (Exception e) {
             printErr("download failed"); e.printStackTrace(); return false;
           } finally {
