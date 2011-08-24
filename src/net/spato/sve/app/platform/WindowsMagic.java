@@ -24,12 +24,14 @@ import java.io.File;
 import javax.swing.UIManager;
 
 import net.spato.sve.app.SPaTo_Visual_Explorer;
+import org.boris.winrun4j.ActivationListener;
+import org.boris.winrun4j.DDE;
 import org.boris.winrun4j.FileAssociation;
 import org.boris.winrun4j.FileAssociations;
 import org.boris.winrun4j.FileVerb;
 
 
-public class WindowsMagic extends PlatformMagic {
+public class WindowsMagic extends PlatformMagic implements ActivationListener {
 
   public WindowsMagic(SPaTo_Visual_Explorer app, String args[]) {
     super(app, args);
@@ -50,6 +52,15 @@ public class WindowsMagic extends PlatformMagic {
     } catch (Exception e) {
       e.printStackTrace();
     }
+    // add DDE listeners and process command line arguments
+    DDE.addActivationListener(this);
+    for (String filename : args)
+      openFile(new File(filename));
+  }
+
+  public void ready() {
+    super.ready();
+    DDE.ready();
   }
 
   protected void setupFileAssociations() throws Exception {
@@ -62,7 +73,8 @@ public class WindowsMagic extends PlatformMagic {
     fa = new FileAssociation(".spato");
     fa.setName("net.spato.document");
     fa.setDescription("SPaTo Document");
-    //fa.put(verb);
+    //fa.setIcon(exeFile + ",0");
+    fa.put(verb);
     FileAssociations.CURRENT_USER.delete(fa);
     FileAssociations.CURRENT_USER.save(fa);
     // register .sve
@@ -70,9 +82,37 @@ public class WindowsMagic extends PlatformMagic {
     fa = new FileAssociation(".sve");
     fa.setName("net.spato.workspace");
     fa.setDescription("SPaTo Workspace");
-    //fa.put(verb);
+    //fa.setIcon(exeFile + ",0");
+    fa.put(verb);
     FileAssociations.CURRENT_USER.delete(fa);
     FileAssociations.CURRENT_USER.save(fa);
+  }
+
+  public void bringToFront() {
+    final SPaTo_Visual_Explorer app = this.app;
+    java.awt.EventQueue.invokeLater(new Runnable() {
+      public void run() {
+        app.frame.setVisible(true);
+        app.frame.setExtendedState(app.frame.getExtendedState() & ~java.awt.Frame.ICONIFIED);
+        app.frame.setAlwaysOnTop(true);
+        app.frame.toFront();
+        app.frame.requestFocus();
+        app.requestFocusInWindow();
+        app.frame.setAlwaysOnTop(false);
+      }
+    });
+  }
+
+  public void activate(String cmd) {
+    String filename = cmd.trim();
+    if (filename.startsWith("\"") && filename.endsWith("\""))
+      filename = filename.substring(1, filename.length() - 1);
+    // activate application window
+    bringToFront();
+    // try to open the file
+    javax.swing.JOptionPane.showMessageDialog(app.frame, "ACTIVATE " + filename, "Open File", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    if (!filename.equals(""))
+      super.openFile(new File(filename));
   }
 
 }
