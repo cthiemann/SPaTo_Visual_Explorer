@@ -206,7 +206,8 @@ public class Updater extends Thread {
       case PApplet.MACOSX:
         return new String[] { appRootFolder + "Contents/Resources/restart.sh" };
       case PApplet.WINDOWS:
-        return new String[] { appRootFolder + "SPaTo Visual Explorer.exe", "sleep", "3" };
+        return new String[] { appRootFolder + "lib\\restart.bat", appRootFolder,
+                              ">", appRootFolder + "lib\\restart_to_update.log", "2>&1" };
       default:
         return null;
     }

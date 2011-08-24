@@ -156,6 +156,10 @@
           description="Create directory containing auto-update files">
     <mkdir dir="build/update" />
     <exec executable="deploy/private-key-password.sh" outputproperty="private.key.password" />
+    <copy file="build/windows/SPaTo Visual Explorer/SPaTo Visual Explorer.exe"
+        tofile="build/windows/SPaTo Visual Explorer/lib/_SPaTo_Visual_Explorer.exe" />
+    <copy file="build/windows/SPaTo Visual Explorer/lib/WinRun4J.jar"
+        tofile="build/windows/SPaTo Visual Explorer/lib/_WinRun4J.jar" />
     <java classname="SPaTo_Update_Builder" fork="true">
       <arg value="${private.key.password}" />
       <classpath>
@@ -163,6 +167,7 @@
         <pathelement location="lib/core.jar" />
       </classpath>
     </java>
+    <delete dir="build/windows/SPaTo Visual Explorer/lib" includes="_SPaTo_Visual_Explorer.exe, _WinRun4J.jar" />
   </target>
 
 

@@ -34,7 +34,7 @@
   </file>
   <file>
     <remote path="windows/_SPaTo_Visual_Explorer.exe"/>
-    <local path="SPaTo Visual Explorer.exe"/>
+    <local path="lib\_SPaTo_Visual_Explorer.exe"/>
   </file>
   <file>
     <remote path="windows/_SPaTo_Visual_Explorer.ini"/>
@@ -42,7 +42,11 @@
   </file>
   <file>
     <remote path="windows/WinRun4J.jar"/>
-    <local path="lib\WinRun4J.jar"/>
+    <local path="lib\_WinRun4J.jar"/>
+  </file>
+  <file>
+    <remote path="windows/restart.bat"/>
+    <local path="lib\restart.bat"/>
   </file>
   <file>
     <remote path="windows/spato-16x16.png"/>

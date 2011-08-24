@@ -112,6 +112,16 @@ public class UpdateInstaller implements Runnable {
     if (postInstallTaskHook != null) postInstallTaskHook.run();
     // Mac OS X caches the Info.plist and needs to be poked to see changes to it
     if (isMac) new File(System.getProperty("spato.app-dir")).setLastModified(new Date().getTime());
+    // On Windows, SPaTo Visual Explorer.exe and WinRun4J.jar are locked while executing and cannot be updated
+    if (isWin) try {  // launch helper batch file that will update the files and restart SPaTo
+      printOut("restarting application through restart.bat");
+      Runtime.getRuntime().exec(new String[] {
+        System.getProperty("spato.app-dir") + "\\lib\\restart.bat", System.getProperty("spato.app-dir") ,
+        ">", System.getProperty("spato.app-dir") + "\\lib\\restart.log", "2>&1" });
+      System.exit(0);
+    } catch (Exception e) {
+      throw new Exception("executing restart.bat failed");
+    }
   }
 
   public void run() {
