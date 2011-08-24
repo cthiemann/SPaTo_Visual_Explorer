@@ -69,7 +69,7 @@
 
   <target name="jars" depends="compile">
     <jar destfile="build/SPaTo_Visual_Explorer.jar" basedir="build/classes" includes="net/spato/sve/app/**" />
-    <jar destfile="build/SPaTo_Prelude.jar" basedir="build/classes" includes="net/spato/sve/prelude/**, UpdateInstaller.class" />
+    <jar destfile="build/SPaTo_Prelude.jar" basedir="build/classes" includes="net/spato/sve/prelude/**, UpdateInstaller*.class" />
   </target>
 
   <fileset dir="." id="bin.common">

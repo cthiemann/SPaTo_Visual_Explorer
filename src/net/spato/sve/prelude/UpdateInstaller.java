@@ -100,19 +100,40 @@ public class UpdateInstaller implements Runnable {
           setExecutable(dst);
       }
     }
-    // touch the application directory (Mac OS X caches the Info.plist and needs to be poked to see changes to it)
-    new File(System.getProperty("spato.app-dir")).setLastModified(new Date().getTime());
+    // remove the update cache folder
+    rmdir(updateCacheFolder);
+  }
+
+  protected Runnable postInstallTaskHook = null;
+
+  public void setPostInstallTaskHook(Runnable r) { postInstallTaskHook = r; }
+
+  protected void runPostInstallTasks() throws Exception {
+    if (postInstallTaskHook != null) postInstallTaskHook.run();
+    // Mac OS X caches the Info.plist and needs to be poked to see changes to it
+    if (isMac) new File(System.getProperty("spato.app-dir")).setLastModified(new Date().getTime());
   }
 
   public void run() {
+    boolean updatesInstalled = false;
     File indexFile = new File(updateCacheFolder, "INDEX");
+    // check if updates are present and install them
     if (indexFile.exists()) try {
       moveUpdatesIntoPlace(loadIndex(indexFile));
+      updatesInstalled = true;
     } catch (Exception e) {
       printErr("something went wrong");
       e.printStackTrace();
     }
-    rmdir(updateCacheFolder);
+    // make sure the INDEX is gone so that nobody gets confused in case anything went wrong
+    indexFile.delete();
+    // deal with some platform-specific special cases
+    if (updatesInstalled) try {
+      runPostInstallTasks();
+    } catch (Exception e) {
+      printErr("something went wrong");
+      e.printStackTrace();
+    }
   }
 
 }

@@ -52,16 +52,21 @@ public class UpdateInstaller implements Runnable {
 
   public void run() {
     // run the real update installer
-    new net.spato.sve.prelude.UpdateInstaller().run();
-    // and since we're at it, let's clean up some stuff
-    if (isLin) new File(System.getProperty("spato.app-dir"), "lib/config.sh").delete();
-    if (isLin) new File(System.getProperty("spato.app-dir"), "lib/config.sh.orig").delete();
-    if (isMac) new File(System.getProperty("spato.app-dir"), "Contents/MacOS/ApplicationUpdateWrapper").delete();
-    if (isMac) new File(System.getProperty("spato.app-dir"), "Contents/MacOS/JavaApplicationStub64").delete();
-    if (isMac) new File(System.getProperty("spato.app-dir"), "Contents/Info.plist.orig").delete();
-    if (isWin) new File(System.getProperty("spato.app-dir"), "lib\\SPaTo_Prelude.ini").delete();
-    if (isWin) new File(System.getProperty("spato.app-dir"), "lib\\SPaTo_Visual_Explorer.ini").delete();
-    if (isWin) new File(System.getProperty("spato.app-dir"), "lib\\SPaTo_Visual_Explorer.ini.orig").delete();
+    net.spato.sve.prelude.UpdateInstaller updater = new net.spato.sve.prelude.UpdateInstaller();
+    updater.setPostInstallTaskHook(new Runnable() {
+      public void run() {
+        // and since we're at it, let's clean up some stuff
+        if (isLin) new File(System.getProperty("spato.app-dir"), "lib/config.sh").delete();
+        if (isLin) new File(System.getProperty("spato.app-dir"), "lib/config.sh.orig").delete();
+        if (isMac) new File(System.getProperty("spato.app-dir"), "Contents/MacOS/ApplicationUpdateWrapper").delete();
+        if (isMac) new File(System.getProperty("spato.app-dir"), "Contents/MacOS/JavaApplicationStub64").delete();
+        if (isMac) new File(System.getProperty("spato.app-dir"), "Contents/Info.plist.orig").delete();
+        if (isWin) new File(System.getProperty("spato.app-dir"), "lib\\SPaTo_Prelude.ini").delete();
+        if (isWin) new File(System.getProperty("spato.app-dir"), "lib\\SPaTo_Visual_Explorer.ini").delete();
+        if (isWin) new File(System.getProperty("spato.app-dir"), "lib\\SPaTo_Visual_Explorer.ini.orig").delete();
+      }
+    });
+    updater.run();
     // launch application (on MacOSX and Linux the old launch scripts will do this)
     if (isWin) new net.spato.sve.prelude.ApplicationLauncher().run();
   }
