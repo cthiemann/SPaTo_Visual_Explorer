@@ -20,60 +20,66 @@
 
 package net.spato.sve.app.platform;
 
-import javax.swing.UIManager;
+import java.io.File;
+import java.util.LinkedList;
 
 import net.spato.sve.app.SPaTo_Visual_Explorer;
-import net.spato.sve.app.SPaToDocument;
 import processing.core.PApplet;
 
 
 public class PlatformMagic {
 
   protected SPaTo_Visual_Explorer app = null;
+  protected boolean ready = false;
+  protected LinkedList<File> fileQueue = new LinkedList<File>();
 
-  protected String defaultTitle = null;
-  protected Object macmagic = null;  // holds a MacMagic instance if platform is MACOSX
-  protected Object winmagic = null;  // holds a WindowsMagic instance if platform is WINDOWS
-
-  public PlatformMagic(SPaTo_Visual_Explorer app) {
+  protected PlatformMagic(SPaTo_Visual_Explorer app, String args[]) {
     this.app = app;
-    if (PApplet.platform == PApplet.MACOSX)
-      macmagic = loadMagicClass("Mac");
-    if (PApplet.platform == PApplet.WINDOWS) {
-      winmagic = loadMagicClass("Windows");
-      setSystemLookAndFeel();
-    }
   }
 
-  public void update() {
-    if (PApplet.platform == PApplet.MACOSX) {
-      SPaToDocument doc = app.doc;
-      boolean showDoc = ((doc != null) && !app.fireworks);
-      if (defaultTitle == null) defaultTitle = app.frame.getTitle();
-      app.frame.setTitle(showDoc ? ((doc.getFile() != null) ? doc.getFile().getAbsolutePath() : doc.getName()) : defaultTitle);
-      app.jframe.getRootPane().putClientProperty("Window.documentFile", showDoc ? doc.getFile() : null);
-      app.jframe.getRootPane().putClientProperty("Window.documentModified", showDoc && doc.isModified());
+  public static PlatformMagic createInstance(SPaTo_Visual_Explorer app, String args[]) {
+    String classname = null;
+    switch (PApplet.platform) {
+      case PApplet.MACOSX:  classname = "MacMagic"; break;
+      case PApplet.WINDOWS: classname = "WindowsMagic"; break;
     }
-  }
-
-  protected Object loadMagicClass(String platform) {
-    try {
-      return Class.forName("net.spato.sve.app.platform." + platform + "Magic").
-        getConstructor(new Class[] { SPaTo_Visual_Explorer.class }).
-        newInstance(new Object[] { app });
+    // instantiate appropriate platform magic class (we need to use reflection here to avoid
+    // the classes being loaded on the wrong platform – otherwise we would run into problems
+    // with platform-specific packages like com.apple.eawt or org.boris.winrun4j)
+    if (classname != null) try {
+      return (PlatformMagic)
+        Class.forName("net.spato.sve.app.platform." + classname).
+          getConstructor(new Class[] { SPaTo_Visual_Explorer.class, new String[0].getClass() }).
+            newInstance(new Object[] { app, args });
     } catch (Exception e) {
       e.printStackTrace();
-      return null;
     }
+    // return the default instance
+    return new PlatformMagic(app, args);
   }
 
-  protected boolean setSystemLookAndFeel() {
-    try {
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-      return true;
-    } catch (Exception e) {
-      e.printStackTrace();
-      return false;
+  public void ready() {
+    this.ready = true;
+    while (!fileQueue.isEmpty())
+      openFile(fileQueue.poll());
+  }
+
+  public void update() {}
+
+  public void openFile(File f) {
+    if (ready) {
+      // try to open file
+      if (f.getName().endsWith(".spato"))
+        app.workspace.openDocument(f);
+      else if (f.getName().endsWith(".sve"))
+        app.workspace.openWorkspace(f);
+      else
+        // FIXME: in-app error message?
+        javax.swing.JOptionPane.showMessageDialog(null, "Unknown file type: " + f,
+          "Open File", javax.swing.JOptionPane.ERROR_MESSAGE);
+    } else {
+      // queue request for later (will be processed once ready() gets called)
+      fileQueue.add(f);
     }
   }
 

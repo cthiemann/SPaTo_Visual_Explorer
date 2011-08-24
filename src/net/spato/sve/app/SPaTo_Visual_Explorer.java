@@ -54,7 +54,8 @@ public class SPaTo_Visual_Explorer extends PApplet {
 
   public ExecutorService worker = Executors.newSingleThreadExecutor();  // FIXME: public?
   public Preferences prefs = Preferences.userRoot().node("/net/spato/SPaTo_Visual_Explorer");  // FIXME: should not be public
-  public boolean canHandleOpenFileEvents = false;  // indicates that GUI and workspace are ready to open files  // FIXME: should not be public
+  public boolean canHandleOpenFileEvents = false;  // indicates that GUI and workspace are ready to open files  // FIXME: get rid of this variable
+  protected String cmdLineArgs[] = new String[0];
 
   float t, tt, dt;  // this frame's time, last frame's time, and delta between the two
   boolean screenshot = false;  // if true, draw() will render one frame to PDF
@@ -72,7 +73,7 @@ public class SPaTo_Visual_Explorer extends PApplet {
 
   public void setup() {
     randomSeed(second() + 60*minute() + 3600*hour());
-    platformMagic = new PlatformMagic(this);
+    platformMagic = PlatformMagic.createInstance(this, cmdLineArgs);
     workspace = new Workspace(this);
     checkForUpdates(false);
     // start caching PDF fonts in a new thread (otherwise the program might stall for up
@@ -93,7 +94,8 @@ public class SPaTo_Visual_Explorer extends PApplet {
     tt = millis()/1000.f;
     if (prefs.getBoolean("workspace.auto-recover", false))
       workspace.replaceWorkspace(XMLElement.parse(prefs.get("workspace", "<workspace />")));
-    canHandleOpenFileEvents = true;
+    canHandleOpenFileEvents = true;  // FIXME
+    platformMagic.ready();
   }
 
   public void setupWindow() {
@@ -367,15 +369,12 @@ public class SPaTo_Visual_Explorer extends PApplet {
         println("  [" + i + "] " + args[i]);
     }
     SPaTo_Visual_Explorer applet = new SPaTo_Visual_Explorer();
+    applet.cmdLineArgs = args;
     if (platform == MACOSX) {
       // Wrap the applet into a JFrame for maximum MacMagic!
       // setup various stuff (see PApplet.runSketch)
       applet.sketchPath = System.getProperty("user.dir");
-      applet.args = (args.length > 1) ? subset(args, 1) : new String[0];
-      for (int i = 0; i < args.length; i++) {
-        if (args[i].startsWith(ARGS_SKETCH_FOLDER))
-          applet.sketchPath = args[i].substring(args[i].indexOf('=') + 1);
-      }
+      applet.args = args;
       // setup shiny JFrame
       applet.frame = applet.jframe = new JFrame();
       applet.jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -396,16 +395,6 @@ public class SPaTo_Visual_Explorer extends PApplet {
         String filename = System.getProperty("spato.app-dir") + "/lib/SPaTo_Visual_Explorer.png";
         applet.frame.setIconImage(Toolkit.getDefaultToolkit().createImage(filename));
       } catch (Exception e) { /* ignore */ }
-    }
-    // handle possible command-line arguments
-    if (args.length > 1) {
-      // wait for applet to initialize
-      while (!applet.canHandleOpenFileEvents) try { Thread.sleep(25); } catch (Exception e) {}
-      // parse command line for files
-      File ff[] = new File[args.length - 1];
-      for (int i = 1; i < args.length; i++)
-        ff[i-1] = new File(args[i]);
-      applet.dataTransferHandler.handleDroppedFiles(ff);
     }
   }
 
