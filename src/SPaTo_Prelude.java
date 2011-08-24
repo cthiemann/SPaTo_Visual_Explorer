@@ -84,7 +84,7 @@ public class SPaTo_Prelude implements Runnable {
       Runnable prelude = null;
       // load updated class
       try {
-        URL urls[] = new URL[] { updateCacheFolder.toURI().toURL() };
+        URL urls[] = new URL[] { new File(updateCacheFolder, "common").toURI().toURL() };
         ClassLoader cl = new URLClassLoader(urls, null);
         prelude = (Runnable)cl.loadClass("SPaTo_Prelude").newInstance();
       } catch (Exception e) {
