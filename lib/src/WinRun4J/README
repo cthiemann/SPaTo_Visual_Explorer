@@ -1,0 +1,6 @@
+SPaTo uses WinRun4J by Peter Smith:
+  http://winrun4j.sourceforge.net
+
+The WinRun4J.jar in lib/ is based on version 0.4.2,
+but modified to store file associations in HKEY_CURRENT_USER
+instead of HKEY_CLASSES_ROOT, and to fix some minor issues.

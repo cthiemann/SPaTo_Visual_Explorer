@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<project name="TransparentGUI" default="build">
+
+  <target name="help" description="Show this help text">
+    <java classname="org.apache.tools.ant.Main"><arg value="-projecthelp" /></java>
+  </target>
+
+  <target name="clean" description="Clear build directory">
+    <delete dir="build" />
+  </target>
+
+  <target name="compile" description="Compile all sources">
+	  <mkdir dir="build/classes" />
+    <javac srcdir="src" destdir="build/classes"
+           target="1.5" source="1.5" debug="true" encoding="UTF-8" includeantruntime="false">
+    </javac>
+  </target>
+
+  <target name="build" depends="compile" description="Build jar file">
+    <jar destfile="build/WinRun4J.jar" basedir="build/classes" />
+  </target>
+
+</project>
