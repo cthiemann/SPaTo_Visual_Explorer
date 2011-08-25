@@ -66,12 +66,11 @@ public class SPaTo_Prelude implements Runnable {
     if (System.getProperty("spato.logfile") != null) {
       try {
         os = new FileOutputStream(System.getProperty("spato.logfile"));
+        PrintStream ps = new PrintStream(os, true);
+        System.setOut(ps); System.setErr(ps);
       } catch (IOException e) {
         printErr("failed to redirect output to " + System.getProperty("spato.logfile"));
       }
-      PrintStream ps = new PrintStream(os, true);
-      System.setOut(ps);
-      System.setErr(ps);
     }
     return os;
   }
