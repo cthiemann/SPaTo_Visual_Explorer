@@ -88,21 +88,6 @@ public class WindowsMagic extends PlatformMagic implements ActivationListener {
     FileAssociations.CURRENT_USER.save(fa);
   }
 
-  public void bringToFront() {
-    final SPaTo_Visual_Explorer app = this.app;
-    java.awt.EventQueue.invokeLater(new Runnable() {
-      public void run() {
-        app.frame.setVisible(true);
-        app.frame.setExtendedState(app.frame.getExtendedState() & ~java.awt.Frame.ICONIFIED);
-        app.frame.setAlwaysOnTop(true);
-        app.frame.toFront();
-        app.frame.requestFocus();
-        app.requestFocusInWindow();
-        app.frame.setAlwaysOnTop(false);
-      }
-    });
-  }
-
   public void activate(String cmd) {
     String filename = cmd.trim();
     if (filename.startsWith("\"") && filename.endsWith("\""))

@@ -67,8 +67,23 @@ public class PlatformMagic {
 
   public void update() {}
 
+  public void bringToFront() {
+    final SPaTo_Visual_Explorer app = this.app;
+    java.awt.EventQueue.invokeLater(new Runnable() {
+      public void run() {
+        app.frame.setVisible(true);
+        app.frame.setExtendedState(app.frame.getExtendedState() & ~java.awt.Frame.ICONIFIED);
+        app.frame.setAlwaysOnTop(true);
+        app.frame.toFront();
+        app.frame.requestFocus();
+        app.requestFocusInWindow();
+        app.frame.setAlwaysOnTop(false);
+      }
+    });
+  }
+
   public void openFile(File f) {
-    if (ready) {
+    if (ready) {  // FIXME: thread-safety?
       // try to open file
       if (f.getName().endsWith(".spato"))
         app.workspace.openDocument(f);

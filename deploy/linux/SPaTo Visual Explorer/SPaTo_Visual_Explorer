@@ -11,8 +11,27 @@ if [ "$1" == "--restart" ]; then
   shift  # remove "--restart" from arguments
 fi
 
+mkdir -p ~/.spato
+PIDFILE=~/.spato/lock
+PIPE=~/.spato/pipe
+
+if [ -e "$PIDFILE" ] && kill -0 `cat "$PIDFILE"`; then
+  # an instance of SPaTo is already running
+  # -> send command line arguments into pipe and quit
+  for f in "$@"; do
+    echo "$f" > "$PIPE"
+  done
+  exit
+fi
+
+echo $$ > "$PIDFILE"
+mkfifo "$PIPE"
+
 SCRIPT="$PWD/$(basename "$0")"
 OPTIONS="$OPTIONS -splash:lib/splash.gif -cp lib"
 
 java $OPTIONS -Dspato.app-dir="$PWD" -Dspato.exec="$SCRIPT" SPaTo_Prelude "$@"
+
+rm "$PIDFILE"
+rm "$PIPE"
 

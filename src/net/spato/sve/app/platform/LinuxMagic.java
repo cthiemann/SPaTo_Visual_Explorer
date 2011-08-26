@@ -23,6 +23,7 @@ package net.spato.sve.app.platform;
 import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import javax.swing.UIManager;
@@ -64,6 +65,35 @@ public class LinuxMagic extends PlatformMagic {
     } catch (Exception e) {
       e.printStackTrace();
     }
+    // set up pipe listener
+    new Thread(new Runnable() {
+      public void run() {
+        while (true) {
+          BufferedReader reader = null;
+          try {
+            System.out.println("--- [pipe] listening to ~/.spato/pipe");
+            // file opening will block if nothing is written to the pipe
+            reader = new BufferedReader(new InputStreamReader(
+              new FileInputStream(new File(System.getProperty("user.home"), ".spato/pipe"))));
+            // something has been written to the pipe
+            String filename = null;
+            while ((filename = reader.readLine()) != null) {
+              System.out.println("--- [pipe] read: " + filename);
+              if (!filename.trim().equals(""))
+                openFile(new File(filename.trim()));
+              bringToFront();
+            }
+          } catch (Exception e) {
+            System.err.println("!!! [pipe] something went wrong");
+            e.printStackTrace();
+          } finally {
+            try { reader.close(); } catch (Exception e) {}
+          }
+          // sleep a little and then start listening again...
+          try { Thread.sleep(250); } catch (Exception e) {}
+        }
+      }
+    }).start();
     // process command line arguments
     for (String filename : args)
       openFile(new File(filename));
