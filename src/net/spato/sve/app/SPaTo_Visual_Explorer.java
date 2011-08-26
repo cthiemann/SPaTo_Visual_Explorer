@@ -23,7 +23,6 @@ package net.spato.sve.app;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -47,9 +46,9 @@ import de.cthiemann.tGUI.*;
 @SuppressWarnings("serial")
 public class SPaTo_Visual_Explorer extends PApplet {
 
-  public static final String VERSION = "1.2.2";
+  public static final String VERSION = "1.2.3";
   public static final String VERSION_DEBUG = "beta";
-  public static final String VERSION_TIMESTAMP = "20110604T220000";
+  public static final String VERSION_TIMESTAMP = "20110831T120000";
   public static final String VERSION_DATE = new SimpleDateFormat("MMMM d, yyyy", Locale.US).format(parseISO8601(VERSION_TIMESTAMP));
 
   public ExecutorService worker = Executors.newSingleThreadExecutor();  // FIXME: public?
@@ -380,10 +379,6 @@ public class SPaTo_Visual_Explorer extends PApplet {
     } else {
       // pass the constructed applet to PApplet.runSketch
       PApplet.runSketch(new String[] { "SPaTo_Visual_Explorer" }, applet);
-      if (platform == LINUX) try {
-        String filename = System.getProperty("spato.app-dir") + "/lib/SPaTo_Visual_Explorer.png";
-        applet.frame.setIconImage(Toolkit.getDefaultToolkit().createImage(filename));
-      } catch (Exception e) { /* ignore */ }
     }
   }
 

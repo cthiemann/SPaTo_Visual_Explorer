@@ -40,6 +40,7 @@ public class PlatformMagic {
   public static PlatformMagic createInstance(SPaTo_Visual_Explorer app, String args[]) {
     String classname = null;
     switch (PApplet.platform) {
+      case PApplet.LINUX:   classname = "LinuxMagic"; break;
       case PApplet.MACOSX:  classname = "MacMagic"; break;
       case PApplet.WINDOWS: classname = "WindowsMagic"; break;
     }

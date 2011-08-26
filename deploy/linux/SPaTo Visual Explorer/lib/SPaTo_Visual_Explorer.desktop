@@ -4,6 +4,5 @@ Type=Application
 Name=SPaTo Visual Explorer
 Comment=Interactively explore complex networks
 Icon=SPaTo_Visual_Explorer
-Exec=/home/ct/Desktop/application.linux/SPaTo_Visual_Explorer/SPaTo_Visual_Explorer %F
 Categories=Education;Science;DataVisualization
 MimeTypes=application/x-spato;application/x-spato-uncompressed;application/x-spato-workspace

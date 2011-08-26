@@ -53,7 +53,8 @@ public class Updater extends Thread {
   protected SPaTo_Visual_Explorer app = null;
 
   boolean force = false;
-  String updateURL = "http://update.spato.net/latest/";
+  // String updateURL = "http://update.spato.net/latest/";
+  String updateURL = "file:///media/sf_host-home/Documents/Processing/SPaTo/SPaTo_Visual_Explorer/build/update/";
   String releaseNotesURL = "http://update.spato.net/release-notes/";
   String indexName = null;
   String appRootFolder = null;
@@ -202,7 +203,7 @@ public class Updater extends Thread {
   public String[] getRestartCmd() {
     switch (PApplet.platform) {
       case PApplet.LINUX:
-        return new String[] { appRootFolder + "SPaTo_Visual_Explorer", "--restart" };
+        return new String[] { System.getProperty("spato.exec"), "--restart" };
       case PApplet.MACOSX:
         return new String[] { appRootFolder + "Contents/Resources/restart.sh" };
       case PApplet.WINDOWS:

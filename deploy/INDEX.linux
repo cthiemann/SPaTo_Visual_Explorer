@@ -36,6 +36,10 @@
     <remote path="linux/SPaTo_Visual_Explorer"/>
     <local path="SPaTo_Visual_Explorer"/>
   </file>
+  <file executable="true">
+    <remote path="linux/xdg.sh"/>
+    <local path="lib/xdg.sh"/>
+  </file>
   <file>
     <remote path="linux/SPaTo_Visual_Explorer.desktop"/>
     <local path="lib/SPaTo_Visual_Explorer.desktop"/>
@@ -59,5 +63,9 @@
   <file>
     <remote path="linux/spato-mime.xml"/>
     <local path="lib/spato-mime.xml"/>
+  </file>
+  <file>
+    <remote path="linux/splash.gif"/>
+    <local path="lib/splash.gif"/>
   </file>
 </update>
