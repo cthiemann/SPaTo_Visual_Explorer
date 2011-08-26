@@ -1,5 +1,16 @@
 <?xml version="1.0"?>
 <release-notes>
+  <release version="1.2.3" debug="beta" date="20110831T120000">
+    <note>Linux and Windows users, please go to http://spato.net/download/ and install this update manually.</note>
+    <item type="enh">Pressing <b>Shift-S</b> saves the current node layout in addition to the PDF screenshot</item>
+    <item type="enh">Better system integration on Windows and Linux</item>
+    <item type="enh">Improved update mechanism and faster application startup</item>
+    <item type="enh">Various minor bug fixes</item>
+    <item type="enh">Source code ported from Processing to pure Java
+      <div style="margin: 0.5em 0; font-size: 80%;">SPaTo still uses the awesome Processing libraries but can now
+        be built from the sources without the Processing Development Environment.  Also, the cross-platform tool
+        Apache Ant is now used as the build system (instead of <tt>make</tt>).</div></item>
+  </release>
   <release version="1.2.2" debug="beta" date="20110604T220000">
     <note>Assuming that no immediate bug-fixes are necessary, this will become the public release version.</note>
     <item type="new">Now available for the Linux platform</item>
