@@ -57,8 +57,6 @@ public class SPaTo_Visual_Explorer extends PApplet {
   protected String cmdLineArgs[] = new String[0];
 
   float t, tt, dt;  // this frame's time, last frame's time, and delta between the two
-  boolean screenshot = false;  // if true, draw() will render one frame to PDF
-  boolean layoutshot = false;  // if true (and screenshot == true), draw() will output coordinates of the current node positions
 
   boolean resizeRequest = false;
   int resizeWidth, resizeHeight;
@@ -153,24 +151,10 @@ public class SPaTo_Visual_Explorer extends PApplet {
     if (resizeRequest) { resizeRenderer(resizeWidth, resizeHeight); resizeRequest = false; }  // handle resize (duplicated from PApplet.run())
     t = millis()/1000.f; dt = t - tt; tt = t;
     if (fireworks && fw.alpha == 1) { fw.draw(); return; }
-    // prepare drawing
-    if (screenshot) {
-      String filename = "SVE_screenshot_" + (new SimpleDateFormat("yyyyMMdd'T'HHmmss").format(new Date())) + ".pdf";
-      filename = System.getProperty("user.home") + ((platform == MACOSX) ? "/Desktop" : "") + File.separator + filename;
-      if (layoutshot) doc.view.writeLayout(filename.substring(0, filename.length() - 4) + "_layout.txt");
-      beginRecord(PDF, filename);
-      SPaToView.fastNodes = false;  // always draw circles in screenshots
-      console.logNote("Recording screenshot to " + filename);
-    } else
-      background(255);
     // draw
+    background(255);
     if (doc != null)
       doc.view.draw(g);
-    // post-drawing stuff
-    if (screenshot) {
-      endRecord();
-      screenshot = false;
-    }
     gui.update(true);
     // fireworks transition drawing and finishing
     if (fireworks) {
@@ -252,8 +236,7 @@ public class SPaTo_Visual_Explorer extends PApplet {
       case '=': doc.view.zoom[doc.view.viewMode] = 1; doc.view.xoff[doc.view.viewMode] = doc.view.yoff[doc.view.viewMode] = 0; return;
       case '[': changeZoom(.5f); return;
       case ']': changeZoom(2); return;
-      case 's': screenshot = true; return;
-      case 'S': screenshot = true; layoutshot = true; return;
+      case 'S': new Screenshot(this).save(); return;
       case 'r': // random walk
         //if (doc.view.hasLinks && (doc.view.links.index[doc.view.r].length > 0))
         //  doc.view.setRootNode(doc.view.links.index[doc.view.r][floor(random(doc.view.links.index[doc.view.r].length))]);

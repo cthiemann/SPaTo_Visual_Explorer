@@ -448,7 +448,17 @@ public class SPaToView {
   float viewWidth = Float.NaN;
   float aNodes = 0, aLinks = 0, aSkeleton = 0, aNeighbors = 0, aNetwork = 0, aLabels = 0;
 
-  public void draw(PGraphics g) {
+  protected boolean animate = true;
+  protected float animate(float currentValue, float targetValue) {
+    return (animate && !Float.isNaN(currentValue))
+      ? currentValue + 3*(targetValue - currentValue)*PApplet.min(app.dt, 1/3.f)
+      : targetValue;
+  }
+
+  public void draw(PGraphics g) { draw(g, true); }
+
+  public void draw(PGraphics g, boolean animate) {
+    this.animate = animate;
     if (Float.isNaN(viewWidth)) viewWidth = g.width;
     if (!hasNodes || (!hasMapLayout && !hasTomLayout)) return;  // nothing to draw
     if ((showNeighbors || showNetwork) && !hasLinks) {
@@ -456,12 +466,12 @@ public class SPaToView {
     Projection p = ((viewMode == VIEW_MAP) || !hasTomLayout) ? projMap : layouts[0].proj;
     boolean linksVisible = (showLinks && !showSkeleton && !showNeighbors && !showNetwork) ||
       (showSkeleton && showLinksWithSkeleton) || (showNeighbors && showLinksWithNeighbors) || (showNetwork && showLinksWithNetwork);
-    aNodes += 3*((showNodes ? 1 : 0) - aNodes)*PApplet.min(app.dt, 1/3.f);
-    aLinks += 3*((linksVisible ? 1 : 0) - aLinks)*PApplet.min(app.dt, 1/3.f);
-    aSkeleton += 3*((showSkeleton ? 1 : 0) - aSkeleton)*PApplet.min(app.dt, 1/3.f);
-    aNeighbors += 3*((showNeighbors ? 1 : 0) - aNeighbors)*PApplet.min(app.dt, 1/3.f);
-    aNetwork += 3*((showNetwork ? 1 : 0) - aNetwork)*PApplet.min(app.dt, 1/3.f);
-    aLabels += 3*((showLabels ? 1 : 0) - aLabels)*PApplet.min(app.dt, 1/3.f);
+    aNodes = animate(aNodes, (showNodes ? 1 : 0));
+    aLinks = animate(aLinks, (linksVisible ? 1 : 0));
+    aSkeleton = animate(aSkeleton, (showSkeleton ? 1 : 0));
+    aNeighbors = animate(aNeighbors, (showNeighbors ? 1 : 0));
+    aNetwork = animate(aNetwork, (showNetwork ? 1 : 0));
+    aLabels = animate(aLabels, (showLabels ? 1 : 0));
     // get current data
     float[] val = null;
     if (hasData) {
@@ -485,7 +495,7 @@ public class SPaToView {
     p.setScalingToFitWithin(wrap ? g.width : .9f*g.width, .9f*g.height);
     if (wrap) {  // FIXME: wrapping should be handled by the projection
       float targetViewWidth = (wrap ? g.width : .9f*g.width)*zoom[viewMode];  // width of the scaled data (used for wrapping)
-      viewWidth += 3*(targetViewWidth - viewWidth)*PApplet.min(app.dt, 1/3.f);
+      viewWidth = animate(viewWidth, targetViewWidth);
       while (xoff[viewMode] > +viewWidth) { xoff[viewMode] -= viewWidth; for (int i = 0; i < NN; i++) nodes[i].x -= viewWidth; }
       while (xoff[viewMode] < -viewWidth) { xoff[viewMode] += viewWidth; for (int i = 0; i < NN; i++) nodes[i].x += viewWidth; }
     }
@@ -496,9 +506,9 @@ public class SPaToView {
       float tx = invis ? nodes[i].x : p.sx*(p.x[i] - p.cx)*zoom[viewMode] + xoff[viewMode] + g.width/2;
       float ty = invis ? nodes[i].y : p.sy*(p.y[i] - p.cy)*zoom[viewMode] + yoff[viewMode] + g.height/2;
       float ta = invis ? 0 : 1;
-      nodes[i].x = Float.isNaN(nodes[i].x) ? tx : nodes[i].x + 3*(tx - nodes[i].x)*PApplet.min(app.dt, 1/3.f);
-      nodes[i].y = Float.isNaN(nodes[i].y) ? ty : nodes[i].y + 3*(ty - nodes[i].y)*PApplet.min(app.dt, 1/3.f);
-      nodes[i].a += 3*(ta - nodes[i].a)*PApplet.min(app.dt, 1/3.f);
+      nodes[i].x = animate(nodes[i].x, tx);
+      nodes[i].y = animate(nodes[i].y, ty);
+      nodes[i].a = animate(nodes[i].a, ta);
       if (wrap) {
         tmpx[i] = nodes[i].x; tmpy[i] = nodes[i].y;
         if (nodes[i].x - g.width/2 > +viewWidth/2) nodes[i].x -= viewWidth;
@@ -628,7 +638,7 @@ public class SPaToView {
     // draw nodes
     g.rectMode(PApplet.CENTER);
     float nodeSize_target = nodeSizeFactor*PApplet.sqrt(PApplet.min(g.width, g.height))*PApplet.sqrt(zoom[viewMode]);
-    nodeSize += 3*(nodeSize_target - nodeSize)*PApplet.min(app.dt, 1/3.f);
+    nodeSize = animate(nodeSize, nodeSize_target);
     if (aNodes > 1/192.f) {
       g.noStroke();
       for (int i = 0; i < NN; i++) {
