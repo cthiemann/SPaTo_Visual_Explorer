@@ -164,4 +164,46 @@ public class FileDialogUtils {
     }
   }
 
+  public static File selectDirectory(SPaTo_Visual_Explorer app) {
+    return selectDirectory(app, null, null);
+  }
+  public static File selectDirectory(SPaTo_Visual_Explorer app, String title) {
+    return selectDirectory(app, title, null);
+  }
+  public static File selectDirectory(SPaTo_Visual_Explorer app, File selected) {
+    return selectDirectory(app, null, selected);
+  }
+  public static File selectDirectory(final SPaTo_Visual_Explorer app, final String title, final File selected) {
+    try {
+      selectFilesResult = new File[1];
+      SwingUtilities.invokeAndWait(new Runnable() {
+        public void run() {
+          if (app.platform == PApplet.MACOSX) {
+            // use FileDialog instead of JFileChooser as per Apple recommendation
+            System.setProperty("apple.awt.fileDialogForDirectories", "true");
+            FileDialog fd = new FileDialog(app.getParentFrame(), (title != null) ? title : "Select directory");
+            if (selected != null)
+              fd.setDirectory(selected.getAbsolutePath());
+            fd.setVisible(true);
+            selectFilesResult[0] = new File(fd.getDirectory(), fd.getFile());
+            System.setProperty("apple.awt.fileDialogForDirectories", "false");
+          } else {
+            JFileChooser fc = new JFileChooser();
+            fc.setDialogTitle((title != null) ? title : "Select directory");
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            if (selected != null)
+              fc.setSelectedFile(selected);
+            if (fc.showDialog(app.getParentFrame(), "Select") == JFileChooser.APPROVE_OPTION)
+              selectFilesResult[0] = fc.getSelectedFile();
+          }
+        }
+      });
+      return selectFilesResult[0];
+    } catch (Exception e) {
+      app.console.logError("Something went wrong: ", e);
+      e.printStackTrace();
+      return null;
+    }
+  }
+
 }
