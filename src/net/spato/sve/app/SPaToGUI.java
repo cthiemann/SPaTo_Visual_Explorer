@@ -67,7 +67,7 @@ public class SPaToGUI extends TransparentGUI {
   int searchUniqueMatch = -1;
 
   public SPaToGUI(SPaTo_Visual_Explorer app) {
-    super(app);
+    super(app, "/net/spato/SPaTo_Visual_Explorer/tGUI");
     this.app = app;
     fnSmall = createFont("GillSans", fnsizeSmall);
     fnMedium = createFont("GillSans", fnsizeMedium);
@@ -164,8 +164,7 @@ public class SPaToGUI extends TransparentGUI {
         // if (ext != null) tooltip += "[color=127,127,127]" + ext + "[/color]";
         // tooltip += "\n";
       }
-      btnWorkspaceRecovery.setToolTip(tooltip);
-      btnWorkspaceRecovery.getToolTip().setID("workspace##recover");
+      btnWorkspaceRecovery.setToolTip(tooltip, TToolTip.INFO);
       panel = createPanel(new TBorderLayout());
       panel.setPadding(5, 10);
       panel.add(createCompactGroup(new TComponent[] { btnWorkspaceRecovery }, 2), TBorderLayout.WEST);
