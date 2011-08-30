@@ -1,0 +1,11 @@
+This is the Processing PDF library from revision r8413.
+We use this rather than the one from r7148 to avoid the costly
+PGraphicsPDF.listFonts() call.  Includes some slight modification
+to make it work with the modified r7148 core.
+
+The Procesing core library is released under the GNU Lesser
+General Public License, and is part of the Processing project:
+http://www.processing.org/
+  Copyright (c) 2004-11 Ben Fry and Casey Reas
+  Copyright (c) 2001-04 Massachusetts Institute of Technology
+

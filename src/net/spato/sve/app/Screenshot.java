@@ -66,13 +66,14 @@ public class Screenshot {
 
   protected void savePDF() {
     app.console.logNote("Recording screenshot to " + getBasename() + ".pdf");
-    PGraphics g = app.createGraphics(getWidth(), getHeight(), PApplet.PDF, getBasename() + ".pdf");
-    g.beginDraw(); view.draw(g, false); g.endDraw();
+    PGraphics g = app.createGraphics(getWidth(), getHeight(), PGraphics.PDF, getBasename() + ".pdf");
+    g.hint(PGraphics.ENABLE_NATIVE_FONTS);
+    g.beginDraw(); g.textMode(PGraphics.SHAPE); view.draw(g, false); g.endDraw();
     g.dispose();
   }
 
   protected void savePNG() {
-    PGraphics g = app.createGraphics(getWidth(), getHeight(), PApplet.JAVA2D);
+    PGraphics g = app.createGraphics(getWidth(), getHeight(), PGraphics.JAVA2D);
     g.beginDraw(); g.smooth(); view.draw(g, false); g.endDraw();
     g.save(getBasename() + ".png");
     g.dispose();
@@ -82,7 +83,7 @@ public class Screenshot {
   protected void saveLayout() {
     if (!getSavePDF() && !getSavePNG()) {
       // make sure node positions are correct -- FIXME: break up SPaToView.draw() into smaller functions
-      PGraphics g = app.createGraphics(getWidth(), getHeight(), PApplet.JAVA2D);
+      PGraphics g = app.createGraphics(getWidth(), getHeight(), PGraphics.JAVA2D);
       g.beginDraw(); view.draw(g, false); g.endDraw();
       g.dispose();
     }

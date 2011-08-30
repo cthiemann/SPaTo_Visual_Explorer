@@ -73,13 +73,6 @@ public class SPaTo_Visual_Explorer extends PApplet {
     platformMagic = PlatformMagic.createInstance(this, cmdLineArgs);
     workspace = new Workspace(this);
     checkForUpdates(false);
-    // start caching PDF fonts in a new thread (otherwise the program might stall for up
-    // to a minute or more when taking the first screenshot)
-    Thread th = new Thread(new Runnable() {
-      public void run() { PGraphicsPDF.listFonts(); }
-    }, "PDF Font Caching");
-    th.setPriority(Thread.MIN_PRIORITY);
-    th.start();
     // setup window
     setupWindow();
     // setup GUI
