@@ -236,6 +236,7 @@ public class SPaTo_Visual_Explorer extends PApplet {
       case '=': doc.view.zoom[doc.view.viewMode] = 1; doc.view.xoff[doc.view.viewMode] = doc.view.yoff[doc.view.viewMode] = 0; return;
       case '[': changeZoom(.5f); return;
       case ']': changeZoom(2); return;
+      case 's': new Screenshot(this).showSettingsWindow(); return;
       case 'S': new Screenshot(this).save(); return;
       case 'r': // random walk
         //if (doc.view.hasLinks && (doc.view.links.index[doc.view.r].length > 0))

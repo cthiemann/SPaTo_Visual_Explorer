@@ -134,6 +134,8 @@ public class SPaToGUI extends TransparentGUI {
       { "Save workspace", "workspace##save" },
       { "Save workspace as\u2026", "workspace##saveAs" },
       null,
+      { "Take screenshot\u2026", "screenshot" },
+      null,
       { "Check for updates", "update" }
     }));
     panel.add(createCompactGroup(new TComponent[] { choiceNetwork }, 5), TBorderLayout.WEST);
@@ -584,7 +586,9 @@ public class SPaToGUI extends TransparentGUI {
         doc.setSelectedSnapshot(target, +1, true);
       else if (argv[2].equals("prev"))
         doc.setSelectedSnapshot(target, -1, true);
-    } else if (argv[0].equals("update"))
+    } else if (argv[0].equals("screenshot"))
+      new Screenshot(app).showSettingsWindow();
+    else if (argv[0].equals("update"))
       app.checkForUpdates(true);
     update();
   }
