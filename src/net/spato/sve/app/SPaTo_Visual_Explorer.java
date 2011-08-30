@@ -48,7 +48,7 @@ public class SPaTo_Visual_Explorer extends PApplet {
 
   public static final String VERSION = "1.2.3";
   public static final String VERSION_DEBUG = "beta";
-  public static final String VERSION_TIMESTAMP = "20110831T120000";
+  public static final String VERSION_TIMESTAMP = "20110830T190000";
   public static final String VERSION_DATE = new SimpleDateFormat("MMMM d, yyyy", Locale.US).format(parseISO8601(VERSION_TIMESTAMP));
 
   public ExecutorService worker = Executors.newSingleThreadExecutor();  // FIXME: public?

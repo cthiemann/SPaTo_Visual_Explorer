@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
 <release-notes>
-  <release version="1.2.3" debug="beta" date="20110831T120000">
-    <note>Linux and Windows users, please go to http://spato.net/download/ and install this update manually.</note>
-    <item type="enh">Pressing <b>Shift-S</b> saves the current node layout in addition to the PDF screenshot</item>
+  <release version="1.2.3" debug="beta" date="20110830T190000">
+    <note>Linux and Windows users, please go to http://spato.net/download and install this update manually.</note>
+    <item type="new">Screenshot feature can now save PDF, PNG and export the current node layout
+      <div style="margin: 0.5em 0; font-size: 80%;">Press <b>S</b> to bring up the screenshot settings window,
+        which is also accessible via the context menu of the network drop-down (in the upper-left corner).</div></item>
     <item type="enh">Better system integration on Windows and Linux</item>
     <item type="enh">Improved update mechanism and faster application startup</item>
-    <item type="enh">Various minor bug fixes</item>
+    <item type="fix">Various minor bug fixes</item>
     <item type="enh">Source code ported from Processing to pure Java
       <div style="margin: 0.5em 0; font-size: 80%;">SPaTo still uses the awesome Processing libraries but can now
         be built from the sources without the Processing Development Environment.  Also, the cross-platform tool
