@@ -53,9 +53,8 @@ public class Updater extends Thread {
   protected SPaTo_Visual_Explorer app = null;
 
   boolean force = false;
-  // String updateURL = "http://update.spato.net/latest/";
-  String updateURL = "file:///media/sf_host-home/Documents/Processing/SPaTo/SPaTo_Visual_Explorer/build/update/";
-  String releaseNotesURL = "http://update.spato.net/release-notes/";
+  String updateURL = System.getProperty("spato.update.url", "http://update.spato.net/latest/");
+  String releaseNotesURL = System.getProperty("spato.release-notes.url", "http://update.spato.net/release-notes/");
   String indexName = null;
   String appRootFolder = null;
   String cacheFolder = null;

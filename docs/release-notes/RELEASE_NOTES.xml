@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <release-notes>
+  <release version="1.2.3_01" debug="beta" date="20110831T160000">
+    <item type="fix">Fixed bug in updater</item>
+  </release>
   <release version="1.2.3" debug="beta" date="20110830T190000">
     <note>Linux and Windows users, please go to http://spato.net/download and install this update manually.</note>
     <item type="new">Screenshot feature can now save PDF, PNG and export the current node layout
