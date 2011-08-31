@@ -200,7 +200,7 @@
     <ftp server="${ftp.host}" userid="${ftp.user}" password="${ftp.password}"
          remotedir="${ftp.dir.download}" action="mkdir" />
     <ftp server="${ftp.host}" userid="${ftp.user}" password="${ftp.password}"
-         remotedir="${ftp.dir.download}">
+         remotedir="${ftp.dir.download}" verbose="yes">
       <fileset dir="build/download" />
     </ftp>
 
@@ -208,7 +208,7 @@
     <ftp server="${ftp.host}" userid="${ftp.user}" password="${ftp.password}"
          remotedir="${ftp.dir.update}" action="mkdir" />
     <ftp server="${ftp.host}" userid="${ftp.user}" password="${ftp.password}"
-         remotedir="${ftp.dir.update}">
+         remotedir="${ftp.dir.update}" verbose="yes">
       <fileset dir="build/update" />
     </ftp>
 
@@ -216,7 +216,7 @@
     <ftp server="${ftp.host}" userid="${ftp.user}" password="${ftp.password}"
          remotedir="${ftp.dir.release-notes}" action="mkdir" />
     <ftp server="${ftp.host}" userid="${ftp.user}" password="${ftp.password}"
-         remotedir="${ftp.dir.release-notes}">
+         remotedir="${ftp.dir.release-notes}" verbose="yes">
       <fileset dir="docs/release-notes" />
     </ftp>
 
